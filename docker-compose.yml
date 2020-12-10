@@ -1,7 +1,6 @@
 version: '3'
 
 services:
-
   mysql:
     image: mariadb:latest
     container_name: api_mysql
@@ -18,7 +17,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: api_backend
-    expose:
+    ports:
       - "8080:8080"
     env_file:
       - .env

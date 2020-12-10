@@ -1,3 +1,11 @@
+# IDE config files
 .idea/
+
+# Env files for docker
 .env
+
+# API Executable
 api.exe
+
+# Golang dependencies
+vendor/
