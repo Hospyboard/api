@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+
+  mysql:
+    image: mariadb:latest
+    volumes:
+      - hospyboard_db_data:/var/lib/mysql
+    restart: always
+    networks:
+      - hospyboard-api
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hospyboard_api
+      MYSQL_USER: hospyboard
+      MYSQL_PASSWORD: kqkjdBkhbE(-(&&19!
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api_backend
+    expose:
+      - 8080
+    networks:
+      - hospyboard-api
+
+networks:
+  hospyboard-api:
+    driver: 'bridge'
+
+volumes:
+  hospyboard_db_data:
