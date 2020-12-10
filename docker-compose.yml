@@ -4,16 +4,14 @@ services:
 
   mysql:
     image: mariadb:latest
+    container_name: api_mysql
     volumes:
-      - hospyboard_db_data:/var/lib/mysql
+      - api_db_data:/var/lib/mysql
     restart: always
     networks:
-      - hospyboard-api
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: hospyboard_api
-      MYSQL_USER: hospyboard
-      MYSQL_PASSWORD: kqkjdBkhbE(-(&&19!
+      - api_net
+    env_file:
+      - .env
 
   api:
     build:
@@ -22,14 +20,14 @@ services:
     container_name: api_backend
     expose:
       - "8080:8080"
-    environment:
-      - API_PORT=8080
+    env_file:
+      - .env
     networks:
-      - hospyboard-api
+      - api_net
 
 networks:
-  hospyboard-api:
+  api_net:
     driver: 'bridge'
 
 volumes:
-  hospyboard_db_data:
+  api_db_data:
