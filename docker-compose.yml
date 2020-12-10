@@ -12,6 +12,14 @@ services:
     env_file:
       - .env
 
+  jenkins:
+    image: jenkins/jenkins
+    container_name: api_jenkins
+    volumes:
+      - api_jenkins_data:/var/jenkins_home
+    ports:
+      - "8181:8080"
+
   api:
     build:
       context: .
@@ -30,3 +38,4 @@ networks:
 
 volumes:
   api_db_data:
+  api_jenkins_data:
