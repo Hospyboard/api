@@ -17,6 +17,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: api_backend
+    restart: always
     ports:
       - "8080:8080"
     env_file:
@@ -30,4 +31,3 @@ networks:
 
 volumes:
   api_db_data:
-  api_jenkins_data:

@@ -4,8 +4,8 @@
 # Env files for docker
 .env
 
-# API Executable
-api.exe
+# Idea project file
+*.iml
 
-# Golang dependencies
-vendor/
+# Target build folder
+target
