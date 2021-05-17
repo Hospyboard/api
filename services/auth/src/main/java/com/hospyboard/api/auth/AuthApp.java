@@ -1,12 +1,11 @@
 package com.hospyboard.api.auth;
 
-import com.hospyboard.api.auth.ressources.AuthResource;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@SpringBootApplication(scanBasePackages = "com.hospyboard.api")
 public class AuthApp {
-
     public static void main(String[] args) {
-        SpringApplication.run(AuthResource.class, args);
+        SpringApplication.run(AuthApp.class, args);
     }
-
 }
