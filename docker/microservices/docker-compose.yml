@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  bff:
+    build:
+      context: ../../services/auth
+    container_name: hospyboard_auth
+    hostname: hb_auth
+    environment:
+      - "SPRING_PROFILES_ACTIVE=docker"
+    ports:
+      - 8080:8080
