@@ -1,0 +1,25 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:13.2
+    container_name: hospyboard_db
+    hostname: db
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ../config/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: azertyuiop
+      POSTGRES_DB: hospybord_devel
+    ports:
+      - 5432:5432
+
+networks:
+  default:
+    name: hospyboard_network
+
+volumes:
+  db_data:
