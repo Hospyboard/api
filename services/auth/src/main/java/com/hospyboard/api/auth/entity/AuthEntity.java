@@ -5,7 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
-@Entity
+@Entity(name = "auth_entity")
 @Getter
 @Setter
 public class AuthEntity {
@@ -13,8 +13,8 @@ public class AuthEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Id
-    @GeneratedValue(generator = "UUID")
+    /*@Id
+    @GeneratedValue(generator = "UUID")*/
     private String uuid;
 
     private String email;

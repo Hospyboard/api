@@ -25,8 +25,13 @@ public class AuthService {
     }
 
     public AuthDTO login(final AuthDTO response) {
-        final AuthEntity authEntity = authRepository.getAuthEntityByUuid(response.getEmail());
+        AuthEntity authEntity = authRepository.getAuthEntityByUuid(response.getEmail());
 
+        if (authEntity == null) {
+            authEntity = new AuthEntity()
+                    .setEmail(response.getEmail())
+                    .setPassword(response.getPassword());
+        }
         return authMapper.toDto(authRepository.save(authEntity));
     }
 

@@ -6,9 +6,11 @@ import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface AuthMapper {
-    @Mapping(target = "uuid", source = "id")
+    //@Mapping(target = "uuid", source = "id")
+    @Mapping(source = "email", target = "email")
+    @Mapping(source = "password", target = "password")
     AuthEntity toEntity(AuthDTO dto);
 
     @InheritInverseConfiguration
