@@ -1,0 +1,1 @@
+CREATE DATABASE hospybord_auth;
