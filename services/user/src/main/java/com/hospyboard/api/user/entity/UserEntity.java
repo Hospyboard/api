@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity(name = "auth_entity")
 @Getter
 @Setter
-public class AuthEntity {
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

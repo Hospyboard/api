@@ -1,11 +1,11 @@
 package com.hospyboard.api.user.repository;
 
-import com.hospyboard.api.user.entity.AuthEntity;
+import com.hospyboard.api.user.entity.UserEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AuthRepository extends CrudRepository<AuthEntity, Long> {
-    AuthEntity getAuthEntityByUuid(final String uuid);
-    AuthEntity getAuthEntityByEmail(final String email);
+public interface UserRepository extends CrudRepository<UserEntity, Long> {
+    UserEntity getAuthEntityByUuid(final String uuid);
+    UserEntity getAuthEntityByEmail(final String email);
 }

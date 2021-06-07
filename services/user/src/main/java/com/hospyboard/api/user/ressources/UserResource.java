@@ -1,16 +1,16 @@
 package com.hospyboard.api.user.ressources;
 
-import com.hospyboard.api.user.dto.AuthDTO;
-import com.hospyboard.api.user.services.AuthService;
+import com.hospyboard.api.user.dto.UserDTO;
+import com.hospyboard.api.user.services.UserService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class AuthResource {
+public class UserResource {
 
-    private final AuthService service;
+    private final UserService service;
 
-    public AuthResource(AuthService authService) {
-        this.service = authService;
+    public UserResource(UserService userService) {
+        this.service = userService;
     }
 
     @RequestMapping
@@ -24,7 +24,7 @@ public class AuthResource {
     }
 
     @PostMapping("/auth/login")
-    public AuthDTO login(@RequestBody AuthDTO request) {
+    public UserDTO login(@RequestBody UserDTO request) {
         return this.service.login(request);
     }
 

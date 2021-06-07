@@ -1,38 +1,38 @@
 package com.hospyboard.api.user.services;
 
-import com.hospyboard.api.user.dto.AuthDTO;
-import com.hospyboard.api.user.entity.AuthEntity;
-import com.hospyboard.api.user.mappers.AuthMapper;
-import com.hospyboard.api.user.repository.AuthRepository;
+import com.hospyboard.api.user.dto.UserDTO;
+import com.hospyboard.api.user.entity.UserEntity;
+import com.hospyboard.api.user.mappers.UserMapper;
+import com.hospyboard.api.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
-public class AuthService {
+public class UserService {
 
-    private final AuthRepository authRepository;
-    private final AuthMapper authMapper;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public AuthService(AuthRepository authRepository,
-                       AuthMapper authMapper) {
-        this.authRepository = authRepository;
-        this.authMapper = authMapper;
+    public UserService(UserRepository userRepository,
+                       UserMapper userMapper) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     public String getRandomUUID() {
         return UUID.randomUUID().toString();
     }
 
-    public AuthDTO login(final AuthDTO response) {
-        AuthEntity authEntity = authRepository.getAuthEntityByUuid(response.getEmail());
+    public UserDTO login(final UserDTO response) {
+        UserEntity userEntity = userRepository.getAuthEntityByUuid(response.getEmail());
 
-        if (authEntity == null) {
-            authEntity = new AuthEntity()
+        if (userEntity == null) {
+            userEntity = new UserEntity()
                     .setEmail(response.getEmail())
                     .setPassword(response.getPassword());
         }
-        return authMapper.toDto(authRepository.save(authEntity));
+        return userMapper.toDto(userRepository.save(userEntity));
     }
 
 }

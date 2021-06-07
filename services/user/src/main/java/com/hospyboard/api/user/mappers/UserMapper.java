@@ -1,13 +1,13 @@
 package com.hospyboard.api.user.mappers;
 
-import com.hospyboard.api.user.dto.AuthDTO;
-import com.hospyboard.api.user.entity.AuthEntity;
+import com.hospyboard.api.user.dto.UserDTO;
+import com.hospyboard.api.user.entity.UserEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface AuthMapper {
+public interface UserMapper {
     //@Mapping(target = "uuid", source = "id")
-    AuthEntity toEntity(AuthDTO dto);
+    UserEntity toEntity(UserDTO dto);
 
-    AuthDTO toDto(AuthEntity entity);
+    UserDTO toDto(UserEntity entity);
 }
