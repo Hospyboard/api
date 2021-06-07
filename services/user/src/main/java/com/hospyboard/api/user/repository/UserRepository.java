@@ -1,6 +1,6 @@
-package com.hospyboard.api.auth.repository;
+package com.hospyboard.api.user.repository;
 
-import com.hospyboard.api.auth.entity.AuthEntity;
+import com.hospyboard.api.user.entity.AuthEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

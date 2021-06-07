@@ -1,7 +1,7 @@
-package com.hospyboard.api.auth.mappers;
+package com.hospyboard.api.user.mappers;
 
-import com.hospyboard.api.auth.dto.AuthDTO;
-import com.hospyboard.api.auth.entity.AuthEntity;
+import com.hospyboard.api.user.dto.AuthDTO;
+import com.hospyboard.api.user.entity.AuthEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

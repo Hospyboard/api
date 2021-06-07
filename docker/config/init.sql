@@ -1,1 +1,1 @@
-CREATE DATABASE hospybord_auth;
+CREATE DATABASE hospybord_user;

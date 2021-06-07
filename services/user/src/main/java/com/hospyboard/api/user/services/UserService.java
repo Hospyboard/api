@@ -1,9 +1,9 @@
-package com.hospyboard.api.auth.services;
+package com.hospyboard.api.user.services;
 
-import com.hospyboard.api.auth.dto.AuthDTO;
-import com.hospyboard.api.auth.entity.AuthEntity;
-import com.hospyboard.api.auth.mappers.AuthMapper;
-import com.hospyboard.api.auth.repository.AuthRepository;
+import com.hospyboard.api.user.dto.AuthDTO;
+import com.hospyboard.api.user.entity.AuthEntity;
+import com.hospyboard.api.user.mappers.AuthMapper;
+import com.hospyboard.api.user.repository.AuthRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;

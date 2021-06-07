@@ -1,7 +1,7 @@
-package com.hospyboard.api.auth.ressources;
+package com.hospyboard.api.user.ressources;
 
-import com.hospyboard.api.auth.dto.AuthDTO;
-import com.hospyboard.api.auth.services.AuthService;
+import com.hospyboard.api.user.dto.AuthDTO;
+import com.hospyboard.api.user.services.AuthService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

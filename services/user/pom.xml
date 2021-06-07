@@ -19,8 +19,8 @@
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
     </properties>
 
-    <groupId>com.hospyboard.api.auth</groupId>
-    <artifactId>Auth</artifactId>
+    <groupId>com.hospyboard.api.user</groupId>
+    <artifactId>User</artifactId>
     <version>1.0</version>
 
     <dependencies>

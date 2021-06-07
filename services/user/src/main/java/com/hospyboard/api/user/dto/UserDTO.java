@@ -1,4 +1,4 @@
-package com.hospyboard.api.auth.dto;
+package com.hospyboard.api.user.dto;
 
 import lombok.Getter;
 import lombok.Setter;

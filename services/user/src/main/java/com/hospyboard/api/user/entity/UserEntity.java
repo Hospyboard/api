@@ -1,4 +1,4 @@
-package com.hospyboard.api.auth.entity;
+package com.hospyboard.api.user.entity;
 
 import lombok.Getter;
 import lombok.Setter;
