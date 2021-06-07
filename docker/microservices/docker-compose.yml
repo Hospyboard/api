@@ -9,4 +9,8 @@ services:
     environment:
       - "SPRING_PROFILES_ACTIVE=docker"
     ports:
-      - 8080:8080
+      - 9090:9090
+
+networks:
+  default:
+    name: hospyboard_network
