@@ -12,6 +12,5 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     UserEntity toEntity(UserDTO dto);
 
-    @InheritInverseConfiguration
     UserDTO toDto(UserEntity entity);
 }

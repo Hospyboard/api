@@ -8,9 +8,7 @@ import com.hospyboard.api.user.mappers.UserMapper;
 import com.hospyboard.api.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Random;
-import java.util.UUID;
 
 @Service
 public class UserService {
@@ -47,7 +45,7 @@ public class UserService {
                 .setToken(userEntity.getToken());
     }
 
-    //TODO Remove ça quand on aura imeplémenté le JWT (ceci est un effet démo)
+    //TODO Remove ça quand on aura imeplémenté le JWT
     private String generateFakeToken() {
         int leftLimit = 97; // letter 'a'
         int rightLimit = 122; // letter 'z'
