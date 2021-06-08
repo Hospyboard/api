@@ -1,12 +1,11 @@
-package com.hospyboard.api.auth.dto;
+package com.hospyboard.api.user.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class AuthDTO {
-    private String id;
+public class UserLoginDTO {
     private String email;
     private String password;
 }

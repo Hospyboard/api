@@ -1,11 +1,11 @@
 version: '3.7'
 
 services:
-  auth:
+  user:
     build:
-      context: ../../services/auth
-    container_name: hospyboard_auth
-    hostname: hb_auth
+      context: ../../services/user
+    container_name: hospyboard_user
+    hostname: hb_user
     environment:
       - "SPRING_PROFILES_ACTIVE=docker"
     ports:
