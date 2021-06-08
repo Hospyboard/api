@@ -1,6 +1,8 @@
 package com.hospyboard.api.user.ressources;
 
 import com.hospyboard.api.user.dto.UserDTO;
+import com.hospyboard.api.user.dto.UserLoginDTO;
+import com.hospyboard.api.user.dto.UserRegisterDTO;
 import com.hospyboard.api.user.services.UserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,18 +16,13 @@ public class UserResource {
         this.service = userService;
     }
 
-    @RequestMapping
-    public String home() {
-        return "test ok.";
-    }
-
-    @GetMapping("token")
-    public String uuid() {
-        return this.service.getRandomUUID();
+    @PostMapping("register")
+    public UserDTO register(@RequestBody UserRegisterDTO request) throws Exception {
+        return this.service.register(request);
     }
 
     @PostMapping("login")
-    public UserDTO login(@RequestBody UserDTO request) {
+    public UserDTO login(@RequestBody UserLoginDTO request) throws Exception {
         return this.service.login(request);
     }
 
