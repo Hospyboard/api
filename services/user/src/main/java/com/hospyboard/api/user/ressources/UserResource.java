@@ -5,6 +5,7 @@ import com.hospyboard.api.user.services.UserService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("auth")
 public class UserResource {
 
     private final UserService service;
@@ -18,12 +19,12 @@ public class UserResource {
         return "test ok.";
     }
 
-    @GetMapping("/token")
+    @GetMapping("token")
     public String uuid() {
         return this.service.getRandomUUID();
     }
 
-    @PostMapping("/auth/login")
+    @PostMapping("login")
     public UserDTO login(@RequestBody UserDTO request) {
         return this.service.login(request);
     }
