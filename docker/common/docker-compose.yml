@@ -9,17 +9,41 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
       - ../config/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - default
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: azertyuiop
       POSTGRES_DB: hospybord_devel
     ports:
-      - 5432:5432
+      - "5432:5432"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak_auth
+    hostname: keycloak
+    restart: always
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: db
+      DB_DATABASE: keycloak
+      DB_USER: hospyboard
+      DB_SCHEMA: public
+      DB_PASSWORD: admin
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+    networks:
+      - default
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
 
 networks:
   default:
     name: hospyboard_network
+    driver: bridge
 
 volumes:
   db_data:

@@ -1,33 +1,32 @@
 package com.hospyboard.api.user.services;
 
+import com.auth0.jwt.JWT;
 import com.hospyboard.api.user.dto.UserDTO;
 import com.hospyboard.api.user.dto.UserLoginDTO;
 import com.hospyboard.api.user.dto.UserRegisterDTO;
 import com.hospyboard.api.user.entity.UserEntity;
+import com.hospyboard.api.user.exception.RegisterAuthException;
 import com.hospyboard.api.user.mappers.UserMapper;
 import com.hospyboard.api.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.Random;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final AuthService authService;
 
     public UserService(UserRepository userRepository,
-                       UserMapper userMapper) {
+                       UserMapper userMapper,
+                       AuthService authService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.authService = authService;
     }
 
-    public UserDTO register(final UserRegisterDTO request) {
-        final UserEntity userEntity = new UserEntity();
-
-        userEntity.setEmail(request.getEmail());
-        userEntity.setPassword(request.getPassword());
-        userEntity.setToken(generateFakeToken());
+    public UserDTO register(final UserRegisterDTO request) throws RegisterAuthException {
+        final UserEntity userEntity = authService.createAccount(request);
 
         return userMapper.toDto(userRepository.save(userEntity));
     }
@@ -44,18 +43,4 @@ public class UserService {
                 .setId(userEntity.getUuid())
                 .setToken(userEntity.getToken());
     }
-
-    //TODO Remove ça quand on aura imeplémenté le JWT
-    private String generateFakeToken() {
-        int leftLimit = 97; // letter 'a'
-        int rightLimit = 122; // letter 'z'
-        int targetStringLength = 20;
-        Random random = new Random();
-
-        return random.ints(leftLimit, rightLimit + 1)
-                .limit(targetStringLength)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString();
-    }
-
 }
