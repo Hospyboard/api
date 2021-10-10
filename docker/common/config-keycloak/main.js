@@ -59,8 +59,12 @@ function createClient() {
             "protocol": "openid-connect"
         }
     }).then(res => {
-        process.exit(0);
+        createUserRole();
     }).catch(err => {
-        process.exit(1);
+        createUserRole();
     });
+}
+
+function createUserRole() {
+
 }
