@@ -40,6 +40,16 @@ services:
     depends_on:
       - db
 
+  setup-keycloak:
+    container_name: build_keycloak
+    build:
+      context: ./config-keycloak
+    restart: on-failure
+    networks:
+      - default
+    depends_on:
+      - keycloak
+
 networks:
   default:
     name: hospyboard_network
