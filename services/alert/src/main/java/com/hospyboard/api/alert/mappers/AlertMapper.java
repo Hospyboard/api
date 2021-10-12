@@ -7,11 +7,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface AlertMapper {
-<<<<<<< Updated upstream
     @Mapping(target = "id", ignore = true)
-=======
-
->>>>>>> Stashed changes
     AlertEntity toEntity(AlertDTO dto);
 
     AlertDTO toDto(AlertEntity entity);
