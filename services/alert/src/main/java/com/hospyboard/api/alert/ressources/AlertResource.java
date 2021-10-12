@@ -15,12 +15,12 @@ public class AlertResource {
         this.service = alertService;
     }
 
-    @PostMapping("create")
+    @PostMapping
     public AlertDTO create(@RequestBody AlertDTO request) throws Exception {
         return this.service.createOrUpdate(request);
     }
 
-    @GetMapping("get")
+    @GetMapping
     public AlertDTO[] get(@RequestParam String alertUuid) throws Exception {
         return this.service.get(alertUuid);
     }
