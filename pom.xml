@@ -5,13 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.hospyboard.api</groupId>
-    <artifactId>HospybardApi</artifactId>
+    <artifactId>HospyboardApi</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
 
     <modules>
         <module>services/user</module>
         <module>services/hospital</module>
+        <module>services/alert</module>
+        <module>services/notification</module>
     </modules>
 
 </project>
