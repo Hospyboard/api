@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AlertRepository extends CrudRepository<AlertEntity, Long> {
-    AlertEntity getAlertEntityByUuid(final String uuid);
-    AlertEntity[] getAlertEntity();
+    AlertEntity getAlertEntityByAlertUuid(final String uuid);
 }

@@ -36,12 +36,15 @@ public class AlertEntity {
     private String patientUuid;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private AlertType type;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private AlertImportance importance;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private AlertStatus status;
 
     @Column(nullable = true)

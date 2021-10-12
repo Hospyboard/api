@@ -21,6 +21,26 @@ services:
     ports:
       - "9091:9091"
 
+  alert:
+    build:
+      context: ../../services/alert
+    container_name: hospyboard_alert
+    hostname: hb_alert
+    environment:
+      - "SPRING_PROFILES_ACTIVE=docker"
+    ports:
+      - "9092:9092"
+
+  notification:
+    build:
+      context: ../../services/notification
+    container_name: hospyboard_notification
+    hostname: hb_notification
+    environment:
+      - "SPRING_PROFILES_ACTIVE=docker"
+    ports:
+      - "9093:9093"
+
 networks:
   default:
     name: hospyboard_network

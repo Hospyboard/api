@@ -7,6 +7,8 @@ import com.hospyboard.api.alert.repository.AlertRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class AlertService {
@@ -35,19 +37,21 @@ public class AlertService {
         return alertMapper.toDto(alertRepository.save(alertEntity));
     }
 
-    public AlertDTO[] get(final String alertUuid) throws Exception {
-        AlertEntity[] ret;
+    public Set<AlertDTO> get(final String alertUuid) throws Exception {
+        final Set<AlertEntity> ret = new HashSet<>();
 
         if (alertUuid != null) {
-            ret = new AlertEntity[]{this.alertRepository.getAlertEntityByUuid(alertUuid)};
+            ret.add(this.alertRepository.getAlertEntityByAlertUuid(alertUuid));
         } else {
-            ret = this.alertRepository.getAlertEntity();
+            for (final AlertEntity alert : this.alertRepository.findAll()) {
+                ret.add(alert);
+            }
         }
-        ArrayList<AlertDTO> res = new ArrayList<>();
+        Set<AlertDTO> toRet = new HashSet<>();
         for (AlertEntity alertEntity : ret) {
-            res.add(this.alertMapper.toDto(alertEntity));
+            toRet.add(this.alertMapper.toDto(alertEntity));
         }
-        return (AlertDTO[]) res.toArray();
+        return toRet;
     }
 
 }
