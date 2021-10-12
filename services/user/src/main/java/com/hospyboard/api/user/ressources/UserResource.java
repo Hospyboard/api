@@ -1,7 +1,6 @@
 package com.hospyboard.api.user.ressources;
 
 import com.hospyboard.api.user.dto.UserDTO;
-import com.hospyboard.api.user.dto.UserLoginDTO;
 import com.hospyboard.api.user.services.UserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,11 +12,6 @@ public class UserResource {
 
     public UserResource(UserService userService) {
         this.service = userService;
-    }
-
-    @PostMapping("login")
-    public UserDTO login(@RequestBody UserLoginDTO request) throws Exception {
-        return this.service.login(request);
     }
 
     @GetMapping

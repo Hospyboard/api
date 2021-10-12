@@ -9,7 +9,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class CurrentUser {
 
@@ -25,12 +24,13 @@ public class CurrentUser {
         final Object principal = authentication.getPrincipal();
 
         if (principal instanceof KeycloakPrincipal) {
-            final KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) principal;
             AccessToken accessToken = ((KeycloakPrincipal<?>) principal).getKeycloakSecurityContext().getToken();
             return new UserDTO()
                     .setEmail(accessToken.getEmail())
                     .setId(accessToken.getId())
-                    .setToken(accessToken.getAccessTokenHash());
+                    .setFirstName(accessToken.getGivenName())
+                    .setLastName(accessToken.getFamilyName())
+                    .setRole(accessToken.getRealmAccess().getRoles());
         } else {
             return null;
         }
