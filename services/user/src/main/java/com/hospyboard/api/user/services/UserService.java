@@ -1,37 +1,35 @@
 package com.hospyboard.api.user.services;
 
-import com.auth0.jwt.JWT;
 import com.hospyboard.api.user.dto.UserDTO;
 import com.hospyboard.api.user.dto.UserLoginDTO;
-import com.hospyboard.api.user.dto.UserRegisterDTO;
 import com.hospyboard.api.user.entity.UserEntity;
-import com.hospyboard.api.user.exception.RegisterAuthException;
 import com.hospyboard.api.user.mappers.UserMapper;
 import com.hospyboard.api.user.repository.UserRepository;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
 
+    private final CurrentUser currentUser;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final AuthService authService;
 
     public UserService(UserRepository userRepository,
                        UserMapper userMapper,
-                       AuthService authService) {
+                       CurrentUser currentUser) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
-        this.authService = authService;
+        this.currentUser = currentUser;
     }
 
-    public UserDTO register(final UserRegisterDTO request) throws RegisterAuthException {
-        final UserEntity userEntity = authService.createAccount(request);
-
-        return userMapper.toDto(userRepository.save(userEntity));
+    @Nullable
+    public UserDTO getActualUser() {
+        return this.currentUser.getCurrentUser();
     }
 
     public UserDTO login(final UserLoginDTO request) throws Exception {
+
         final UserEntity userEntity = userRepository.getAuthEntityByEmail(request.getEmail());
 
         if (userEntity == null) {
