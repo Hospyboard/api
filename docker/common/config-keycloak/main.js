@@ -59,12 +59,54 @@ function createClient() {
             "protocol": "openid-connect"
         }
     }).then(res => {
-        createUserRole();
+        createRole("Patient");
+        createRole("HospitalStaff");
+        createRole("Admin");
+
+        createUser({
+            "enabled": true,
+            "attributes": {},
+            "groups": [],
+            "emailVerified": true,
+            "username": "mark",
+            "email": "mark.dutronc@mail.fr",
+            "firstName": "Mark",
+            "lastName": "Dutronc"
+        })
     }).catch(err => {
-        createUserRole();
+        createRole("Patient");
+        createRole("HospitalMember");
+        createRole("Admin");
     });
 }
 
-function createUserRole() {
+function createRole(name) {
+    axios({
+        method: 'post',
+        url: 'http://' + domain + '/auth/admin/realms/SpringBootKeycloak/roles',
+        headers: {
+            'Authorization': 'bearer ' + accessToken,
+            'Content-Type': 'application/json'
+        },
+        data: {
+            "name": name
+        }
+    }).then(res => {
+    }).catch(err => {
+    });
+}
 
+function createUser(data, password, role) {
+    axios({
+        method: 'post',
+        url: 'http://' + domain + '/auth/admin/realms/SpringBootKeycloak/users',
+        headers: {
+            'Authorization': 'bearer ' + accessToken,
+            'Content-Type': 'application/json'
+        },
+        data: data
+    }).then(res => {
+
+    }).catch(err => {
+    });
 }
