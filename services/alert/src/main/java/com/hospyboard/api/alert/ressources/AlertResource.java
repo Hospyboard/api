@@ -2,7 +2,6 @@ package com.hospyboard.api.alert.ressources;
 
 import com.hospyboard.api.alert.dto.AlertDTO;
 import com.hospyboard.api.alert.services.AlertService;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -21,12 +20,12 @@ public class AlertResource {
     @PostMapping
     @Transactional
     public AlertDTO create(@RequestBody AlertDTO request) throws Exception {
-        return this.service.createOrUpdate(request);
+        return service.createOrUpdate(request);
     }
 
     @GetMapping
     public Set<AlertDTO> get(@RequestParam String alertUuid) throws Exception {
-        return this.service.get(alertUuid);
+        return service.get(alertUuid);
     }
 
 }

@@ -13,5 +13,4 @@ public class NotificationResource {
         this.service = notificationService;
     }
 
-
 }

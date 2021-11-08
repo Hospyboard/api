@@ -2,7 +2,7 @@ package com.hospyboard.api.alert.dto;
 
 public enum AlertStatus {
     PENDING,
-    INPROGRESS,
+    IN_PROGRESS,
     DONE,
     CANCEL;
 }

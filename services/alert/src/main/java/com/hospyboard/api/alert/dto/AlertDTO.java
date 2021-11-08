@@ -13,4 +13,3 @@ public class AlertDTO {
     private AlertStatus status;
     private String staffUuid;
 }
-
