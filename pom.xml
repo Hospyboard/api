@@ -14,6 +14,7 @@
         <module>services/hospital</module>
         <module>services/alert</module>
         <module>services/notification</module>
+        <module>services/spring-websockets</module>
     </modules>
 
 </project>

@@ -20,12 +20,26 @@ public class AlertResource {
     @PostMapping
     @Transactional
     public AlertDTO create(@RequestBody AlertDTO request) throws Exception {
-        return service.createOrUpdate(request);
+        AlertDTO ret = service.create(request);
+        service.updateWS();
+        return ret;
+    }
+    @PutMapping
+    public AlertDTO update(@RequestBody AlertDTO request) throws  Exception {
+        AlertDTO ret = service.update(request);
+        service.updateWS();
+        return ret;
     }
 
     @GetMapping
     public Set<AlertDTO> get(@RequestParam String alertUuid) throws Exception {
-        return service.get(alertUuid);
+        Set<AlertDTO> ret = service.get(alertUuid);
+        service.updateWS();
+        return ret;
+    }
+    @GetMapping("/all")
+    public Set<AlertDTO> getALL() throws Exception {
+        return service.get(null);
     }
 
 }
