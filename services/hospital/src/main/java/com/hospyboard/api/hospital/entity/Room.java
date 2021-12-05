@@ -1,5 +1,6 @@
 package com.hospyboard.api.hospital.entity;
 
+import com.hospyboard.api.core.db_converters.EncryptionDatabaseString;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -30,5 +31,6 @@ public class Room {
     }
 
     @Column(name = "room_number")
+    @Convert(converter = EncryptionDatabaseString.class)
     private String roomNumber;
 }
