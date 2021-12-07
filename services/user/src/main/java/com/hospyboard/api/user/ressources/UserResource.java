@@ -5,7 +5,7 @@ import com.hospyboard.api.user.services.UserService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("user")
+@RequestMapping
 public class UserResource {
 
     private final UserService service;
@@ -17,6 +17,11 @@ public class UserResource {
     @GetMapping
     public UserDTO getActualUser() {
         return service.getActualUser();
+    }
+
+    @PostMapping("login")
+    public UserDTO login() {
+
     }
 
 }

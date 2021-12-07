@@ -1,8 +1,10 @@
 package com.hospyboard.api.user.services;
 
 import com.hospyboard.api.user.dto.UserDTO;
+import com.hospyboard.api.user.exception.LoginHospyboardException;
 import com.hospyboard.api.user.mappers.UserMapper;
 import com.hospyboard.api.user.repository.UserRepository;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -24,5 +26,10 @@ public class UserService {
     @Nullable
     public UserDTO getActualUser() {
         return this.currentUser.getCurrentUser();
+    }
+
+    @NonNull
+    public UserDTO loginUser(final String email, final String password) throws LoginHospyboardException {
+
     }
 }
