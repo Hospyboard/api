@@ -10,11 +10,12 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>services/core</module>
         <module>services/user</module>
         <module>services/hospital</module>
         <module>services/alert</module>
         <module>services/notification</module>
-        <module>services/core</module>
+        <module>services/logActions</module>
     </modules>
 
 </project>
