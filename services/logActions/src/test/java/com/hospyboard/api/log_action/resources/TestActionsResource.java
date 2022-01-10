@@ -1,7 +1,7 @@
 package com.hospyboard.api.log_action.resources;
 
-import com.hospyboard.api.core.db_converters.EncryptionDatabaseInstant;
-import com.hospyboard.api.core.db_converters.EncryptionDatabaseString;
+//import com.hospyboard.api.core.db_converters.EncryptionDatabaseInstant;
+//import com.hospyboard.api.core.db_converters.EncryptionDatabaseString;
 import com.hospyboard.api.log_actions.dto.HospyboardActionDTO;
 import com.hospyboard.api.log_actions.resources.HospyboardActionResource;
 import com.hospyboard.api.log_actions.services.HospyboardActionsService;
@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class TestActionsResource {
 
-    @Autowired
+    /*@Autowired
     private MockMvc mockMvc;
 
     @MockBean
@@ -50,6 +50,6 @@ public class TestActionsResource {
 
         this.mockMvc.perform(post("/log"))
                 .andExpect(status().isOk());
-    }
+    }*/
 
 }

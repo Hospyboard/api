@@ -1,13 +1,11 @@
-package com.hospyboard.api.log_actions;
+package com.hospyboard.api.core;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 
-@EnableFeignClients("com.hospyboard.api")
 @SpringBootApplication(scanBasePackages = "com.hospyboard.api")
-public class LogActionsApp {
+public class CoreApp {
     public static void main(String[] args) {
-        SpringApplication.run(LogActionsApp.class, args);
+        SpringApplication.run(CoreApp.class, args);
     }
 }
