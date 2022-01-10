@@ -1,5 +1,6 @@
 package com.hospyboard.api.user.clients;
 
+import com.hospyboard.api.user.dto.UserAuth;
 import com.hospyboard.api.user.dto.UserAuthDTO;
 import com.hospyboard.api.user.dto.UserDTO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -15,5 +16,5 @@ public interface UserClient {
 
     @PostMapping("login")
     @Transactional
-    UserDTO login(final UserAuthDTO authDTO);
+    UserAuth login(final UserAuthDTO authDTO);
 }

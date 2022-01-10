@@ -2,15 +2,10 @@ package com.hospyboard.api.notification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.hospyboard.api.notification.dto.SubscriptionDto;
 import com.hospyboard.api.notification.dto.WebSocketDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.json.GsonJsonParser;
-import org.springframework.boot.json.JsonParser;
-import org.springframework.context.annotation.Scope;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.SubProtocolCapable;
@@ -29,6 +24,7 @@ public class ServerWebSocketHandler extends TextWebSocketHandler implements SubP
     private static final ResponseMapper responseMapper = new ResponseMapper();
 
     private static final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         logger.info("Server connection opened");
@@ -105,7 +101,7 @@ public class ServerWebSocketHandler extends TextWebSocketHandler implements SubP
         return Collections.singletonList("subprotocol.demo.websocket");
     }
 
-    public void Notify(Object param) {
+    public void notify(Object param) {
         if (sessions.size() > 0) {
             sessions.forEach(it -> {
                 try {

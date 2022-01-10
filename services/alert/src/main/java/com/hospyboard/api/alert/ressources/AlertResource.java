@@ -34,6 +34,7 @@ public class AlertResource {
         service.updateWS();
         return ret;
     }
+
     @PutMapping
     public AlertDTO update(@RequestBody AlertDTO request) throws  Exception {
         AlertDTO ret = service.update(request);
@@ -47,10 +48,12 @@ public class AlertResource {
         service.updateWS();
         return ret;
     }
+
     @GetMapping("/all")
     public Set<AlertDTO> getALL() throws Exception {
         return service.get(null);
     }
+
     @GetMapping("/asset")
     public Set<FileDto> getAlertAsset() throws Exception {
         String path = "services/alert/assets/";

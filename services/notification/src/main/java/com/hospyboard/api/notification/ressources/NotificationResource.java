@@ -1,23 +1,23 @@
 package com.hospyboard.api.notification.ressources;
 
 import com.hospyboard.api.notification.ServerWebSocketHandler;
+import com.hospyboard.api.notification.clients.NotificationClient;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-public class NotificationResource {
+public class NotificationResource implements NotificationClient {
     public final ServerWebSocketHandler handler;
 
     public NotificationResource(ServerWebSocketHandler handler) {this.handler = handler;}
 
-    @PostMapping("/notify")
-    public void Notify(@RequestBody Object param) {
-        handler.Notify(param);
+    @Override
+    public void notify(@RequestBody Object param) {
+        handler.notify(param);
 
     }
 
-    @GetMapping("/notify")
-    public void NotifyGET() {
-        handler.Notify(null);
+    @Override
+    public void notifyGET() {
+        handler.notify(null);
 
     }
 }

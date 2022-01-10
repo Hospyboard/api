@@ -7,6 +7,8 @@ import com.hospyboard.api.alert.dto.AlertType;
 import com.hospyboard.api.alert.entity.AlertEntity;
 import com.hospyboard.api.alert.mappers.AlertMapper;
 import com.hospyboard.api.alert.repository.AlertRepository;
+import com.hospyboard.api.notification.clients.NotificationClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -22,12 +24,16 @@ public class AlertService {
 
     private final AlertRepository alertRepository;
     private final AlertMapper alertMapper;
+    private final NotificationClient notificationClient;
 
     public AlertService(AlertRepository alertRepository,
-                       AlertMapper alertMapper) {
+                       AlertMapper alertMapper,
+                        NotificationClient notificationClient) {
         this.alertRepository = alertRepository;
         this.alertMapper = alertMapper;
+        this.notificationClient = notificationClient;
     }
+
     public void updateWS() throws Exception {
         String url = "http://localhost:9393/notify";
         HttpHeaders headers = new HttpHeaders();
