@@ -30,6 +30,7 @@ public class UserService {
 
     @NonNull
     public UserDTO loginUser(final String email, final String password) throws LoginHospyboardException {
-
+        return null;
+        //TODO auth
     }
 }
