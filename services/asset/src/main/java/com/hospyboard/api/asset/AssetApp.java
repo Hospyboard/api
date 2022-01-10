@@ -1,13 +1,11 @@
-package com.hospyboard.api.notification;
+package com.hospyboard.api.asset;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication(scanBasePackages = "com.hospyboard.api")
-@EnableSwagger2
-public class NotificationApp {
+public class AssetApp {
     public static void main(String[] args) {
-        SpringApplication.run(NotificationApp.class, args);
+        SpringApplication.run(AssetApp.class, args);
     }
 }
