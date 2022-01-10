@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  hospiboard:
+    build:
+      context: ../../
+    container_name: hospyboard_api
+    hostname: hospyboard_api
+    environment:
+      - "SPRING_PROFILES_ACTIVE=docker"
+    ports:
+      - "9090:9090"
+
+networks:
+  default:
+    name: hospyboard_network
+    driver: bridge
