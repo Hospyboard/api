@@ -1,8 +1,6 @@
 package com.hospyboard.api.user.services;
 
 import com.hospyboard.api.user.dto.UserDTO;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.representations.AccessToken;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -23,17 +21,8 @@ public class CurrentUser {
 
         final Object principal = authentication.getPrincipal();
 
-        if (principal instanceof KeycloakPrincipal) {
-            AccessToken accessToken = ((KeycloakPrincipal<?>) principal).getKeycloakSecurityContext().getToken();
-            return new UserDTO()
-                    .setEmail(accessToken.getEmail())
-                    .setId(accessToken.getId())
-                    .setFirstName(accessToken.getGivenName())
-                    .setLastName(accessToken.getFamilyName())
-                    .setRole(accessToken.getRealmAccess().getRoles());
-        } else {
-            return null;
-        }
+        //TODO redev this
+        return null;
     }
 
 }
