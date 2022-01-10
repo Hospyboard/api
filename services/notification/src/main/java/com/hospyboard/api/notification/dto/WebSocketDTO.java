@@ -9,5 +9,4 @@ import org.springframework.web.socket.WebSocketSession;
 public class WebSocketDTO {
     private String userUuid;
     private String token;
-    private Subscription[] sub;
 }

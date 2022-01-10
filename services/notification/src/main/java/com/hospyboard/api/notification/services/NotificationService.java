@@ -22,7 +22,6 @@ public class NotificationService {
         WebSocketDTO ws = new WebSocketDTO();
         ws.setUserUuid(userUuid);
         ws.setToken(token);
-        ws.setSub(subList);
         session.getUserProperties().put( "ws", ws );
         webSocketPool.put(session.getId(), session);
     }
@@ -35,7 +34,7 @@ public class NotificationService {
     @OnMessage
     public void handleMessage(Subscription[] subList, Session session) {
         WebSocketDTO ws = (WebSocketDTO) session.getUserProperties().get("ws");
-        ws.setSub(subList);
+
         session.getUserProperties().put( "ws", ws );
     }
 }
