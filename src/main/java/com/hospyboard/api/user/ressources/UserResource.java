@@ -1,7 +1,7 @@
 package com.hospyboard.api.user.ressources;
 
-import com.hospyboard.api.user.dto.UserAuth;
 import com.hospyboard.api.user.dto.UserAuthDTO;
+import com.hospyboard.api.user.dto.UserCreationDTO;
 import com.hospyboard.api.user.dto.UserDTO;
 import com.hospyboard.api.user.services.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
-import java.time.Instant;
 
 @RestController
 @RequestMapping("user")
@@ -27,17 +26,10 @@ public class UserResource {
         return service.getActualUser();
     }
 
-    @PostMapping("login")
+    @PostMapping("register")
     @Transactional
-    public UserAuth login(final UserAuthDTO authDTO) {
-        final UserAuth userAuth = new UserAuth();
-
-        userAuth.setAuthToken("slkfqs765455678kjsdflksdllmsqd");
-        userAuth.setRefreshToken("qkshudqisygd234567890P0000IJHSGFhqdk");
-        userAuth.setExpirationDate(Instant.now().plusSeconds(100000));
-
-        return userAuth;
-        //TODO impl auth
+    public UserDTO register(final UserCreationDTO userCreationDTO) {
+        return service.createNewUser(userCreationDTO);
     }
 
 }

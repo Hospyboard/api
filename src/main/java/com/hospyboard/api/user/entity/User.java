@@ -1,5 +1,6 @@
 package com.hospyboard.api.user.entity;
 
+import com.hospyboard.api.user.enums.UserRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -12,7 +13,7 @@ import java.util.UUID;
 @Entity(name = "auth_user")
 @Getter
 @Setter
-public class UserEntity implements Serializable {
+public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false, unique = true)
@@ -30,16 +31,19 @@ public class UserEntity implements Serializable {
         }
     }
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    private String token;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_role", nullable = false)
+    private UserRole role;
 }
