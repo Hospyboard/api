@@ -13,6 +13,8 @@ public interface UserMapper {
     @Mapping(target = "password", ignore = true)
     User toEntity(UserDTO dto);
 
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "id", ignore = true)
     User fromUserCreationToEntity(UserCreationDTO userCreationDTO);
 
     @Mapping(target = "id", source = "uuid")

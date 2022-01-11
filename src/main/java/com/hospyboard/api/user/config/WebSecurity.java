@@ -31,7 +31,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().authorizeRequests()
-                .antMatchers(HttpMethod.POST, JWTConfig.SIGN_UP_URL).permitAll()
+                .antMatchers(HttpMethod.POST, JWTConfig.REGISTER_URL).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtConfig))
