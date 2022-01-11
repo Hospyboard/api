@@ -1,6 +1,5 @@
 package com.hospyboard.api.user.ressources;
 
-import com.hospyboard.api.user.dto.UserAuthDTO;
 import com.hospyboard.api.user.dto.UserCreationDTO;
 import com.hospyboard.api.user.dto.UserDTO;
 import com.hospyboard.api.user.services.UserService;
@@ -21,12 +20,12 @@ public class UserResource {
         this.service = userService;
     }
 
-    @GetMapping
+    @GetMapping("info")
     public UserDTO getActualUser() {
         return service.getActualUser();
     }
 
-    @PostMapping("register")
+    @PostMapping("/register")
     @Transactional
     public UserDTO register(final UserCreationDTO userCreationDTO) {
         return service.createNewUser(userCreationDTO);

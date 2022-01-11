@@ -5,7 +5,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hospyboard.api.core.exceptions.HospyboardAppException;
 import com.hospyboard.api.user.entity.User;
-import com.hospyboard.api.user.services.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,7 +39,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            creds.getEmail(),
+                            creds.getUsername(),
                             creds.getPassword(),
                             new ArrayList<>())
             );
@@ -57,11 +56,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         final User user = (User) auth.getPrincipal();
 
         String token = JWT.create()
-                .withSubject(user.getEmail())
+                .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JWTConfig.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(jwtConfig.getSecret().getBytes()));
 
-        String body = ((User) auth.getPrincipal()).getEmail() + " " + token;
+        String body = user.getUsername() + " " + token;
 
         res.getWriter().write(body);
         res.getWriter().flush();

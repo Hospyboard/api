@@ -1,6 +1,8 @@
 package com.hospyboard.api.user.services;
 
 import com.hospyboard.api.user.dto.UserDTO;
+import com.hospyboard.api.user.entity.User;
+import com.hospyboard.api.user.mappers.UserMapper;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -9,6 +11,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CurrentUser {
+
+    private final UserMapper userMapper;
+
+    public CurrentUser(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
 
     @Nullable
     public UserDTO getCurrentUser() {
@@ -21,7 +29,10 @@ public class CurrentUser {
 
         final Object principal = authentication.getPrincipal();
 
-        //TODO redev this
+        if (principal instanceof User) {
+            return this.userMapper.toDto((User) principal);
+        }
+
         return null;
     }
 
