@@ -1,21 +1,19 @@
 package com.hospyboard.api.log_actions.resources;
 
 import com.hospyboard.api.log_actions.dto.HospyboardActionDTO;
-import com.hospyboard.api.log_actions.services.HospyboardActionsService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.hospyboard.api.log_actions.services.LogActionService;
+import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @RestController
 @RequestMapping("log")
 public class HospyboardActionResource {
 
-    private final HospyboardActionsService actionsService;
+    private final LogActionService actionsService;
 
-    public HospyboardActionResource(HospyboardActionsService actionsService) {
+    public HospyboardActionResource(LogActionService actionsService) {
         this.actionsService = actionsService;
     }
 
@@ -23,6 +21,11 @@ public class HospyboardActionResource {
     @Transactional
     public HospyboardActionDTO doAction(@RequestBody HospyboardActionDTO actionDTO) {
         return this.actionsService.doAction(actionDTO);
+    }
+
+    @GetMapping
+    public List<HospyboardActionDTO> getAll() {
+        return this.actionsService.getAllActions();
     }
 
 }
