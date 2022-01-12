@@ -10,11 +10,16 @@ import com.hospyboard.api.user.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final CurrentUser currentUser;
     private final UserRepository userRepository;
@@ -36,6 +41,7 @@ public class UserService {
         return this.currentUser.getCurrentUser();
     }
 
+    @Transactional
     public UserDTO createNewUser(final UserCreationDTO userCreationDTO) {
         if (userCreationDTO.getPassword().equals(userCreationDTO.getPasswordConfirmation())) {
             final User user = this.userMapper.fromUserCreationToEntity(userCreationDTO);
@@ -46,5 +52,14 @@ public class UserService {
             throw new RegisterHospyboardException("Vos mots de passe ne correspondent pas.");
         }
 
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository
+                .findByUsername(username)
+                .orElseThrow(
+                        () -> new UsernameNotFoundException(String.format("Utilisateur non trouvé: %s", username))
+                );
     }
 }
