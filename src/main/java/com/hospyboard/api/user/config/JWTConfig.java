@@ -10,9 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 public class JWTConfig {
-    public static final long EXPIRATION_TIME = 604800000; //1 semaine
-    public static final String TOKEN_PREFIX = "Bearer ";
-    public static final String HEADER_STRING = "Authorization";
     public static final String REGISTER_URL = "/user/register";
     public static final String LOGIN_URL = "/user/login";
 

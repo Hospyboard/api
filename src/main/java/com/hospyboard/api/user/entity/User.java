@@ -5,15 +5,18 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.NaturalId;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.UUID;
 
 @Entity(name = "auth_user")
 @Getter
 @Setter
-public class User implements Serializable {
+public class User implements Serializable, UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false, unique = true)
@@ -31,7 +34,7 @@ public class User implements Serializable {
         }
     }
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
 
     @Column(nullable = false)
@@ -46,4 +49,29 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role", nullable = false)
     private UserRole role;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

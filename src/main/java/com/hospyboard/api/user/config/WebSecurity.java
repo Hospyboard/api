@@ -1,57 +1,102 @@
 package com.hospyboard.api.user.config;
 
+import com.hospyboard.api.user.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+import javax.servlet.http.HttpServletResponse;
 
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(
+        jsr250Enabled = true
+)
 public class WebSecurity extends WebSecurityConfigurerAdapter {
 
-    private final UserDetailsService userDetailsService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final JWTConfig jwtConfig;
+    private final UserRepository userRepository;
+    private final JwtTokenFilter jwtTokenFilter;
 
-    public WebSecurity(UserDetailsService userDetailsService,
-                       BCryptPasswordEncoder bCryptPasswordEncoder,
-                       JWTConfig jwtConfig) {
-        this.userDetailsService = userDetailsService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.jwtConfig = jwtConfig;
+    public WebSecurity(UserRepository userRepository,
+                       JwtTokenFilter jwtTokenFilter) {
+        this.userRepository = userRepository;
+        this.jwtTokenFilter = jwtTokenFilter;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().authorizeRequests()
+        http = http.cors().and().csrf().disable();
+
+        //Set unauthorized requests exception handler
+        http = http
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and();
+
+        http = http
+                .exceptionHandling()
+                .authenticationEntryPoint(
+                        (request, response, ex) -> response.sendError(
+                                HttpServletResponse.SC_UNAUTHORIZED,
+                                ex.getMessage()
+                        )
+                )
+                .and();
+
+        http.authorizeRequests()
                 .antMatchers(HttpMethod.POST, JWTConfig.REGISTER_URL).permitAll()
-                .antMatchers(HttpMethod.GET, "/log").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtConfig))
-                .addFilter(new JWTAuthorizationFilter(authenticationManager(), jwtConfig))
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .antMatchers(HttpMethod.POST, JWTConfig.LOGIN_URL).permitAll()
+                .anyRequest().authenticated();
+
+        http.addFilterBefore(
+                jwtTokenFilter,
+                UsernamePasswordAuthenticationFilter.class
+        );
     }
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
+        auth.userDetailsService(username -> userRepository
+                .findByUsername(username)
+                .orElseThrow(
+                        () -> new UsernameNotFoundException(
+                                String.format("User: %s, not found", username)
+                        )
+                ));
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
 
-        CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
-        source.registerCorsConfiguration("/**", corsConfiguration);
+    @Override @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
-        return source;
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
