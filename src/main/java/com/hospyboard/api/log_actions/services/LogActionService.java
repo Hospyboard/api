@@ -6,16 +6,28 @@ import com.hospyboard.api.log_actions.mappers.ActionMapper;
 import com.hospyboard.api.log_actions.repositories.ActionRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
-public class HospyboardActionsService {
+public class LogActionService {
 
     private final ActionRepository actionRepository;
     private final ActionMapper actionMapper;
 
-    public HospyboardActionsService(ActionRepository actionRepository,
-                                    ActionMapper actionMapper) {
+    public LogActionService(ActionRepository actionRepository,
+                            ActionMapper actionMapper) {
         this.actionRepository = actionRepository;
         this.actionMapper = actionMapper;
+    }
+
+    public List<HospyboardActionDTO> getAllActions() {
+        final List<HospyboardActionDTO> actions = new ArrayList<>();
+
+        for (final HospyboardAction hospyboardAction : this.actionRepository.findAll()) {
+            actions.add(this.actionMapper.toDto(hospyboardAction));
+        }
+        return actions;
     }
 
     public HospyboardActionDTO doAction(final HospyboardActionDTO action) {

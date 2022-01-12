@@ -25,6 +25,7 @@
         <swagger.version>2.9.2</swagger.version>
         <jackson.version>2.10.2</jackson.version>
         <jwt.version>3.17.0</jwt.version>
+        <org.flyway.version>8.4.1</org.flyway.version>
     </properties>
 
     <dependencyManagement>
@@ -138,6 +139,12 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${org.flyway.version}</version>
         </dependency>
     </dependencies>
 

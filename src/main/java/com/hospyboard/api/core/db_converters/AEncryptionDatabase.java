@@ -30,6 +30,10 @@ public abstract class AEncryptionDatabase {
 
     public String convertToDatabase(final String object) {
         try {
+            if (object == null) {
+                return null;
+            }
+
             cipher.init(Cipher.ENCRYPT_MODE, key);
             return base64Encoder.encodeToString(cipher.doFinal(object.getBytes()));
         } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
@@ -39,6 +43,10 @@ public abstract class AEncryptionDatabase {
 
     public String convertToEntity(final String dbData) {
         try {
+            if (dbData == null) {
+                return null;
+            }
+
             cipher.init(Cipher.DECRYPT_MODE, key);
             return new String(cipher.doFinal(base64Decoder.decode(dbData)));
         } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {

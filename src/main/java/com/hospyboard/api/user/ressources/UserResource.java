@@ -1,23 +1,27 @@
 package com.hospyboard.api.user.ressources;
 
+import com.hospyboard.api.log_actions.dto.HospyboardActionDTO;
+import com.hospyboard.api.log_actions.entity.HospyboardAction;
+import com.hospyboard.api.log_actions.services.LogActionService;
 import com.hospyboard.api.user.dto.UserCreationDTO;
 import com.hospyboard.api.user.dto.UserDTO;
 import com.hospyboard.api.user.services.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 
 @RestController
 @RequestMapping("user")
 public class UserResource {
 
     private final UserService service;
+    private final LogActionService logActionService;
 
-    public UserResource(UserService userService) {
+    public UserResource(UserService userService,
+                        LogActionService logActionService) {
         this.service = userService;
+        this.logActionService = logActionService;
     }
 
     @GetMapping("info")
@@ -27,7 +31,15 @@ public class UserResource {
 
     @PostMapping("/register")
     @Transactional
-    public UserDTO register(final UserCreationDTO userCreationDTO) {
+    public UserDTO register(@RequestBody final UserCreationDTO userCreationDTO) {
+        final HospyboardActionDTO hospyboardAction = new HospyboardActionDTO();
+
+        hospyboardAction.setRequestedAt(Instant.now());
+        hospyboardAction.setUserUuid(null);
+        hospyboardAction.setRouteName("/user/register");
+        hospyboardAction.setService("UserResource");
+
+        this.logActionService.doAction(hospyboardAction);
         return service.createNewUser(userCreationDTO);
     }
 
