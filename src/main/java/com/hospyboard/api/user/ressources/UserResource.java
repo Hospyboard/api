@@ -8,7 +8,6 @@ import com.hospyboard.api.user.dto.UserTokenDTO;
 import com.hospyboard.api.user.entity.User;
 import com.hospyboard.api.user.exception.LoginHospyboardException;
 import com.hospyboard.api.user.services.UserService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,7 +37,7 @@ public class UserResource {
         return service.getActualUser();
     }
 
-    @PostMapping("/login")
+    @PostMapping("login")
     public UserTokenDTO login(@RequestBody @Valid final UserAuthDTO request) {
         try {
             Authentication authenticate = authenticationManager
@@ -56,7 +55,7 @@ public class UserResource {
         }
     }
 
-    @PostMapping("/register")
+    @PostMapping("register")
     public UserDTO register(@RequestBody final UserCreationDTO userCreationDTO) {
         return service.createNewUser(userCreationDTO);
     }
