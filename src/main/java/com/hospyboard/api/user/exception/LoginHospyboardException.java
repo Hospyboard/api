@@ -1,11 +1,8 @@
 package com.hospyboard.api.user.exception;
 
-import com.hospyboard.api.core.exceptions.HospyboardAppException;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import com.hospyboard.api.core.exceptions.BadRequestException;
 
-@ResponseStatus(value = HttpStatus.UNAUTHORIZED)
-public class LoginHospyboardException extends HospyboardAppException {
+public class LoginHospyboardException extends BadRequestException {
     private final static String ERROR_MESSAGE = "Your password and username does not match.";
 
     public LoginHospyboardException() {

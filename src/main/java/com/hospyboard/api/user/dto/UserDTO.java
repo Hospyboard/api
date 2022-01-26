@@ -1,15 +1,28 @@
 package com.hospyboard.api.user.dto;
 
-import com.hospyboard.api.user.enums.UserRole;
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
 public class UserDTO {
+    @NotBlank
     private String id;
+    @NotBlank
     private String username;
+    @NotBlank
     private String firstName;
+    @NotBlank
     private String lastName;
-    private UserRole role;
+    @NotBlank @Email
+    private String email;
+    @NotBlank
+    private String password;
+    @NotBlank
+    private String passwordConfirmation;
+    @NotBlank
+    private String role;
 }

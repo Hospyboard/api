@@ -6,6 +6,7 @@ import com.hospyboard.api.user.dto.UserCreationDTO;
 import com.hospyboard.api.user.dto.UserDTO;
 import com.hospyboard.api.user.dto.UserTokenDTO;
 import com.hospyboard.api.user.entity.User;
+import com.hospyboard.api.user.enums.UserRole;
 import com.hospyboard.api.user.exception.LoginHospyboardException;
 import com.hospyboard.api.user.services.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
 @RestController
@@ -35,6 +37,18 @@ public class UserResource {
     @GetMapping
     public UserDTO getActualUser() {
         return service.getActualUser();
+    }
+
+    @PatchMapping
+    @RolesAllowed(UserRole.ADMIN)
+    public UserDTO partialUpdateUser(@RequestBody final UserDTO user) {
+        return this.service.updateUser(user);
+    }
+
+    @PutMapping
+    @RolesAllowed(UserRole.ADMIN)
+    public UserDTO updateUser(@RequestBody @Valid final UserDTO user) {
+        return this.service.updateUser(user);
     }
 
     @PostMapping("login")
