@@ -4,8 +4,10 @@ import com.hospyboard.api.user.dto.UserCreationDTO;
 import com.hospyboard.api.user.dto.UserDTO;
 import com.hospyboard.api.user.entity.User;
 import com.hospyboard.api.user.exception.RegisterHospyboardException;
+import com.hospyboard.api.user.exception.UserUpdateException;
 import com.hospyboard.api.user.mappers.UserMapper;
 import com.hospyboard.api.user.repository.UserRepository;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -36,6 +39,34 @@ public class UserService implements UserDetailsService {
     @Nullable
     public UserDTO getActualUser() {
         return this.currentUser.getCurrentUser();
+    }
+
+    @Transactional
+    public UserDTO updateUser(final UserDTO request) {
+        if (Strings.isEmpty(request.getId())) {
+            throw new UserUpdateException("L'utilisateur que vous voulez mettre à jour ne possède pas d'id.");
+        }
+
+        if (!Strings.isEmpty(request.getPassword()) && !Strings.isEmpty(request.getPasswordConfirmation())) {
+            if (request.getPassword().equals(request.getPasswordConfirmation())) {
+                request.setPassword(passwordEncoder.encode(request.getPassword()));
+                //TODO invalid JWT token of user password edited
+            } else {
+                throw new UserUpdateException("Les mots de passe ne correspondent pas.");
+            }
+        }
+
+        final Optional<User> user = this.userRepository.findByUuid(request.getId());
+        if (user.isPresent()) {
+            final User userFind = user.get();
+            final User userPatch = this.userMapper.toEntity(request);
+
+            userPatch.setId(null);
+            this.userMapper.patchUser(userPatch, userFind);
+            return this.userMapper.toDto(this.userRepository.save(userFind));
+        } else {
+            throw new UserUpdateException("L'id que vous avez fourni n'existe pas en base de donnée.");
+        }
     }
 
     @Transactional

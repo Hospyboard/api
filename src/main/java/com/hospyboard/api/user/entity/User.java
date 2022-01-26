@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.UUID;
 
 @Entity(name = "auth_user")
@@ -46,13 +47,18 @@ public class User implements Serializable, UserDetails {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private String email;
+
     @Column(name = "user_role", nullable = false)
-    private UserRole role;
+    private String role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        final UserRole userRole = new UserRole();
+
+        userRole.setAuthority(role);
+        return Collections.singleton(userRole);
     }
 
     @Override
