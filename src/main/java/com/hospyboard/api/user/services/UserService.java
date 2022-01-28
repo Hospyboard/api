@@ -72,6 +72,12 @@ public class UserService implements UserDetailsService {
     @Transactional
     public UserDTO createNewUser(final UserCreationDTO userCreationDTO) {
         if (userCreationDTO.getPassword().equals(userCreationDTO.getPasswordConfirmation())) {
+            final Optional<User> optUser = this.userRepository.findByUsername(userCreationDTO.getUsername());
+
+            if (optUser.isPresent()) {
+                throw new RegisterHospyboardException("Ce nom d'utilisateur existe déjà.");
+            }
+
             final User user = this.userMapper.fromUserCreationToEntity(userCreationDTO);
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -79,7 +85,6 @@ public class UserService implements UserDetailsService {
         } else {
             throw new RegisterHospyboardException("Vos mots de passe ne correspondent pas.");
         }
-
     }
 
     @Override
