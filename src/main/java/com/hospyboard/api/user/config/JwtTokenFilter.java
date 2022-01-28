@@ -1,5 +1,6 @@
 package com.hospyboard.api.user.config;
 
+import com.hospyboard.api.user.entity.User;
 import com.hospyboard.api.user.repository.UserRepository;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpHeaders;
@@ -47,14 +48,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
 
         // Get user identity and set it on the spring security context
-        UserDetails userDetails = userRepository
+        User user = userRepository
                 .findByUsername(jwtTokenUtil.getUsername(token))
                 .orElse(null);
 
-        UsernamePasswordAuthenticationToken
-                authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null,
-                userDetails == null ? List.of() : userDetails.getAuthorities()
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                user,
+                null,
+                user == null ? List.of() : user.getAuthorities()
         );
 
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
