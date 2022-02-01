@@ -13,6 +13,7 @@ import java.util.Date;
 @Slf4j
 public class JwtTokenUtil {
     private final static String ISSUER = "Hospyboard";
+    private final static Integer EXPIRATION_SECONDS_TOKEN = 604800; //1 Week
     private final String jwtSecret;
 
     public JwtTokenUtil(JWTConfig jwtConfig) {
@@ -20,15 +21,17 @@ public class JwtTokenUtil {
     }
 
     public UserTokenDTO generateAccessToken(final User user) {
-        final Instant expiresAt = Instant.ofEpochMilli(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000); // 1 week
+        final Instant now = Instant.now();
+        final Instant expiresAt = now.plusSeconds(EXPIRATION_SECONDS_TOKEN);
+
         return new UserTokenDTO(Jwts.builder()
                 .setSubject(String.format("%s,%s", user.getUuid(), user.getUsername()))
                 .setIssuer(ISSUER)
-                .setIssuedAt(new Date())
+                .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(expiresAt))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact(),
-                expiresAt);
+                expiresAt.getEpochSecond() - now.getEpochSecond());
     }
 
     public String getUserUuid(String token) {
@@ -61,7 +64,7 @@ public class JwtTokenUtil {
     public boolean validate(String token) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
-            return true;
+            return true;//TODO add checking of tokens unvalidated (like password reseted or username changed)
         } catch (SignatureException ex) {
             log.error("Invalid JWT signature - {}", ex.getMessage());
         } catch (MalformedJwtException ex) {
