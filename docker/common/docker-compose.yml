@@ -19,6 +19,18 @@ services:
     ports:
       - "5432:5432"
 
+  hospyboard:
+    build:
+      context: ../../
+    container_name: hospyboard_api
+    hostname: hospyboard_api
+    networks:
+      - default
+    environment:
+      - "SPRING_PROFILES_ACTIVE=docker"
+    ports:
+      - "9090:9090"
+
 networks:
   default:
     name: hospyboard_network
