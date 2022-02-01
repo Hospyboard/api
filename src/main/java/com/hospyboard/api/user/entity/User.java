@@ -10,8 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity(name = "auth_user")
@@ -55,10 +56,12 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        final Collection<GrantedAuthority> roles = new ArrayList<GrantedAuthority>();
         final UserRole userRole = new UserRole();
 
         userRole.setAuthority(role);
-        return Collections.singleton(userRole);
+        roles.add(userRole);
+        return roles;
     }
 
     @Override

@@ -1,8 +1,10 @@
 package com.hospyboard.api.user.services;
 
+import com.hospyboard.api.core.exceptions.ForbiddenException;
 import com.hospyboard.api.user.dto.UserCreationDTO;
 import com.hospyboard.api.user.dto.UserDTO;
 import com.hospyboard.api.user.entity.User;
+import com.hospyboard.api.user.enums.UserRole;
 import com.hospyboard.api.user.exception.RegisterHospyboardException;
 import com.hospyboard.api.user.exception.UserUpdateException;
 import com.hospyboard.api.user.mappers.UserMapper;
@@ -43,6 +45,11 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public UserDTO updateUser(final UserDTO request) {
+        final UserDTO currentUser = this.currentUser.getCurrentUser();
+
+        if (currentUser != null && !currentUser.getRole().equals(UserRole.ADMIN)) {
+            throw new ForbiddenException("Impossible de mettre à jour les comptes utilisateurs. Vous devez être admin.");
+        }
         if (Strings.isEmpty(request.getId())) {
             throw new UserUpdateException("L'utilisateur que vous voulez mettre à jour ne possède pas d'id.");
         }
