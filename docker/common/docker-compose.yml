@@ -5,7 +5,7 @@ services:
     image: postgres:13.2
     container_name: hospyboard_db
     hostname: db
-    restart: always
+    restart: on-failure
     volumes:
       - db_data:/var/lib/postgresql/data
       - ../config/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -24,8 +24,11 @@ services:
       context: ../../
     container_name: hospyboard_api
     hostname: hospyboard_api
+    depends_on:
+      - db
     networks:
       - default
+    restart: on-failure
     environment:
       - "SPRING_PROFILES_ACTIVE=docker"
     ports:
