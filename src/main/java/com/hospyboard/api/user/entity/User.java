@@ -1,5 +1,6 @@
 package com.hospyboard.api.user.entity;
 
+import com.hospyboard.api.core.db_converters.EncryptionDatabaseString;
 import com.hospyboard.api.user.enums.UserRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,21 +36,27 @@ public class User implements Serializable, UserDetails {
     }
 
     @Column(nullable = false, unique = true)
+    @Convert(converter = EncryptionDatabaseString.class)
     private String username;
 
     @Column(nullable = false)
+    @Convert(converter = EncryptionDatabaseString.class)
     private String password;
 
     @Column(name = "first_name", nullable = false)
+    @Convert(converter = EncryptionDatabaseString.class)
     private String firstName;
 
     @Column(name = "last_name", nullable = false)
+    @Convert(converter = EncryptionDatabaseString.class)
     private String lastName;
 
     @Column(nullable = false)
+    @Convert(converter = EncryptionDatabaseString.class)
     private String email;
 
     @Column(name = "user_role", nullable = false)
+    @Convert(converter = EncryptionDatabaseString.class)
     private String role;
 
     @Override
