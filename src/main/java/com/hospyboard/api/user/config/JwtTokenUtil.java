@@ -22,7 +22,7 @@ public class JwtTokenUtil {
 
     public UserTokenDTO generateAccessToken(final User user) {
         final Instant now = Instant.now();
-        final Instant expiresAt = now.plusSeconds(EXPIRATION_SECONDS_TOKEN);
+        final Instant expiresAt = now.plusSeconds(EXPIRATION_SECONDS_TOKEN - 20);
 
         return new UserTokenDTO(Jwts.builder()
                 .setSubject(String.format("%s,%s", user.getUuid(), user.getUsername()))
@@ -64,18 +64,17 @@ public class JwtTokenUtil {
     public boolean validate(String token) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
-            return true;//TODO add checking of tokens unvalidated (like password reseted or username changed)
-        } catch (SignatureException ex) {
-            log.error("Invalid JWT signature - {}", ex.getMessage());
-        } catch (MalformedJwtException ex) {
-            log.error("Invalid JWT token - {}", ex.getMessage());
-        } catch (ExpiredJwtException ex) {
-            log.error("Expired JWT token - {}", ex.getMessage());
-        } catch (UnsupportedJwtException ex) {
-            log.error("Unsupported JWT token - {}", ex.getMessage());
-        } catch (IllegalArgumentException ex) {
-            log.error("JWT claims string is empty - {}", ex.getMessage());
+            return true;//TODO add checking of tokens unvalidated (like password reset or username changed)
+        } catch (JwtException e) {
+            if (e instanceof ExpiredJwtException) {
+                log.error("Votre token de session a expiré. {}", e.getMessage());
+            } else {
+                log.error("Votre token d'accès est invalide. {}", e.getMessage());
+            }
+            return false;
+        } catch (IllegalArgumentException e) {
+            log.error("Votre token d'accès est invalide. {}", e.getMessage());
+            return false;
         }
-        return false;
     }
 }

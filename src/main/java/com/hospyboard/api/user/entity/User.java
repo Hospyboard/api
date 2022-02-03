@@ -6,14 +6,12 @@ import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity(name = "auth_user")
 @Getter
@@ -56,12 +54,7 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        final Collection<GrantedAuthority> roles = new ArrayList<GrantedAuthority>();
-        final UserRole userRole = new UserRole();
-
-        userRole.setAuthority(role);
-        roles.add(userRole);
-        return roles;
+        return Collections.singletonList(new SimpleGrantedAuthority(this.role));
     }
 
     @Override

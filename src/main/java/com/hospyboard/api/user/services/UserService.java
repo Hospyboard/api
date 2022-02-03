@@ -1,5 +1,6 @@
 package com.hospyboard.api.user.services;
 
+import com.hospyboard.api.core.exceptions.BadRequestException;
 import com.hospyboard.api.core.exceptions.ForbiddenException;
 import com.hospyboard.api.user.dto.UserCreationDTO;
 import com.hospyboard.api.user.dto.UserDTO;
@@ -10,7 +11,6 @@ import com.hospyboard.api.user.exception.UserUpdateException;
 import com.hospyboard.api.user.mappers.UserMapper;
 import com.hospyboard.api.user.repository.UserRepository;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.lang.Nullable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,9 +38,14 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Nullable
     public UserDTO getActualUser() {
-        return this.currentUser.getCurrentUser();
+        final UserDTO userDTO = this.currentUser.getCurrentUser();
+
+        if (userDTO == null) {
+            throw new BadRequestException("Impossible de récupérer l'utilisateur connecté. Veuillez vérifier que vous êtes bien connecté.");
+        } else {
+            return userDTO;
+        }
     }
 
     @Transactional
