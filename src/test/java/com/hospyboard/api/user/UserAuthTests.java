@@ -14,10 +14,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -51,14 +50,15 @@ public class UserAuthTests {
                 .andReturn();
 
         final UserDTO result = JsonHelper.fromJson(objectMapper, mvcResult.getResponse().getContentAsString(), UserDTO.class);
+        
         assertNotNull(result.getId());
         assertEquals(userCreationDTO.getUsername(), result.getUsername());
         assertEquals(userCreationDTO.getFirstName(), result.getFirstName());
         assertEquals(userCreationDTO.getLastName(), result.getLastName());
         assertEquals(userCreationDTO.getEmail(), result.getEmail());
         assertEquals(UserRole.PATIENT, result.getRole());
-        assertNotNull(result.getPassword());
-        assertNotNull(result.getPasswordConfirmation());
+        assertNull(result.getPassword());
+        assertNull(result.getPasswordConfirmation());
     }
 
 }
