@@ -25,7 +25,7 @@
         <swagger.version>2.9.2</swagger.version>
         <jackson.version>2.10.2</jackson.version>
         <jwt.version>0.9.1</jwt.version>
-        <org.flyway.version>8.4.1</org.flyway.version>
+        <org.flyway.version>8.5.8</org.flyway.version>
         <mariadb.version>3.0.3</mariadb.version>
     </properties>
 
@@ -166,9 +166,16 @@
             <version>${org.mapstruct.version}</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-mysql -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
+            <version>${org.flyway.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
             <version>${org.flyway.version}</version>
         </dependency>
 

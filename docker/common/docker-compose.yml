@@ -1,23 +1,18 @@
 version: '3.7'
 
 services:
-  db:
-    image: postgres:13.2
+  mysql:
+    image: mariadb:latest
     container_name: hospyboard_db
-    hostname: db
-    restart: on-failure
     volumes:
-      - db_data:/var/lib/postgresql/data
-      - ../config/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./config/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: on-failure
+    environment:
+      MYSQL_ROOT_PASSWORD: root
     networks:
       - default
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: azertyuiop
-      POSTGRES_DB: hospybord_devel
     ports:
-      - "5432:5432"
+      - "3306:3306"
 
   hospyboard:
     build:
@@ -25,7 +20,7 @@ services:
     container_name: hospyboard_api
     hostname: hospyboard_api
     depends_on:
-      - db
+      - mysql
     networks:
       - default
     restart: on-failure
@@ -38,6 +33,3 @@ networks:
   default:
     name: hospyboard_network
     driver: bridge
-
-volumes:
-  db_data:
