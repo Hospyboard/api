@@ -66,7 +66,7 @@ public class UserResource {
     }
 
     @PostMapping("register")
-    public UserDTO register(@RequestBody final UserCreationDTO userCreationDTO) {
+    public UserDTO register(@RequestBody @Valid final UserCreationDTO userCreationDTO) {
         return service.createNewUser(userCreationDTO);
     }
 

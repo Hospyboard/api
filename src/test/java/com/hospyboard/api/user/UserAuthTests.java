@@ -8,7 +8,6 @@ import com.hospyboard.api.user.dto.UserCreationDTO;
 import com.hospyboard.api.user.dto.UserDTO;
 import com.hospyboard.api.user.dto.UserTokenDTO;
 import com.hospyboard.api.user.enums.UserRole;
-import com.hospyboard.api.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
