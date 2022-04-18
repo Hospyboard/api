@@ -26,6 +26,7 @@
         <jackson.version>2.10.2</jackson.version>
         <jwt.version>0.9.1</jwt.version>
         <org.flyway.version>8.4.1</org.flyway.version>
+        <mariadb.version>3.0.3</mariadb.version>
     </properties>
 
     <dependencyManagement>
@@ -64,9 +65,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>${mariadb.version}</version>
         </dependency>
 
         <dependency>
