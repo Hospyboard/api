@@ -1,4 +1,0 @@
-[submodule "libs/FunixAPI"]
-	path = libs/FunixAPI
-	url = git@github.com:FunixProductions/FunixAPI.git
-	branch = master

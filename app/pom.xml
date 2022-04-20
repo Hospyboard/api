@@ -6,13 +6,13 @@
 
     <parent>
         <groupId>com.hospyboard.api</groupId>
-        <artifactId>HospyboardApi</artifactId>
+        <artifactId>hospyboard-api</artifactId>
         <version>1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>com.hospyboard.api.app</groupId>
-    <artifactId>HospyboardApiAPP</artifactId>
+    <artifactId>hospyboard-api-app</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
 

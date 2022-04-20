@@ -5,19 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.hospyboard.api</groupId>
-    <artifactId>HospyboardApi</artifactId>
+    <artifactId>hospyboard-api</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
 
     <parent>
-        <artifactId>FunixAPI</artifactId>
+        <artifactId>funix-api</artifactId>
         <groupId>fr.funixgaming.api</groupId>
         <version>1.0.0</version>
-        <relativePath>./libs/FunixAPI/pom.xml</relativePath>
     </parent>
 
     <modules>
-        <module>libs/FunixAPI</module>
         <module>app</module>
     </modules>
 
