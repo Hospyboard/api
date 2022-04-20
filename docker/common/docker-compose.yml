@@ -16,7 +16,7 @@ services:
 
   hospyboard:
     build:
-      context: ../../
+      context: ../../app
     container_name: hospyboard_api
     hostname: hospyboard_api
     depends_on:
