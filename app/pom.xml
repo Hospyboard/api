@@ -20,17 +20,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-
-        <swagger.version>2.9.2</swagger.version>
-        <jackson.version>2.10.2</jackson.version>
-        <org.flyway.version>8.5.8</org.flyway.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>fr.funixgaming.api.core</groupId>
             <artifactId>funix-api-core</artifactId>
-            <version>1.0.0</version>
+            <version>${fr.funixgaming.api.version}</version>
             <scope>compile</scope>
         </dependency>
 
