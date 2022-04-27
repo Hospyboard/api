@@ -4,10 +4,11 @@ import com.hospyboard.api.app.user.dto.UserCreationDTO;
 import com.hospyboard.api.app.user.dto.UserDTO;
 import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.enums.UserRole;
+import fr.funixgaming.api.core.crud.mappers.ApiMapper;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper {
+public interface UserMapper extends ApiMapper<User, UserDTO> {
     @Mapping(target = "uuid", source = "id")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)

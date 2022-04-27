@@ -1,5 +1,6 @@
 package com.hospyboard.api.app.user.dto;
 
+import fr.funixgaming.api.core.crud.dtos.ApiDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,9 +9,7 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
-public class UserDTO {
-    @NotBlank
-    private String id;
+public class UserDTO extends ApiDTO {
     @NotBlank
     private String username;
     @NotBlank
