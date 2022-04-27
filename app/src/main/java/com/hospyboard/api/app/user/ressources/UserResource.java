@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Set;
 
 @RestController
 @RequestMapping("user")
@@ -32,19 +33,29 @@ public class UserResource {
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
-    @GetMapping
+    @GetMapping("session")
     public UserDTO getActualUser() {
         return service.getActualUser();
     }
 
+    @GetMapping
+    public Set<UserDTO> getAllUsers() {
+        return this.service.getAll();
+    }
+
     @PatchMapping
-    public UserDTO partialUpdateUser(@RequestBody final UserDTO user) {
+    public UserDTO patchUser(@RequestBody final UserDTO user) {
         return this.service.updateUser(user);
     }
 
-    @PutMapping
-    public UserDTO updateUser(@RequestBody @Valid final UserDTO user) {
+    @PostMapping
+    public UserDTO createUser(@RequestBody @Valid final UserDTO user) {
         return this.service.updateUser(user);
+    }
+
+    @DeleteMapping
+    public void deleteUser(@RequestParam("id") String id) {
+        this.service.delete(id);
     }
 
     @PostMapping("login")
