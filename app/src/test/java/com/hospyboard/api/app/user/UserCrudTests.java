@@ -6,7 +6,6 @@ import com.hospyboard.api.app.user.config.JWTConfig;
 import com.hospyboard.api.app.user.dto.UserAuthDTO;
 import com.hospyboard.api.app.user.dto.UserCreationDTO;
 import com.hospyboard.api.app.user.dto.UserDTO;
-import com.hospyboard.api.app.user.dto.UserTokenDTO;
 import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.enums.UserRole;
 import com.hospyboard.api.app.user.repository.UserRepository;

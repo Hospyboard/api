@@ -1,6 +1,7 @@
 package com.hospyboard.api.app.user.entity;
 
 import com.hospyboard.api.app.core.db_converters.EncryptionDatabaseString;
+import fr.funixgaming.api.core.crud.entities.ApiEntity;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -13,27 +14,10 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 
-@Entity(name = "auth_user")
 @Getter
 @Setter
-public class User implements Serializable, UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, updatable = false, unique = true)
-    private Long id;
-
-    @NaturalId
-    @Column(name = "uuid", nullable = false, updatable = false, unique = true)
-    private String uuid;
-
-    @PrePersist
-    @PreUpdate
-    public void onCreateOrUpdate() {
-        if (Strings.isEmpty(uuid)) {
-            uuid = UUID.randomUUID().toString();
-        }
-    }
-
+@Entity(name = "auth_user")
+public class User extends ApiEntity implements UserDetails {
     @Column(nullable = false, unique = true)
     @Convert(converter = EncryptionDatabaseString.class)
     private String username;
@@ -57,6 +41,9 @@ public class User implements Serializable, UserDetails {
     @Column(name = "user_role", nullable = false)
     @Convert(converter = EncryptionDatabaseString.class)
     private String role;
+
+    @OneToMany(mappedBy = "user")
+    private Set<UserToken> tokens;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

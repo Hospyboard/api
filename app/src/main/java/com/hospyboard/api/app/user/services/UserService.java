@@ -10,6 +10,7 @@ import com.hospyboard.api.app.user.exception.RegisterHospyboardException;
 import com.hospyboard.api.app.user.exception.UserUpdateException;
 import com.hospyboard.api.app.user.mappers.UserMapper;
 import com.hospyboard.api.app.user.repository.UserRepository;
+import fr.funixgaming.api.core.crud.services.ApiService;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,10 +22,9 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepository> implements UserDetailsService {
 
     private final CurrentUser currentUser;
-    private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -32,7 +32,7 @@ public class UserService implements UserDetailsService {
                        UserMapper userMapper,
                        CurrentUser currentUser,
                        PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
+        super(userRepository, userMapper);
         this.userMapper = userMapper;
         this.currentUser = currentUser;
         this.passwordEncoder = passwordEncoder;
@@ -55,7 +55,7 @@ public class UserService implements UserDetailsService {
         if (currentUser != null && !currentUser.getRole().equals(UserRole.ADMIN)) {
             throw new ForbiddenException("Impossible de mettre à jour les comptes utilisateurs. Vous devez être admin.");
         }
-        if (Strings.isEmpty(request.getId())) {
+        if (request.getId() == null) {
             throw new UserUpdateException("L'utilisateur que vous voulez mettre à jour ne possède pas d'id.");
         }
 
@@ -68,23 +68,13 @@ public class UserService implements UserDetailsService {
             }
         }
 
-        final Optional<User> user = this.userRepository.findByUuid(request.getId());
-        if (user.isPresent()) {
-            final User userFind = user.get();
-            final User userPatch = this.userMapper.toEntity(request);
-
-            userPatch.setId(null);
-            this.userMapper.patchUser(userPatch, userFind);
-            return this.userMapper.toDto(this.userRepository.save(userFind));
-        } else {
-            throw new UserUpdateException("L'id que vous avez fourni n'existe pas en base de donnée.");
-        }
+        return super.update(request);
     }
 
     @Transactional
     public UserDTO createNewUser(final UserCreationDTO userCreationDTO) {
         if (userCreationDTO.getPassword().equals(userCreationDTO.getPasswordConfirmation())) {
-            final Optional<User> optUser = this.userRepository.findByUsername(userCreationDTO.getUsername());
+            final Optional<User> optUser = super.getRepository().findByUsername(userCreationDTO.getUsername());
 
             if (optUser.isPresent()) {
                 throw new RegisterHospyboardException("Ce nom d'utilisateur existe déjà.");
@@ -93,7 +83,7 @@ public class UserService implements UserDetailsService {
             final User user = this.userMapper.fromUserCreationToEntity(userCreationDTO);
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-            return this.userMapper.toDto(this.userRepository.save(user));
+            return this.userMapper.toDto(super.getRepository().save(user));
         } else {
             throw new RegisterHospyboardException("Vos mots de passe ne correspondent pas.");
         }
@@ -101,7 +91,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository
+        return super.getRepository()
                 .findByUsername(username)
                 .orElseThrow(
                         () -> new UsernameNotFoundException(String.format("Utilisateur non trouvé: %s", username))
