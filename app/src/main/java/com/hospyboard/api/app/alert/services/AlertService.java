@@ -1,12 +1,13 @@
 package com.hospyboard.api.app.alert.services;
 
 import com.hospyboard.api.app.alert.dto.AlertDTO;
-import com.hospyboard.api.app.alert.dto.AlertImportance;
-import com.hospyboard.api.app.alert.dto.AlertStatus;
-import com.hospyboard.api.app.alert.dto.AlertType;
+import com.hospyboard.api.app.alert.enums.AlertImportance;
+import com.hospyboard.api.app.alert.enums.AlertStatus;
+import com.hospyboard.api.app.alert.enums.AlertType;
 import com.hospyboard.api.app.alert.entity.AlertEntity;
 import com.hospyboard.api.app.alert.mappers.AlertMapper;
 import com.hospyboard.api.app.alert.repository.AlertRepository;
+import fr.funixgaming.api.core.crud.services.ApiService;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,67 +19,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-public class AlertService {
-
-    private final AlertRepository alertRepository;
-    private final AlertMapper alertMapper;
+public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper, AlertRepository> {
 
     public AlertService(AlertRepository alertRepository,
                        AlertMapper alertMapper) {
-        this.alertRepository = alertRepository;
-        this.alertMapper = alertMapper;
-    }
-
-    public void updateWS() throws Exception {
-        String url = "http://localhost:9393/notify";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        AlertDTO obj = new AlertDTO();
-        obj.setType(AlertType.WC);
-        obj.setPatientUuid("eeee");
-        obj.setImportance(AlertImportance.NOT_URGENT);
-        obj.setStatus(AlertStatus.PENDING);
-        obj.setStaffUuid("eeeeeeeeee");
-        HttpEntity<AlertDTO> req = new HttpEntity(obj, headers);
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.exchange(url, HttpMethod.GET,  req, String.class);
-    }
-
-    public AlertDTO create(final AlertDTO request) throws Exception {
-        AlertEntity alertEntity = new AlertEntity();
-        alertEntity.setType(request.getType());
-        alertEntity.setPatientUuid(request.getPatientUuid());
-        alertEntity.setImportance(request.getImportance());
-        alertEntity.setStatus(request.getStatus());
-        alertEntity.setStaffUuid(request.getStaffUuid());
-        return alertMapper.toDto(alertRepository.save(alertEntity));
-    }
-    public AlertDTO update(final AlertDTO request) throws Exception {
-        final AlertEntity alertEntity = this.alertRepository.getAlertEntityByAlertUuid(request.getAlertUuid());
-
-        alertEntity.setType(request.getType());
-        alertEntity.setPatientUuid(request.getPatientUuid());
-        alertEntity.setImportance(request.getImportance());
-        alertEntity.setStatus(request.getStatus());
-        alertEntity.setStaffUuid(request.getStaffUuid());
-        return alertMapper.toDto(alertRepository.save(alertEntity));
-    }
-
-    public Set<AlertDTO> get(final String alertUuid) throws Exception {
-        final Set<AlertEntity> ret = new HashSet<>();
-
-        if (alertUuid != null) {
-            ret.add(this.alertRepository.getAlertEntityByAlertUuid(alertUuid));
-        } else {
-            for (final AlertEntity alert : this.alertRepository.findAll()) {
-                ret.add(alert);
-            }
-        }
-        Set<AlertDTO> toRet = new HashSet<>();
-        for (AlertEntity alertEntity : ret) {
-            toRet.add(this.alertMapper.toDto(alertEntity));
-        }
-        return toRet;
+        super(alertRepository, alertMapper);
     }
 
 }

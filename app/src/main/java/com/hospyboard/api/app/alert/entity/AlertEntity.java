@@ -1,37 +1,18 @@
 package com.hospyboard.api.app.alert.entity;
 
-import com.hospyboard.api.app.alert.dto.AlertImportance;
-import com.hospyboard.api.app.alert.dto.AlertStatus;
-import com.hospyboard.api.app.alert.dto.AlertType;
+import com.hospyboard.api.app.alert.enums.AlertImportance;
+import com.hospyboard.api.app.alert.enums.AlertStatus;
+import com.hospyboard.api.app.alert.enums.AlertType;
+import fr.funixgaming.api.core.crud.entities.ApiEntity;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.util.Strings;
-import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
-import java.util.UUID;
 
-@Entity(name = "alert_entity")
 @Getter
 @Setter
-public class AlertEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, updatable = false, unique = true)
-    private Long id;
-
-    @NaturalId
-    @Column(name = "alertUuid", nullable = false, updatable = false, unique = true)
-    private String alertUuid;
-
-    @PrePersist
-    @PreUpdate
-    public void onCreateOrUpdate() {
-        if (Strings.isEmpty(alertUuid)) {
-            alertUuid = UUID.randomUUID().toString();
-        }
-    }
-
+@Entity(name = "alert_entity")
+public class AlertEntity extends ApiEntity {
     @Column(nullable = false)
     private String patientUuid;
 
