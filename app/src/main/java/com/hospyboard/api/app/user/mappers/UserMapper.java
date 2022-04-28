@@ -9,11 +9,12 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper extends ApiMapper<User, UserDTO> {
+    @Override
     @Mapping(target = "uuid", source = "id")
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "password", ignore = true)
     User toEntity(UserDTO dto);
 
+    @Override
     @Mapping(target = "id", source = "uuid")
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "passwordConfirmation", ignore = true)
@@ -24,7 +25,8 @@ public interface UserMapper extends ApiMapper<User, UserDTO> {
     @Mapping(target = "role", constant = UserRole.PATIENT)
     User fromUserCreationToEntity(UserCreationDTO userCreationDTO);
 
+    @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "authorities", ignore = true)
-    void patchUser(User newUser, @MappingTarget User oldUser);
+    void patch(User newUser, @MappingTarget User oldUser);
 }

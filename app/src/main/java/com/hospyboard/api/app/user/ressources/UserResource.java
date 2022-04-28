@@ -6,8 +6,11 @@ import com.hospyboard.api.app.user.dto.UserCreationDTO;
 import com.hospyboard.api.app.user.dto.UserDTO;
 import com.hospyboard.api.app.user.dto.UserTokenDTO;
 import com.hospyboard.api.app.user.entity.User;
+import com.hospyboard.api.app.user.enums.UserRole;
 import com.hospyboard.api.app.user.exception.LoginHospyboardException;
 import com.hospyboard.api.app.user.services.UserService;
+import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
+import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,6 +41,22 @@ public class UserResource {
         return service.getActualUser();
     }
 
+    @GetMapping("{id}")
+    public UserDTO getUserById(@PathVariable String id) {
+        final UserDTO userDTO = service.findById(id);
+
+        if (userDTO == null) {
+            throw new ApiNotFoundException("Utilisateur non trouvé.");
+        } else {
+            return userDTO;
+        }
+    }
+
+    @GetMapping("logout")
+    public void logoutUser() {
+        this.jwtTokenUtil.invalidateTokens(service.getActualUser().getId());
+    }
+
     @GetMapping
     public Set<UserDTO> getAllUsers() {
         return this.service.getAll();
@@ -50,12 +69,22 @@ public class UserResource {
 
     @PostMapping
     public UserDTO createUser(@RequestBody @Valid final UserDTO user) {
-        return this.service.updateUser(user);
+        final UserDTO currentUser = this.service.getActualUser();
+
+        if (currentUser.getRole().equals(UserRole.ADMIN)) {
+            return this.service.create(user);
+        } else {
+            throw new ApiForbiddenException("Vous n'êtes pas un admin.");
+        }
     }
 
     @DeleteMapping
     public void deleteUser(@RequestParam("id") String id) {
-        this.service.delete(id);
+        if (this.service.getActualUser().getRole().equals(UserRole.ADMIN)) {
+            this.service.delete(id);
+        } else {
+            throw new ApiForbiddenException("Vous n'êtes pas un admin.");
+        }
     }
 
     @PostMapping("login")

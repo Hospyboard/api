@@ -30,6 +30,13 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>

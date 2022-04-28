@@ -1,11 +1,14 @@
 package com.hospyboard.api.app.user.config;
 
+import com.hospyboard.api.app.user.dto.UserDTO;
 import com.hospyboard.api.app.user.dto.UserTokenDTO;
 import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.entity.UserToken;
 import com.hospyboard.api.app.user.mappers.UserTokenMapper;
+import com.hospyboard.api.app.user.repository.UserRepository;
 import com.hospyboard.api.app.user.repository.UserTokenRepository;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
+import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -13,10 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -26,13 +26,16 @@ public class JwtTokenUtil {
 
     private final UserTokenMapper tokenMapper;
     private final UserTokenRepository tokenRepository;
+    private final UserRepository userRepository;
     private final String jwtSecret;
 
     public JwtTokenUtil(JWTConfig jwtConfig,
                         UserTokenRepository tokenRepository,
+                        UserRepository userRepository,
                         UserTokenMapper tokenMapper) {
         this.jwtSecret = jwtConfig.getSecret();
         this.tokenMapper = tokenMapper;
+        this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
     }
 
@@ -61,12 +64,22 @@ public class JwtTokenUtil {
             final UserToken userToken = getToken(token);
 
             if (userToken == null) {
-                throw new ApiBadRequestException("Votre token d'accès est invalide.");
+                throw new ApiForbiddenException("Votre token d'accès est invalide.");
             } else {
                 return true;
             }
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    public void invalidateTokens(final UUID userUuid) {
+        final Optional<User> search = this.userRepository.findByUuid(userUuid.toString());
+
+        if (search.isPresent()) {
+            final User user = search.get();
+            final Set<UserToken> userTokens = user.getTokens();
+            this.tokenRepository.deleteAll(userTokens);
         }
     }
 

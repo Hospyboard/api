@@ -2,10 +2,10 @@ package com.hospyboard.api.app.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hospyboard.api.app.core.JsonHelper;
-import com.hospyboard.api.app.user.config.JWTConfig;
 import com.hospyboard.api.app.user.dto.UserAuthDTO;
 import com.hospyboard.api.app.user.dto.UserCreationDTO;
 import com.hospyboard.api.app.user.dto.UserDTO;
+import com.hospyboard.api.app.user.dto.UserTokenDTO;
 import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.enums.UserRole;
 import com.hospyboard.api.app.user.repository.UserRepository;
@@ -49,11 +49,11 @@ public class UserCrudTests {
         final UserDTO userDTO = getUserFromToken(credentials);
         final UserDTO patchUser = new UserDTO();
 
-        final Optional<User> user = this.userRepository.findByUuid(userDTO.getId());
+        final Optional<User> user = this.userRepository.findByUuid(userDTO.getId().toString());
         if (user.isPresent()) {
             final User userFind = user.get();
             userFind.setRole(UserRole.ADMIN);
-            this.userRepository.saveAndFlush(userFind);
+            this.userRepository.save(userFind);
         } else {
             fail("user not found");
         }
@@ -61,7 +61,7 @@ public class UserCrudTests {
         patchUser.setId(userDTO.getId());
         patchUser.setFirstName("heyChanged");
 
-        final MvcResult result = this.mockMvc.perform(patch("/user")
+        final MvcResult result = this.mockMvc.perform(patch(UserAuthTests.ROUTE)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
                 .content(JsonHelper.toJson(objectMapper, patchUser))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -72,37 +72,40 @@ public class UserCrudTests {
     }
 
     @Test
-    public void testPutUser() throws Exception {
+    public void testUserCreation() throws Exception {
         final UserTokenDTO credentials = generateToken();
         final UserDTO changedUser = getUserFromToken(credentials);
 
-        final Optional<User> user = this.userRepository.findByUuid(changedUser.getId());
+        final Optional<User> user = this.userRepository.findByUuid(changedUser.getId().toString());
         if (user.isPresent()) {
             final User userFind = user.get();
             userFind.setRole(UserRole.ADMIN);
-            this.userRepository.saveAndFlush(userFind);
+            this.userRepository.save(userFind);
         } else {
             fail("user not found");
         }
 
-        changedUser.setFirstName("ouioui");
-        changedUser.setLastName("nonnon");
-        changedUser.setPassword("oui");
-        changedUser.setPasswordConfirmation("oui");
+        final UserDTO request = new UserDTO();
+        request.setUsername("funix");
+        request.setFirstName("funixName");
+        request.setLastName("funixLast");
+        request.setEmail("email@funix.fr");
+        request.setPassword("1234567");
+        request.setRole(UserRole.ADMIN);
 
-        final MvcResult result = this.mockMvc.perform(put("/user")
+        final MvcResult result = this.mockMvc.perform(post(UserAuthTests.ROUTE)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
-                .content(JsonHelper.toJson(objectMapper, changedUser))
+                .content(JsonHelper.toJson(objectMapper, request))
                 .contentType(MediaType.APPLICATION_JSON)
-        ).andReturn();
+        ).andExpect(status().isOk()).andReturn();
 
         final UserDTO res = JsonHelper.fromJson(objectMapper, result.getResponse().getContentAsString(), UserDTO.class);
-        assertEquals(res.getId(), changedUser.getId());
-        assertEquals(res.getUsername(), changedUser.getUsername());
-        assertEquals(res.getFirstName(), changedUser.getFirstName());
-        assertEquals(res.getLastName(), changedUser.getLastName());
-        assertEquals(res.getEmail(), changedUser.getEmail());
-        assertEquals(res.getRole(), changedUser.getRole());
+        assertNotNull(res.getId());
+        assertEquals(res.getUsername(), request.getUsername());
+        assertEquals(res.getFirstName(), request.getFirstName());
+        assertEquals(res.getLastName(), request.getLastName());
+        assertEquals(res.getEmail(), request.getEmail());
+        assertEquals(res.getRole(), request.getRole());
         assertNull(res.getPassword());
         assertNull(res.getPasswordConfirmation());
     }
@@ -112,7 +115,7 @@ public class UserCrudTests {
         final UserTokenDTO credentials = generateToken();
         final UserDTO changedUser = getUserFromToken(credentials);
 
-        this.mockMvc.perform(patch("/user")
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
                 .content(JsonHelper.toJson(objectMapper, changedUser))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -125,11 +128,11 @@ public class UserCrudTests {
         final UserDTO userDTO = getUserFromToken(credentials);
         final UserDTO patchUser = new UserDTO();
 
-        final Optional<User> user = this.userRepository.findByUuid(userDTO.getId());
+        final Optional<User> user = this.userRepository.findByUuid(userDTO.getId().toString());
         if (user.isPresent()) {
             final User userFind = user.get();
             userFind.setRole(UserRole.ADMIN);
-            this.userRepository.saveAndFlush(userFind);
+            this.userRepository.save(userFind);
         } else {
             fail("user not found");
         }
@@ -139,7 +142,7 @@ public class UserCrudTests {
         patchUser.setPassword("oui");
         patchUser.setPasswordConfirmation("non");
 
-        this.mockMvc.perform(patch("/user")
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
                 .content(JsonHelper.toJson(objectMapper, patchUser))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -152,22 +155,77 @@ public class UserCrudTests {
         final UserDTO userDTO = getUserFromToken(credentials);
         final UserDTO patchUser = new UserDTO();
 
-        final Optional<User> user = this.userRepository.findByUuid(userDTO.getId());
+        final Optional<User> user = this.userRepository.findByUuid(userDTO.getId().toString());
         if (user.isPresent()) {
             final User userFind = user.get();
             userFind.setRole(UserRole.ADMIN);
-            this.userRepository.saveAndFlush(userFind);
+            this.userRepository.save(userFind);
         } else {
             fail("user not found");
         }
 
-        patchUser.setId(UUID.randomUUID().toString());
+        patchUser.setId(UUID.randomUUID());
 
-        this.mockMvc.perform(patch("/user")
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
                 .content(JsonHelper.toJson(objectMapper, patchUser))
                 .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isBadRequest());
+        ).andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteUser() throws Exception {
+        final UserTokenDTO credentials = generateToken();
+        final UserDTO userDTO = getUserFromToken(credentials);
+
+        final Optional<User> user = this.userRepository.findByUuid(userDTO.getId().toString());
+        if (user.isPresent()) {
+            final User userFind = user.get();
+            userFind.setRole(UserRole.ADMIN);
+            this.userRepository.save(userFind);
+        } else {
+            fail("user not found");
+        }
+
+        this.mockMvc.perform(delete(UserAuthTests.ROUTE + "?id=" + userDTO.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
+        ).andExpect(status().isOk());
+
+        this.mockMvc.perform(get(UserAuthTests.ROUTE + userDTO.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
+        ).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void deleteUserWithNoAdmin() throws Exception {
+        final UserTokenDTO credentials = generateToken();
+        final UserDTO userDTO = getUserFromToken(credentials);
+
+        this.mockMvc.perform(delete(UserAuthTests.ROUTE + "?id=" + userDTO.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
+        ).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testGetUser() throws Exception {
+        final UserTokenDTO credentials = generateToken();
+        final UserDTO userDTO = getUserFromToken(credentials);
+
+        MvcResult result = this.mockMvc.perform(get(UserAuthTests.ROUTE + userDTO.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
+        ).andExpect(status().isOk()).andReturn();
+
+        final UserDTO res = JsonHelper.fromJson(objectMapper, result.getResponse().getContentAsString(), UserDTO.class);
+        assertNotNull(res.getId());
+    }
+
+    @Test
+    public void testGetAll() throws Exception {
+        final UserTokenDTO credentials = generateToken();
+
+        this.mockMvc.perform(get(UserAuthTests.ROUTE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
+        ).andExpect(status().isOk());
     }
 
     private UserTokenDTO generateToken() throws Exception {
@@ -179,7 +237,7 @@ public class UserCrudTests {
         userCreationDTO.setPassword("12345");
         userCreationDTO.setPasswordConfirmation("12345");
 
-        this.mockMvc.perform(post(JWTConfig.REGISTER_URL)
+        this.mockMvc.perform(post(UserAuthTests.ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
                 .andExpect(status().isOk());
@@ -188,7 +246,7 @@ public class UserCrudTests {
         authDTO.setUsername(userCreationDTO.getUsername());
         authDTO.setPassword(userCreationDTO.getPassword());
 
-        MvcResult mvcResult = this.mockMvc.perform(post(JWTConfig.LOGIN_URL)
+        MvcResult mvcResult = this.mockMvc.perform(post(UserAuthTests.ROUTE + "login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonHelper.toJson(objectMapper, authDTO)))
                 .andExpect(status().isOk())
@@ -198,7 +256,7 @@ public class UserCrudTests {
     }
 
     private UserDTO getUserFromToken(final UserTokenDTO userTokenDTO) throws Exception {
-        final MvcResult mvcResultGet = this.mockMvc.perform(get("/user")
+        final MvcResult mvcResultGet = this.mockMvc.perform(get(UserAuthTests.ROUTE + "session")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + userTokenDTO.getToken())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
