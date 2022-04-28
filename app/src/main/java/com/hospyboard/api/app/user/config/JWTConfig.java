@@ -10,8 +10,5 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "jwt")
 public class JWTConfig {
-    public static final String REGISTER_URL = "/user/register";
-    public static final String LOGIN_URL = "/user/login";
-
     private String secret;
 }
