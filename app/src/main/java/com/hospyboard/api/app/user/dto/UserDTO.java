@@ -20,7 +20,6 @@ public class UserDTO extends ApiDTO {
     private String email;
     @NotBlank
     private String password;
-    @NotBlank
     private String passwordConfirmation;
     @NotBlank
     private String role;

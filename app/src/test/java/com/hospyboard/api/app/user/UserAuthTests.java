@@ -6,6 +6,7 @@ import com.hospyboard.api.app.user.config.JWTConfig;
 import com.hospyboard.api.app.user.dto.UserAuthDTO;
 import com.hospyboard.api.app.user.dto.UserCreationDTO;
 import com.hospyboard.api.app.user.dto.UserDTO;
+import com.hospyboard.api.app.user.dto.UserTokenDTO;
 import com.hospyboard.api.app.user.enums.UserRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class UserAuthTests {
 
+    public static final String ROUTE = "/user/";
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
 
@@ -47,14 +49,17 @@ public class UserAuthTests {
         userCreationDTO.setPassword("12345");
         userCreationDTO.setPasswordConfirmation("12345");
 
-        MvcResult mvcResult = this.mockMvc.perform(post(JWTConfig.REGISTER_URL)
+        MvcResult mvcResult = this.mockMvc.perform(post(ROUTE + "register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         final UserDTO result = JsonHelper.fromJson(objectMapper, mvcResult.getResponse().getContentAsString(), UserDTO.class);
+
         assertNotNull(result.getId());
+        assertNotNull(result.getCreatedAt());
+        assertNull(result.getUpdatedAt());
         assertEquals(userCreationDTO.getUsername(), result.getUsername());
         assertEquals(userCreationDTO.getFirstName(), result.getFirstName());
         assertEquals(userCreationDTO.getLastName(), result.getLastName());
@@ -75,7 +80,7 @@ public class UserAuthTests {
         userCreationDTO.setPassword("12345");
         userCreationDTO.setPasswordConfirmation("123456");
 
-        this.mockMvc.perform(post(JWTConfig.REGISTER_URL)
+        this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
                 .andExpect(status().isBadRequest());
@@ -92,11 +97,11 @@ public class UserAuthTests {
         userCreationDTO.setPassword("12345");
         userCreationDTO.setPasswordConfirmation("12345");
 
-        this.mockMvc.perform(post(JWTConfig.REGISTER_URL)
+        this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
                 .andExpect(status().isOk());
-        this.mockMvc.perform(post(JWTConfig.REGISTER_URL)
+        this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
                 .andExpect(status().isBadRequest());
@@ -112,7 +117,7 @@ public class UserAuthTests {
         userCreationDTO.setPassword("12345");
         userCreationDTO.setPasswordConfirmation("12345");
 
-        this.mockMvc.perform(post(JWTConfig.REGISTER_URL)
+        this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
                 .andExpect(status().isOk());
@@ -121,15 +126,16 @@ public class UserAuthTests {
         authDTO.setUsername(userCreationDTO.getUsername());
         authDTO.setPassword(userCreationDTO.getPassword());
 
-        MvcResult mvcResult = this.mockMvc.perform(post(JWTConfig.LOGIN_URL)
+        MvcResult mvcResult = this.mockMvc.perform(post(ROUTE + "login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonHelper.toJson(objectMapper, authDTO)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         final UserTokenDTO result = JsonHelper.fromJson(objectMapper, mvcResult.getResponse().getContentAsString(), UserTokenDTO.class);
-        assertNotNull(result.getExpiresInSeconds());
+        assertNotNull(result.getExpirationDate());
         assertNotNull(result.getToken());
+        assertNotNull(result.getUser());
     }
 
     @Test
@@ -142,7 +148,7 @@ public class UserAuthTests {
         userCreationDTO.setPassword("12345");
         userCreationDTO.setPasswordConfirmation("12345");
 
-        this.mockMvc.perform(post(JWTConfig.REGISTER_URL)
+        this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
                 .andExpect(status().isOk());
@@ -151,7 +157,7 @@ public class UserAuthTests {
         authDTO.setUsername(userCreationDTO.getUsername());
         authDTO.setPassword("WrongPassword");
 
-        this.mockMvc.perform(post(JWTConfig.LOGIN_URL)
+        this.mockMvc.perform(post(ROUTE + "login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonHelper.toJson(objectMapper, authDTO)))
                 .andExpect(status().isBadRequest());
@@ -163,7 +169,7 @@ public class UserAuthTests {
         authDTO.setUsername("NoAccountHere");
         authDTO.setPassword("password");
 
-        this.mockMvc.perform(post(JWTConfig.LOGIN_URL)
+        this.mockMvc.perform(post(ROUTE + "login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonHelper.toJson(objectMapper, authDTO)))
                 .andExpect(status().isBadRequest());
@@ -179,7 +185,7 @@ public class UserAuthTests {
         userCreationDTO.setPassword("12345");
         userCreationDTO.setPasswordConfirmation("12345");
 
-        this.mockMvc.perform(post(JWTConfig.REGISTER_URL)
+        this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
                 .andExpect(status().isOk());
@@ -188,7 +194,7 @@ public class UserAuthTests {
         authDTO.setUsername(userCreationDTO.getUsername());
         authDTO.setPassword(userCreationDTO.getPassword());
 
-        MvcResult mvcResult = this.mockMvc.perform(post(JWTConfig.LOGIN_URL)
+        MvcResult mvcResult = this.mockMvc.perform(post(ROUTE + "login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JsonHelper.toJson(objectMapper, authDTO)))
                 .andExpect(status().isOk())
@@ -196,7 +202,7 @@ public class UserAuthTests {
 
         final UserTokenDTO result = JsonHelper.fromJson(objectMapper, mvcResult.getResponse().getContentAsString(), UserTokenDTO.class);
 
-        final MvcResult mvcResultGet = this.mockMvc.perform(get("/user")
+        final MvcResult mvcResultGet = this.mockMvc.perform(get(ROUTE + "session")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.getToken())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
@@ -213,15 +219,52 @@ public class UserAuthTests {
     }
 
     @Test
+    public void testLogout() throws Exception {
+        final UserCreationDTO userCreationDTO = new UserCreationDTO();
+        userCreationDTO.setUsername(UUID.randomUUID().toString());
+        userCreationDTO.setFirstName("testFirstName");
+        userCreationDTO.setLastName("testLastName");
+        userCreationDTO.setEmail("test@gmail.com");
+        userCreationDTO.setPassword("12345");
+        userCreationDTO.setPasswordConfirmation("12345");
+
+        this.mockMvc.perform(post(ROUTE + "register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
+                .andExpect(status().isOk());
+
+        final UserAuthDTO authDTO = new UserAuthDTO();
+        authDTO.setUsername(userCreationDTO.getUsername());
+        authDTO.setPassword(userCreationDTO.getPassword());
+
+        MvcResult mvcResult = this.mockMvc.perform(post(ROUTE + "login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JsonHelper.toJson(objectMapper, authDTO)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        final UserTokenDTO result = JsonHelper.fromJson(objectMapper, mvcResult.getResponse().getContentAsString(), UserTokenDTO.class);
+        this.mockMvc.perform(get(ROUTE + "logout")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.getToken()))
+                .andExpect(status().isOk());
+
+        this.mockMvc.perform(get(ROUTE + "session")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.getToken())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+
+    }
+
+    @Test
     public void testGettingActualUserNoAuthError() throws Exception {
-        this.mockMvc.perform(get("/user")
+        this.mockMvc.perform(get(ROUTE)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void testInvalidTokenAccess() throws Exception {
-        this.mockMvc.perform(get("/user")
+        this.mockMvc.perform(get(ROUTE)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer qlkjd75")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
