@@ -1,9 +1,5 @@
 package com.hospyboard.api.app.user.enums;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-
 public class UserRole {
     public static final String PATIENT = "PATIENT";
     public static final String HOSPYTAL_WORKER = "HOSPYTAL_WORKER";
