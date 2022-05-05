@@ -11,6 +11,7 @@ import com.hospyboard.api.app.user.enums.UserRole;
 import com.hospyboard.api.app.user.services.CurrentUser;
 import com.hospyboard.api.app.user.services.UserService;
 import fr.funixgaming.api.core.crud.services.ApiService;
+import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiException;
 import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
@@ -46,11 +47,12 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
             AlertEntity alert = super.getMapper().toEntity(request);
 
             alert.setPatient(patient);
+            alert.setStaff(null);
             alert.setStatus(AlertStatus.PENDING);
             alert = super.getRepository().save(alert);
             return super.getMapper().toDto(alert);
         } else {
-            throw new ApiException("Ce patient n'existe pas.");
+            throw new ApiBadRequestException("Ce patient n'existe pas.");
         }
     }
 
