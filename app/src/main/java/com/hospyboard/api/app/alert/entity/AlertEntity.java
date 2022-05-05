@@ -20,7 +20,7 @@ public class AlertEntity extends ApiEntity {
     private User patient;
 
     @MapsId
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "staff_id")
     private User staff;
 
