@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -17,12 +18,12 @@ public class AlertDTO extends ApiDTO {
 
     private String staffUuid;
 
-    @NotBlank
+    @NotNull
     private AlertType type;
 
-    @NotBlank
+    @NotNull
     private AlertImportance importance;
 
-    @NotBlank
+    @NotNull
     private AlertStatus status;
 }

@@ -13,8 +13,11 @@ import javax.persistence.*;
 @Setter
 @Entity(name = "alert_entity")
 public class AlertEntity extends ApiEntity {
-    @Column(nullable = false)
+    @Column(nullable = false, name = "patient_uuid")
     private String patientUuid;
+
+    @Column(name = "staff_uuid")
+    private String staffUuid;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -27,8 +30,5 @@ public class AlertEntity extends ApiEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private AlertStatus status;
-
-    @Column(nullable = true)
-    private String staffUuid;
 
 }

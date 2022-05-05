@@ -84,7 +84,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     }
 
     @Transactional
-    public UserDTO createNewUser(final UserCreationDTO userCreationDTO) {
+    public UserDTO register(final UserCreationDTO userCreationDTO) {
         if (userCreationDTO.getPassword().equals(userCreationDTO.getPasswordConfirmation())) {
             final Optional<User> optUser = super.getRepository().findByUsername(userCreationDTO.getUsername());
 
@@ -93,8 +93,16 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
             }
 
             final User user = this.userMapper.fromUserCreationToEntity(userCreationDTO);
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            final Optional<User> admin = this.getRepository().findByUsername("admin");
+            final Optional<User> hospital = this.getRepository().findByUsername("hospital");
 
+            if (userCreationDTO.getUsername().equalsIgnoreCase("admin") && admin.isEmpty()) {
+                user.setRole(UserRole.ADMIN);
+            } else if (userCreationDTO.getUsername().equalsIgnoreCase("hospital") && hospital.isEmpty()) {
+                user.setRole(UserRole.HOSPYTAL_WORKER);
+            }
+
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             return this.userMapper.toDto(super.getRepository().save(user));
         } else {
             throw new RegisterHospyboardException("Vos mots de passe ne correspondent pas.");
