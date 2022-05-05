@@ -15,13 +15,13 @@ import javax.persistence.*;
 @Entity(name = "alert_entity")
 public class AlertEntity extends ApiEntity {
     @MapsId
-    @OneToOne
-    @Column(nullable = false, name = "patient_id")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "patient_id", nullable = false)
     private User patient;
 
     @MapsId
     @OneToOne
-    @Column(name = "staff_id")
+    @JoinColumn(name = "staff_id")
     private User staff;
 
     @Column(nullable = false)
