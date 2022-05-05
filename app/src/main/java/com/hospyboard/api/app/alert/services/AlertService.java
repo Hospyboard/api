@@ -1,82 +1,113 @@
 package com.hospyboard.api.app.alert.services;
 
 import com.hospyboard.api.app.alert.dto.AlertDTO;
-import com.hospyboard.api.app.alert.enums.AlertImportance;
-import com.hospyboard.api.app.alert.enums.AlertStatus;
-import com.hospyboard.api.app.alert.enums.AlertType;
 import com.hospyboard.api.app.alert.entity.AlertEntity;
+import com.hospyboard.api.app.alert.enums.AlertStatus;
 import com.hospyboard.api.app.alert.mappers.AlertMapper;
 import com.hospyboard.api.app.alert.repository.AlertRepository;
 import com.hospyboard.api.app.user.dto.UserDTO;
+import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.enums.UserRole;
 import com.hospyboard.api.app.user.services.CurrentUser;
+import com.hospyboard.api.app.user.services.UserService;
 import fr.funixgaming.api.core.crud.services.ApiService;
+import fr.funixgaming.api.core.exceptions.ApiException;
 import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.HashSet;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper, AlertRepository> {
 
+    private final UserService userService;
     private final CurrentUser currentUser;
 
     public AlertService(AlertRepository alertRepository,
                         AlertMapper alertMapper,
-                        CurrentUser currentUser) {
+                        CurrentUser currentUser,
+                        UserService userService) {
         super(alertRepository, alertMapper);
         this.currentUser = currentUser;
+        this.userService = userService;
     }
 
     @Override
     public AlertDTO create(AlertDTO request) {
-        editDto(request);
-        return super.create(request);
+        final Optional<User> patientSearch = userService.getRepository().findByUuid(currentUser.getCurrentUser().getId().toString());
+
+        if (patientSearch.isPresent()) {
+            final User patient = patientSearch.get();
+            AlertEntity alert = super.getMapper().toEntity(request);
+
+            alert.setPatient(patient);
+            alert.setStatus(AlertStatus.PENDING);
+            alert = super.getRepository().save(alert);
+            return super.getMapper().toDto(alert);
+        } else {
+            throw new ApiException("Ce patient n'existe pas.");
+        }
     }
 
     @Override
     public List<AlertDTO> update(List<AlertDTO> request) {
-        for (final AlertDTO alertDTO : request) {
-            editDto(alertDTO);
-        }
+        final List<AlertDTO> data = new ArrayList<>();
 
-        return super.update(request);
+        for (final AlertDTO alertDTO : request) {
+            data.add(editDto(alertDTO));
+        }
+        return data;
     }
 
     @Override
     public AlertDTO update(AlertDTO request) {
-        editDto(request);
-        return super.update(request);
+        return editDto(request);
     }
 
-    private void editDto(final AlertDTO request) {
-        final UserDTO user = currentUser.getCurrentUser();
+    private AlertDTO editDto(final AlertDTO request) {
+        final UserDTO userDto = currentUser.getCurrentUser();
+        final Optional<AlertEntity> search = super.getRepository().findByUuid(request.getId().toString());
+        final Optional<User> searchUser = userService.getRepository().findByUuid(userDto.getId().toString());
+        final AlertEntity alert;
+        final User user;
+
+        if (search.isPresent()) {
+            alert = search.get();
+        } else {
+            throw new ApiNotFoundException("Cette alerte n'existe pas.");
+        }
+
+        if (searchUser.isPresent()) {
+            user = searchUser.get();
+        } else {
+            throw new ApiNotFoundException("L'utilisateur connecté est introuvable.");
+        }
+
+        AlertEntity requestEnt = super.getMapper().toEntity(request);
+        requestEnt.setId(null);
+        requestEnt.setUpdatedAt(Date.from(Instant.now()));
+        super.getMapper().patch(requestEnt, alert);
 
         if (user.getRole().equals(UserRole.PATIENT)) {
             if (request.getId() != null) {
-                final Optional<AlertEntity> search = super.getRepository().findByUuid(request.getId().toString());
+                final User patient = alert.getPatient();
 
-                if (search.isPresent()) {
-                    final AlertEntity alert = search.get();
-
-                    if (!alert.getPatient().getUuid().equals(user.getId())) {
-                        throw new ApiForbiddenException("Vous ne pouvez pas modifier une alerte que vous n'avez pas crée.");
-                    }
+                if (patient == null || !patient.getId().equals(user.getId())) {
+                    throw new ApiForbiddenException("Vous ne pouvez pas modifier une alerte que vous n'avez pas crée.");
                 }
             }
 
-            request.setPatient(user);
+            alert.setPatient(user);
         } else {
-            request.setStaff(user);
+            alert.setStaff(user);
         }
+
+        return super.getMapper().toDto(super.getRepository().save(alert));
     }
 
 }
