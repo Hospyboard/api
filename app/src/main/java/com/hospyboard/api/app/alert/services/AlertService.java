@@ -38,7 +38,7 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
     }
 
     @Override
-    public AlertDTO create(AlertDTO request) {
+    public AlertDTO create(AlertDTO request) throws ApiException {
         final Optional<User> patientSearch = userService.getRepository().findByUuid(currentUser.getCurrentUser().getId().toString());
 
         if (patientSearch.isPresent()) {
@@ -55,7 +55,7 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
     }
 
     @Override
-    public List<AlertDTO> update(List<AlertDTO> request) {
+    public List<AlertDTO> update(List<AlertDTO> request) throws ApiException {
         final List<AlertDTO> data = new ArrayList<>();
 
         for (final AlertDTO alertDTO : request) {
@@ -65,11 +65,11 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
     }
 
     @Override
-    public AlertDTO update(AlertDTO request) {
+    public AlertDTO update(AlertDTO request) throws ApiException {
         return editDto(request);
     }
 
-    private AlertDTO editDto(final AlertDTO request) {
+    private AlertDTO editDto(final AlertDTO request) throws ApiException {
         final UserDTO userDto = currentUser.getCurrentUser();
         final Optional<AlertEntity> search = super.getRepository().findByUuid(request.getId().toString());
         final Optional<User> searchUser = userService.getRepository().findByUuid(userDto.getId().toString());
