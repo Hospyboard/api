@@ -36,4 +36,7 @@ public class AlertEntity extends ApiEntity {
     @Enumerated(EnumType.STRING)
     private AlertStatus status;
 
+    @Column(length = 10000)
+    private String infos;
+
 }
