@@ -16,7 +16,8 @@ services:
 
   hospyboard:
     build:
-      context: ../../app
+      context: ../../
+      dockerfile: Dockerfile
     container_name: hospyboard_api
     hostname: hospyboard_api
     depends_on:
