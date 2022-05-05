@@ -23,7 +23,6 @@ public class AlertDTO extends ApiDTO {
     @NotNull
     private AlertImportance importance;
 
-    @NotNull
     private AlertStatus status;
 
     private String infos;
