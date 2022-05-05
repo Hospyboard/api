@@ -18,7 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Set;
+import java.util.List;
 
 @RestController
 @RequestMapping("user")
@@ -58,8 +58,8 @@ public class UserResource {
     }
 
     @GetMapping
-    public Set<UserDTO> getAllUsers() {
-        return this.service.getAll();
+    public List<UserDTO> getAllUsers() {
+        return this.service.getAll(null, null);
     }
 
     @PatchMapping
@@ -107,7 +107,7 @@ public class UserResource {
 
     @PostMapping("register")
     public UserDTO register(@RequestBody @Valid final UserCreationDTO userCreationDTO) {
-        return service.createNewUser(userCreationDTO);
+        return service.register(userCreationDTO);
     }
 
 }
