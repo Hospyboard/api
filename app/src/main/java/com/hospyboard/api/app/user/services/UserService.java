@@ -29,6 +29,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
 
     private final CurrentUser currentUser;
     private final UserMapper userMapper;
+
     private final JwtTokenUtil tokenUtil;
     private final PasswordEncoder passwordEncoder;
 
