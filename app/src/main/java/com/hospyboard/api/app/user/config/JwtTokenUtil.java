@@ -78,7 +78,8 @@ public class JwtTokenUtil {
 
         if (search.isPresent()) {
             final User user = search.get();
-            final Set<UserToken> userTokens = user.getTokens();
+            final Set<UserToken> userTokens = this.tokenRepository.findAllByUser(user);
+
             this.tokenRepository.deleteAll(userTokens);
         }
     }
