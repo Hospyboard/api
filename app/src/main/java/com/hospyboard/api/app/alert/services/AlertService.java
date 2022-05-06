@@ -8,8 +8,8 @@ import com.hospyboard.api.app.alert.repository.AlertRepository;
 import com.hospyboard.api.app.user.dto.UserDTO;
 import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.enums.UserRole;
+import com.hospyboard.api.app.user.repository.UserRepository;
 import com.hospyboard.api.app.user.services.CurrentUser;
-import com.hospyboard.api.app.user.services.UserService;
 import fr.funixgaming.api.core.crud.services.ApiService;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiException;
@@ -17,30 +17,29 @@ import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper, AlertRepository> {
 
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final CurrentUser currentUser;
 
     public AlertService(AlertRepository alertRepository,
                         AlertMapper alertMapper,
                         CurrentUser currentUser,
-                        UserService userService) {
+                        UserRepository userRepository) {
         super(alertRepository, alertMapper);
         this.currentUser = currentUser;
-        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @Override
+    @Transactional
     public AlertDTO create(AlertDTO request) throws ApiException {
-        final Optional<User> patientSearch = userService.getRepository().findByUuid(currentUser.getCurrentUser().getId().toString());
+        final Optional<User> patientSearch = userRepository.findByUuid(currentUser.getCurrentUser().getId().toString());
 
         if (patientSearch.isPresent()) {
             final User patient = patientSearch.get();
@@ -57,6 +56,7 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
     }
 
     @Override
+    @Transactional
     public List<AlertDTO> update(List<AlertDTO> request) throws ApiException {
         final List<AlertDTO> data = new ArrayList<>();
 
@@ -67,6 +67,7 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
     }
 
     @Override
+    @Transactional
     public AlertDTO update(AlertDTO request) throws ApiException {
         return editDto(request);
     }
@@ -74,7 +75,7 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
     private AlertDTO editDto(final AlertDTO request) throws ApiException {
         final UserDTO userDto = currentUser.getCurrentUser();
         final Optional<AlertEntity> search = super.getRepository().findByUuid(request.getId().toString());
-        final Optional<User> searchUser = userService.getRepository().findByUuid(userDto.getId().toString());
+        final Optional<User> searchUser = userRepository.findByUuid(userDto.getId().toString());
         final AlertEntity alert;
         final User user;
 
