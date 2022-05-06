@@ -1,17 +1,15 @@
 package com.hospyboard.api.app.user.entity;
 
+import com.hospyboard.api.app.alert.entity.AlertEntity;
 import com.hospyboard.api.app.core.db_converters.EncryptionDatabaseString;
 import fr.funixgaming.api.core.crud.entities.ApiEntity;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.util.Strings;
-import org.hibernate.annotations.NaturalId;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.*;
 
 @Getter
@@ -44,6 +42,12 @@ public class User extends ApiEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private Set<UserToken> tokens;
+
+    @OneToMany(mappedBy = "patient", orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<AlertEntity> patientAlerts;
+
+    @OneToMany(mappedBy = "staff", orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<AlertEntity> staffAlerts;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

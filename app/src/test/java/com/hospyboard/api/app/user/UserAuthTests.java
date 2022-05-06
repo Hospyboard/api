@@ -29,11 +29,11 @@ public class UserAuthTests {
 
     public static final String ROUTE = "/user/";
     private final MockMvc mockMvc;
-    private final ObjectMapper objectMapper;
+    private final JsonHelper objectMapper;
 
     @Autowired
     public UserAuthTests(MockMvc mockMvc,
-                         ObjectMapper objectMapper) {
+                         JsonHelper objectMapper) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
     }
@@ -51,11 +51,11 @@ public class UserAuthTests {
 
         MvcResult mvcResult = this.mockMvc.perform(post(ROUTE + "register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
+                .content(objectMapper.toJson(userCreationDTO)))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        final UserDTO result = JsonHelper.fromJson(objectMapper, mvcResult.getResponse().getContentAsString(), UserDTO.class);
+        final UserDTO result = objectMapper.fromJson(mvcResult.getResponse().getContentAsString(), UserDTO.class);
 
         assertNotNull(result.getId());
         assertNotNull(result.getCreatedAt());
@@ -82,7 +82,7 @@ public class UserAuthTests {
 
         this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
+                        .content(objectMapper.toJson(userCreationDTO)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -99,11 +99,11 @@ public class UserAuthTests {
 
         this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
+                        .content(objectMapper.toJson(userCreationDTO)))
                 .andExpect(status().isOk());
         this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
+                        .content(objectMapper.toJson(userCreationDTO)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -119,7 +119,7 @@ public class UserAuthTests {
 
         this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
+                        .content(objectMapper.toJson(userCreationDTO)))
                 .andExpect(status().isOk());
 
         final UserAuthDTO authDTO = new UserAuthDTO();
@@ -128,11 +128,11 @@ public class UserAuthTests {
 
         MvcResult mvcResult = this.mockMvc.perform(post(ROUTE + "login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonHelper.toJson(objectMapper, authDTO)))
+                        .content(objectMapper.toJson(authDTO)))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        final UserTokenDTO result = JsonHelper.fromJson(objectMapper, mvcResult.getResponse().getContentAsString(), UserTokenDTO.class);
+        final UserTokenDTO result = objectMapper.fromJson(mvcResult.getResponse().getContentAsString(), UserTokenDTO.class);
         assertNotNull(result.getExpirationDate());
         assertNotNull(result.getToken());
         assertNotNull(result.getUser());
@@ -150,7 +150,7 @@ public class UserAuthTests {
 
         this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
+                        .content(objectMapper.toJson(userCreationDTO)))
                 .andExpect(status().isOk());
 
         final UserAuthDTO authDTO = new UserAuthDTO();
@@ -159,7 +159,7 @@ public class UserAuthTests {
 
         this.mockMvc.perform(post(ROUTE + "login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonHelper.toJson(objectMapper, authDTO)))
+                        .content(objectMapper.toJson(authDTO)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -171,7 +171,7 @@ public class UserAuthTests {
 
         this.mockMvc.perform(post(ROUTE + "login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonHelper.toJson(objectMapper, authDTO)))
+                        .content(objectMapper.toJson(authDTO)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -187,7 +187,7 @@ public class UserAuthTests {
 
         this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
+                        .content(objectMapper.toJson(userCreationDTO)))
                 .andExpect(status().isOk());
 
         final UserAuthDTO authDTO = new UserAuthDTO();
@@ -196,18 +196,18 @@ public class UserAuthTests {
 
         MvcResult mvcResult = this.mockMvc.perform(post(ROUTE + "login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonHelper.toJson(objectMapper, authDTO)))
+                        .content(objectMapper.toJson(authDTO)))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        final UserTokenDTO result = JsonHelper.fromJson(objectMapper, mvcResult.getResponse().getContentAsString(), UserTokenDTO.class);
+        final UserTokenDTO result = objectMapper.fromJson(mvcResult.getResponse().getContentAsString(), UserTokenDTO.class);
 
         final MvcResult mvcResultGet = this.mockMvc.perform(get(ROUTE + "session")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.getToken())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
-        final UserDTO account = JsonHelper.fromJson(objectMapper, mvcResultGet.getResponse().getContentAsString(), UserDTO.class);
+        final UserDTO account = objectMapper.fromJson(mvcResultGet.getResponse().getContentAsString(), UserDTO.class);
         assertNotNull(account.getId());
         assertEquals(account.getUsername(), userCreationDTO.getUsername());
         assertEquals(account.getFirstName(), userCreationDTO.getFirstName());
@@ -230,7 +230,7 @@ public class UserAuthTests {
 
         this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonHelper.toJson(objectMapper, userCreationDTO)))
+                        .content(objectMapper.toJson(userCreationDTO)))
                 .andExpect(status().isOk());
 
         final UserAuthDTO authDTO = new UserAuthDTO();
@@ -239,11 +239,11 @@ public class UserAuthTests {
 
         MvcResult mvcResult = this.mockMvc.perform(post(ROUTE + "login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonHelper.toJson(objectMapper, authDTO)))
+                        .content(objectMapper.toJson(authDTO)))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        final UserTokenDTO result = JsonHelper.fromJson(objectMapper, mvcResult.getResponse().getContentAsString(), UserTokenDTO.class);
+        final UserTokenDTO result = objectMapper.fromJson(mvcResult.getResponse().getContentAsString(), UserTokenDTO.class);
         this.mockMvc.perform(get(ROUTE + "logout")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.getToken()))
                 .andExpect(status().isOk());
