@@ -1,19 +1,23 @@
 package com.hospyboard.api.app.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hospyboard.api.app.core.JsonHelper;
-import com.hospyboard.api.app.user.config.JWTConfig;
 import com.hospyboard.api.app.user.dto.UserAuthDTO;
 import com.hospyboard.api.app.user.dto.UserCreationDTO;
 import com.hospyboard.api.app.user.dto.UserDTO;
 import com.hospyboard.api.app.user.dto.UserTokenDTO;
+import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.enums.UserRole;
+import com.hospyboard.api.app.user.repository.UserRepository;
+import com.hospyboard.api.app.user.services.CurrentUser;
+import com.hospyboard.api.app.user.services.UserService;
+import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -30,16 +34,26 @@ public class UserAuthTests {
     public static final String ROUTE = "/user/";
     private final MockMvc mockMvc;
     private final JsonHelper objectMapper;
+    private final CurrentUser currentUser;
+    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Autowired
     public UserAuthTests(MockMvc mockMvc,
-                         JsonHelper objectMapper) {
+                         JsonHelper objectMapper,
+                         CurrentUser currentUser,
+                         UserService userService,
+                         UserRepository userRepository) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
+        this.currentUser = currentUser;
+        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @Test
     public void testRegisterSuccess() throws Exception {
+        new UserRole();
         final UserCreationDTO userCreationDTO = new UserCreationDTO();
 
         userCreationDTO.setUsername("testUser");
@@ -268,5 +282,30 @@ public class UserAuthTests {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer qlkjd75")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void serviceGetUserNoAuth() {
+        try {
+            this.currentUser.getCurrentUser();
+            fail();
+        } catch (ApiForbiddenException ignored) {
+        }
+    }
+
+    @Test
+    public void testLoadByUsername() {
+        User user = new User();
+        user.setUsername("USERtESTGGGG");
+        user.setPassword("passss");
+        user.setFirstName("oui");
+        user.setLastName("oui");
+        user.setEmail("oui.gmail.com");
+        user.setRole(UserRole.PATIENT);
+
+        user = this.userRepository.save(user);
+        final UserDetails res = this.userService.loadUserByUsername(user.getUsername());
+        assertEquals(user.getUsername(), res.getUsername());
+        assertEquals(user.getPassword(), res.getPassword());
     }
 }

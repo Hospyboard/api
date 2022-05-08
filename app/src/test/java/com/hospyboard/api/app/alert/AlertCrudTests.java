@@ -16,6 +16,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -123,6 +126,48 @@ public class AlertCrudTests {
         assertEquals(alertDTO.getType(), response.getType());
         assertEquals(alertDTO.getInfos(), response.getInfos());
         assertEquals(alertDTO.getStatus(), response.getStatus());
+    }
+
+    @Test
+    public void testPatchAdminMultiple() throws Exception {
+        AlertDTO alertDTO = new AlertDTO();
+        alertDTO.setImportance(AlertImportance.URGENT);
+        alertDTO.setType(AlertType.BODY_ISSUE);
+        alertDTO.setInfos("mal de crane");
+
+        AlertDTO alertDTO2 = new AlertDTO();
+        alertDTO2.setImportance(AlertImportance.URGENT);
+        alertDTO2.setType(AlertType.BODY_ISSUE);
+        alertDTO2.setInfos("mal de crane");
+
+        MvcResult mvcResult = mockMvc.perform(post(ROUTE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + patientToken.getToken())
+                .content(jsonHelper.toJson(alertDTO))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk()).andReturn();
+        alertDTO = convert(mvcResult);
+
+        mvcResult = mockMvc.perform(post(ROUTE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + patientToken.getToken())
+                .content(jsonHelper.toJson(alertDTO2))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk()).andReturn();
+        alertDTO2 = convert(mvcResult);
+
+        alertDTO.setImportance(AlertImportance.BIT_URGENT);
+        alertDTO.setStatus(AlertStatus.IN_PROGRESS);
+        alertDTO2.setImportance(AlertImportance.BIT_URGENT);
+        alertDTO2.setStatus(AlertStatus.IN_PROGRESS);
+
+        final List<AlertDTO> alertDTOS = new ArrayList<>();
+        alertDTOS.add(alertDTO);
+        alertDTOS.add(alertDTO2);
+
+        mockMvc.perform(patch(ROUTE + "/batch")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken.getToken())
+                .content(jsonHelper.toJson(alertDTOS))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
     }
 
     private AlertDTO convert(final MvcResult result) throws Exception {
