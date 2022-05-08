@@ -8,6 +8,7 @@ import com.hospyboard.api.app.user.dto.UserTokenDTO;
 import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.enums.UserRole;
 import com.hospyboard.api.app.user.exception.LoginHospyboardException;
+import com.hospyboard.api.app.user.services.CurrentUser;
 import com.hospyboard.api.app.user.services.UserService;
 import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
@@ -25,20 +26,23 @@ import java.util.List;
 public class UserResource {
 
     private final UserService service;
+    private final CurrentUser currentUser;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
 
     public UserResource(UserService userService,
                         AuthenticationManager authenticationManager,
+                        CurrentUser currentUser,
                         JwtTokenUtil jwtTokenUtil) {
         this.service = userService;
+        this.currentUser = currentUser;
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @GetMapping("session")
     public UserDTO getActualUser() {
-        return service.getActualUser();
+        return currentUser.getCurrentUser();
     }
 
     @GetMapping("{id}")
@@ -54,7 +58,7 @@ public class UserResource {
 
     @GetMapping("logout")
     public void logoutUser() {
-        this.jwtTokenUtil.invalidateTokens(service.getActualUser().getId());
+        this.jwtTokenUtil.invalidateTokens(currentUser.getCurrentUser().getId());
     }
 
     @GetMapping
@@ -69,7 +73,7 @@ public class UserResource {
 
     @PostMapping
     public UserDTO createUser(@RequestBody @Valid final UserDTO user) {
-        final UserDTO currentUser = this.service.getActualUser();
+        final UserDTO currentUser = this.currentUser.getCurrentUser();
 
         if (currentUser.getRole().equals(UserRole.ADMIN)) {
             return this.service.create(user);
@@ -80,7 +84,7 @@ public class UserResource {
 
     @DeleteMapping
     public void deleteUser(@RequestParam("id") String id) {
-        if (this.service.getActualUser().getRole().equals(UserRole.ADMIN)) {
+        if (this.currentUser.getCurrentUser().getRole().equals(UserRole.ADMIN)) {
             this.service.delete(id);
         } else {
             throw new ApiForbiddenException("Vous n'êtes pas un admin.");

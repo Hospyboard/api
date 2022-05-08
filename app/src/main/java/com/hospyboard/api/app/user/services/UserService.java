@@ -45,21 +45,11 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserDTO getActualUser() {
-        final UserDTO userDTO = this.currentUser.getCurrentUser();
-
-        if (userDTO == null) {
-            throw new BadRequestException("Impossible de récupérer l'utilisateur connecté. Veuillez vérifier que vous êtes bien connecté.");
-        } else {
-            return userDTO;
-        }
-    }
-
     @Transactional
     public UserDTO updateUser(final UserDTO request) {
         final UserDTO currentUser = this.currentUser.getCurrentUser();
 
-        if (currentUser != null && (!currentUser.getRole().equals(UserRole.ADMIN))) {
+        if (!currentUser.getRole().equals(UserRole.ADMIN)) {
             throw new ForbiddenException("Impossible de mettre à jour les comptes utilisateurs. Vous devez être admin.");
         }
         if (request.getId() == null) {

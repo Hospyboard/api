@@ -130,6 +130,20 @@ public class UserCrudTests {
     }
 
     @Test
+    public void testUpdateWithNoId() throws Exception {
+        final UserTokenDTO credentials = userHelper.generateAdminToken();
+        final UserDTO patchUser = new UserDTO();
+
+        patchUser.setId(null);
+
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
+                .content(objectMapper.toJson(patchUser))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void deleteUser() throws Exception {
         final UserTokenDTO credentials = userHelper.generateAdminToken();
         final UserDTO userDTO = credentials.getUser();

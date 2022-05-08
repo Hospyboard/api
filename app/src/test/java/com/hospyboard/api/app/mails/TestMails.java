@@ -55,7 +55,7 @@ public class TestMails {
         ).andExpect(status().isOk());
 
         Thread.sleep(1000);
-        final Instant expiration = Instant.now().plusSeconds(20);
+        final Instant expiration = Instant.now().plusSeconds(13);
         while (Instant.now().isBefore(expiration) && !mailService.getMailQueue().isEmpty());
 
         assertEquals(0, mailService.getMailQueue().size());
