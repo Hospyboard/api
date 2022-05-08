@@ -30,6 +30,13 @@ services:
     ports:
       - "9090:9090"
 
+  mail:
+    image: maildev/maildev
+    container_name: hospyboard_api_mail
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
 networks:
   default:
     name: hospyboard_network
