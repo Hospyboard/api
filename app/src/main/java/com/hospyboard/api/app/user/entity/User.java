@@ -40,6 +40,7 @@ public class User extends ApiEntity implements UserDetails {
     @Convert(converter = EncryptionDatabaseString.class)
     private String role;
 
+    @Column(length = 10000)
     @Convert(converter = EncryptionDatabaseString.class)
     private String infos;
 

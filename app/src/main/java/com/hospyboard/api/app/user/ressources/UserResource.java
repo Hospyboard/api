@@ -1,10 +1,7 @@
 package com.hospyboard.api.app.user.ressources;
 
 import com.hospyboard.api.app.user.config.JwtTokenUtil;
-import com.hospyboard.api.app.user.dto.UserAuthDTO;
-import com.hospyboard.api.app.user.dto.UserCreationDTO;
-import com.hospyboard.api.app.user.dto.UserDTO;
-import com.hospyboard.api.app.user.dto.UserTokenDTO;
+import com.hospyboard.api.app.user.dto.*;
 import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.enums.UserRole;
 import com.hospyboard.api.app.user.exception.LoginHospyboardException;
@@ -69,6 +66,11 @@ public class UserResource {
     @PatchMapping
     public UserDTO patchUser(@RequestBody final UserDTO user) {
         return this.service.updateUser(user);
+    }
+
+    @PatchMapping("changePassword")
+    public void changePassword(@RequestBody final UserResetPasswordDTO request) {
+        this.service.changePassword(request);
     }
 
     @PostMapping

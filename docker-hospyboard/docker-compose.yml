@@ -16,7 +16,7 @@ services:
 
   hospyboard:
     build:
-      context: ../../
+      context: ../
       dockerfile: Dockerfile
     container_name: hospyboard_api
     hostname: hospyboard_api

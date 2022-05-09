@@ -1,10 +1,10 @@
 package com.hospyboard.api.app.user.services;
 
-import com.hospyboard.api.app.core.exceptions.BadRequestException;
 import com.hospyboard.api.app.core.exceptions.ForbiddenException;
 import com.hospyboard.api.app.user.config.JwtTokenUtil;
 import com.hospyboard.api.app.user.dto.UserCreationDTO;
 import com.hospyboard.api.app.user.dto.UserDTO;
+import com.hospyboard.api.app.user.dto.UserResetPasswordDTO;
 import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.enums.UserRole;
 import com.hospyboard.api.app.user.exception.RegisterHospyboardException;
@@ -12,6 +12,7 @@ import com.hospyboard.api.app.user.exception.UserUpdateException;
 import com.hospyboard.api.app.user.mappers.UserMapper;
 import com.hospyboard.api.app.user.repository.UserRepository;
 import fr.funixgaming.api.core.crud.services.ApiService;
+import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -97,6 +98,25 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
             return this.userMapper.toDto(super.getRepository().save(user));
         } else {
             throw new RegisterHospyboardException("Vos mots de passe ne correspondent pas.");
+        }
+    }
+
+    @Transactional
+    public void changePassword(final UserResetPasswordDTO request) throws ApiBadRequestException {
+        final UserDTO userDTO = this.currentUser.getCurrentUser();
+        final Optional<User> search = this.getRepository().findByUuid(userDTO.getId().toString());
+
+        if (search.isPresent()) {
+            final User user = search.get();
+
+            if (request.getNewPassword().equals(request.getNewPasswordConfirmation())) {
+                user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                tokenUtil.invalidateTokens(userDTO.getId());
+                super.getRepository().save(user);
+            } else {
+                throw new ApiBadRequestException("Vos nouveaux mots de passe ne correspondent pas.");
+            }
+
         }
     }
 
