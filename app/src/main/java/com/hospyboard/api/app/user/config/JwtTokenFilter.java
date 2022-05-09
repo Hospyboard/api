@@ -1,7 +1,7 @@
 package com.hospyboard.api.app.user.config;
 
-import com.hospyboard.api.app.user.entity.User;
-import com.hospyboard.api.app.user.repository.UserRepository;
+import com.hospyboard.api.app.log_action.services.LogActionService;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,13 +17,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
-
-    public JwtTokenFilter(final JwtTokenUtil jwtTokenUtil) {
-        this.jwtTokenUtil = jwtTokenUtil;
-    }
+    private final LogActionService logActionService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -31,6 +29,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                                     FilterChain chain) throws ServletException, IOException {
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (Strings.isEmpty(header) || !header.startsWith("Bearer ")) {
+            logActionService.logAction(request);
             chain.doFilter(request, response);
             return;
         }
@@ -38,6 +37,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         // Get jwt token and validate
         final String token = header.split(" ")[1].trim();
         if (!jwtTokenUtil.isTokenValid(token)) {
+            logActionService.logAction(request);
             chain.doFilter(request, response);
             return;
         }
@@ -47,6 +47,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        logActionService.logAction(request);
         chain.doFilter(request, response);
     }
+
 }

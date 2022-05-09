@@ -1,6 +1,7 @@
 package com.hospyboard.api.app.user.services;
 
 import com.hospyboard.api.app.core.exceptions.ForbiddenException;
+import com.hospyboard.api.app.log_action.repositories.LogActionRepository;
 import com.hospyboard.api.app.user.config.JwtTokenUtil;
 import com.hospyboard.api.app.user.dto.UserCreationDTO;
 import com.hospyboard.api.app.user.dto.UserDTO;
@@ -33,17 +34,20 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
 
     private final JwtTokenUtil tokenUtil;
     private final PasswordEncoder passwordEncoder;
+    private final LogActionRepository logActionRepository;
 
     public UserService(UserRepository userRepository,
                        UserMapper userMapper,
                        JwtTokenUtil tokenUtil,
                        CurrentUser currentUser,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder,
+                       LogActionRepository logActionRepository) {
         super(userRepository, userMapper);
         this.userMapper = userMapper;
         this.currentUser = currentUser;
         this.tokenUtil = tokenUtil;
         this.passwordEncoder = passwordEncoder;
+        this.logActionRepository = logActionRepository;
     }
 
     @Transactional
