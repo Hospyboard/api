@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Type;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
