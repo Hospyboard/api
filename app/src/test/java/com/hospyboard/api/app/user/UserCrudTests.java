@@ -3,6 +3,7 @@ package com.hospyboard.api.app.user;
 import com.hospyboard.api.app.core.JsonHelper;
 import com.hospyboard.api.app.core.UserHelper;
 import com.hospyboard.api.app.user.dto.UserDTO;
+import com.hospyboard.api.app.user.dto.UserResetPasswordDTO;
 import com.hospyboard.api.app.user.dto.UserTokenDTO;
 import com.hospyboard.api.app.user.enums.UserRole;
 import org.junit.jupiter.api.Test;
@@ -190,5 +191,50 @@ public class UserCrudTests {
         this.mockMvc.perform(get(UserAuthTests.ROUTE)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
         ).andExpect(status().isOk());
+    }
+
+    @Test
+    public void resetPassword() throws Exception {
+        final UserTokenDTO credentials = userHelper.generatePatientToken();
+        final UserResetPasswordDTO resetPasswordDTO = new UserResetPasswordDTO();
+
+        resetPasswordDTO.setNewPassword("12345");
+        resetPasswordDTO.setNewPasswordConfirmation("12345");
+
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE + "changePassword")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
+                .content(objectMapper.toJson(resetPasswordDTO))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    public void resetPasswordNoMatch() throws Exception {
+        final UserTokenDTO credentials = userHelper.generatePatientToken();
+        final UserResetPasswordDTO resetPasswordDTO = new UserResetPasswordDTO();
+
+        resetPasswordDTO.setNewPassword("1234522");
+        resetPasswordDTO.setNewPasswordConfirmation("12345");
+
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE + "changePassword")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
+                .content(objectMapper.toJson(resetPasswordDTO))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void resetPasswordActualPasswordNoMatch() throws Exception {
+        final UserTokenDTO credentials = userHelper.generatePatientToken();
+        final UserResetPasswordDTO resetPasswordDTO = new UserResetPasswordDTO();
+
+        resetPasswordDTO.setNewPassword("1234522");
+        resetPasswordDTO.setNewPasswordConfirmation("12345");
+
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE + "changePassword")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
+                .content(objectMapper.toJson(resetPasswordDTO))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isBadRequest());
     }
 }
