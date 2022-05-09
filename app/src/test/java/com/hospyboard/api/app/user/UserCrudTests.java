@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -67,6 +68,7 @@ public class UserCrudTests {
         request.setEmail("email@funix.fr");
         request.setPassword("1234567");
         request.setRole(UserRole.ADMIN);
+        request.setInfos("très naze comme patient");
 
         final MvcResult result = this.mockMvc.perform(post(UserAuthTests.ROUTE)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
@@ -74,13 +76,14 @@ public class UserCrudTests {
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk()).andReturn();
 
-        final UserDTO res = objectMapper.fromJson(result.getResponse().getContentAsString(), UserDTO.class);
+        final UserDTO res = objectMapper.fromJson(result.getResponse().getContentAsString(StandardCharsets.UTF_8), UserDTO.class);
         assertNotNull(res.getId());
         assertEquals(res.getUsername(), request.getUsername());
         assertEquals(res.getFirstName(), request.getFirstName());
         assertEquals(res.getLastName(), request.getLastName());
         assertEquals(res.getEmail(), request.getEmail());
         assertEquals(res.getRole(), request.getRole());
+        assertEquals(res.getInfos(), request.getInfos());
         assertNull(res.getPassword());
         assertNull(res.getPasswordConfirmation());
     }

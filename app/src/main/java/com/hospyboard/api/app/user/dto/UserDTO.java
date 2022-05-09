@@ -23,4 +23,5 @@ public class UserDTO extends ApiDTO {
     private String passwordConfirmation;
     @NotBlank
     private String role;
+    private String infos;
 }

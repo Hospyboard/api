@@ -40,6 +40,9 @@ public class User extends ApiEntity implements UserDetails {
     @Convert(converter = EncryptionDatabaseString.class)
     private String role;
 
+    @Convert(converter = EncryptionDatabaseString.class)
+    private String infos;
+
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<UserToken> tokens;
 
