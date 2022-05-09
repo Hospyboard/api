@@ -96,8 +96,6 @@ public class UserMappersTests {
         user1.setCreatedAt(now);
         user1.setUpdatedAt(now);
         user1.setRole("sdfs");
-        user1.setPatientAlerts(new HashSet<>());
-        user1.setStaffAlerts(new HashSet<>());
         user1.setTokens(new HashSet<>());
 
         final User user2 = new User();
@@ -111,8 +109,6 @@ public class UserMappersTests {
         user2.setCreatedAt(now);
         user2.setUpdatedAt(now);
         user2.setRole("sdfs");
-        user2.setPatientAlerts(new HashSet<>());
-        user2.setStaffAlerts(new HashSet<>());
         user2.setTokens(new HashSet<>());
 
         userMapper.patch(user1, user2);
@@ -126,8 +122,6 @@ public class UserMappersTests {
         assertEquals(user1.getCreatedAt(), user2.getCreatedAt());
         assertEquals(user1.getUpdatedAt(), user2.getUpdatedAt());
         assertEquals(user1.getRole(), user2.getRole());
-        assertEquals(user1.getPatientAlerts(), user2.getPatientAlerts());
-        assertEquals(user1.getStaffAlerts(), user2.getStaffAlerts());
         assertEquals(user1.getTokens(), user2.getTokens());
     }
 

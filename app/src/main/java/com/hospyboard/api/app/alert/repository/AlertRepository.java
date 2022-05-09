@@ -9,6 +9,6 @@ import java.util.Set;
 
 @Repository
 public interface AlertRepository extends ApiRepository<AlertEntity> {
-    Set<AlertEntity> findAllByPatient(User patient);
-    Set<AlertEntity> findAllByStaff(User staff);
+    void deleteAllByPatient(User patient);
+    void deleteAllByStaff(User staff);
 }

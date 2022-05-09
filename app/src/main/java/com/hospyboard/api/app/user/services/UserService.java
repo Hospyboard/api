@@ -1,5 +1,6 @@
 package com.hospyboard.api.app.user.services;
 
+import com.hospyboard.api.app.alert.repository.AlertRepository;
 import com.hospyboard.api.app.core.exceptions.ForbiddenException;
 import com.hospyboard.api.app.log_action.repositories.LogActionRepository;
 import com.hospyboard.api.app.user.config.JwtTokenUtil;
@@ -34,20 +35,20 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
 
     private final JwtTokenUtil tokenUtil;
     private final PasswordEncoder passwordEncoder;
-    private final LogActionRepository logActionRepository;
+    private final AlertRepository alertRepository;
 
     public UserService(UserRepository userRepository,
                        UserMapper userMapper,
                        JwtTokenUtil tokenUtil,
                        CurrentUser currentUser,
                        PasswordEncoder passwordEncoder,
-                       LogActionRepository logActionRepository) {
+                       AlertRepository alertRepository) {
         super(userRepository, userMapper);
         this.userMapper = userMapper;
         this.currentUser = currentUser;
         this.tokenUtil = tokenUtil;
         this.passwordEncoder = passwordEncoder;
-        this.logActionRepository = logActionRepository;
+        this.alertRepository = alertRepository;
     }
 
     @Transactional
@@ -125,7 +126,19 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     }
 
     @Override
+    @Transactional
     public void delete(String id) {
+        final Optional<User> search = super.getRepository().findByUuid(id);
+
+        if (search.isPresent()) {
+            final User user = search.get();
+
+            this.alertRepository.deleteAllByPatient(user);
+            this.alertRepository.deleteAllByStaff(user);
+        } else {
+            throw new ApiNotFoundException("L'utilisateur que vous souhaitez supprimer n'existe pas.");
+        }
+
         this.tokenUtil.invalidateTokens(UUID.fromString(id));
         super.delete(id);
     }

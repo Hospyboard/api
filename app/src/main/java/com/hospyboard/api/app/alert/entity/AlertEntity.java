@@ -15,11 +15,11 @@ import javax.persistence.*;
 @Entity(name = "alert_entity")
 public class AlertEntity extends ApiEntity {
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
     private User patient;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "staff_id")
     private User staff;
 

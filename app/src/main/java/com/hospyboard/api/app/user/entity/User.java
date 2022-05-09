@@ -47,12 +47,6 @@ public class User extends ApiEntity implements UserDetails {
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<UserToken> tokens;
 
-    @OneToMany(mappedBy = "patient", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<AlertEntity> patientAlerts;
-
-    @OneToMany(mappedBy = "staff", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<AlertEntity> staffAlerts;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(this.role));
