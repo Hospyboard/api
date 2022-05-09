@@ -33,6 +33,9 @@ services:
   mail:
     image: maildev/maildev
     container_name: hospyboard_api_mail
+    networks:
+      - default
+    restart: on-failure
     ports:
       - "1080:1080"
       - "1025:1025"
