@@ -2,6 +2,8 @@ package com.hospyboard.api.app.user.services;
 
 import com.hospyboard.api.app.alert.repository.AlertRepository;
 import com.hospyboard.api.app.core.exceptions.ForbiddenException;
+import com.hospyboard.api.app.hospital.entity.Room;
+import com.hospyboard.api.app.hospital.repositories.RoomRepository;
 import com.hospyboard.api.app.user.config.JwtTokenUtil;
 import com.hospyboard.api.app.mails.dtos.HospyboardMailDTO;
 import com.hospyboard.api.app.mails.services.HospyboardMailService;
@@ -44,6 +46,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     private final JwtTokenUtil tokenUtil;
     private final PasswordEncoder passwordEncoder;
     private final AlertRepository alertRepository;
+    private final RoomRepository roomRepository;
     private final UserForgotPasswordResetRepository passwordResetRepository;
     private final HospyboardMailService mailService;
 
@@ -53,12 +56,14 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                        CurrentUser currentUser,
                        PasswordEncoder passwordEncoder,
                        AlertRepository alertRepository,
+                       RoomRepository roomRepository,
                        UserForgotPasswordResetRepository passwordResetRepository,
                        HospyboardMailService mailService) {
         super(userRepository, userMapper);
         this.userMapper = userMapper;
         this.currentUser = currentUser;
         this.tokenUtil = tokenUtil;
+        this.roomRepository = roomRepository;
         this.passwordEncoder = passwordEncoder;
         this.alertRepository = alertRepository;
         this.passwordResetRepository = passwordResetRepository;
@@ -235,5 +240,38 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
             }
         }
         this.passwordResetRepository.deleteAll(toRemove);
+    }
+
+    @Override
+    public UserDTO update(UserDTO request) {
+        return updateUser(request);
+    }
+
+    @Override
+    public UserDTO create(UserDTO request) {
+        updateRoomLinkedToUser(request);
+        return super.create(request);
+    }
+
+    private void updateRoomLinkedToUser(final UserDTO userDTO) {
+        if (userDTO.getRoom() != null && userDTO.getRoom().getId() != null) {
+            final Optional<Room> search = this.roomRepository.findByUuid(userDTO.getRoom().getId().toString());
+
+            if (search.isPresent()) {
+                final Room room = search.get();
+                final Optional<User> searchUser = getRepository().findByUuid(userDTO.getId().toString());
+
+                if (searchUser.isPresent()) {
+                    final User user = searchUser.get();
+                    user.setRoomUuid(room.getUuid());
+
+                    getRepository().save(user);
+                } else {
+                    throw new ApiNotFoundException(String.format("L'utilisateur id %s n'existe pas.", userDTO.getId()));
+                }
+            } else {
+                throw new ApiNotFoundException(String.format("La chambre id %s n'existe pas.", userDTO.getRoom().getId()));
+            }
+        }
     }
 }
