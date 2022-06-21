@@ -3,20 +3,22 @@ package com.hospyboard.api.app.hospital.services;
 import com.hospyboard.api.app.hospital.dto.HospitalDTO;
 import com.hospyboard.api.app.hospital.dto.ServiceDTO;
 import com.hospyboard.api.app.hospital.entity.Hospital;
-import com.hospyboard.api.app.hospital.entity.Service;
+import com.hospyboard.api.app.hospital.entity.ServiceEntity;
 import com.hospyboard.api.app.hospital.mappers.ServiceMapper;
 import com.hospyboard.api.app.hospital.repositories.HospitalRepository;
 import com.hospyboard.api.app.hospital.repositories.ServiceRepository;
 import fr.funixgaming.api.core.crud.services.ApiService;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.*;
 
-@org.springframework.stereotype.Service
-public class ServicesService extends ApiService<ServiceDTO, Service, ServiceMapper, ServiceRepository> {
+@Service
+public class ServicesService extends ApiService<ServiceDTO, ServiceEntity, ServiceMapper, ServiceRepository> {
 
     private final HospitalRepository hospitalRepository;
 
@@ -29,22 +31,23 @@ public class ServicesService extends ApiService<ServiceDTO, Service, ServiceMapp
 
     @Override
     public ServiceDTO create(ServiceDTO request) {
-        final Service service = getMapper().toEntity(request);
+        final ServiceEntity service = getMapper().toEntity(request);
         service.setHospital(findHospital(request.getHospital()));
 
         return getMapper().toDto(getRepository().save(service));
     }
 
+    @NonNull
     @Override
     public ServiceDTO update(ServiceDTO request) {
         if (request.getId() == null) {
             throw new ApiBadRequestException("Pas d'id spécifié pour la mise à jour du service.");
         } else {
-            final Optional<Service> search = getRepository().findByUuid(request.getId().toString());
+            final Optional<ServiceEntity> search = getRepository().findByUuid(request.getId().toString());
 
             if (search.isPresent()) {
-                final Service entRequest = getMapper().toEntity(request);
-                Service service = search.get();
+                final ServiceEntity entRequest = getMapper().toEntity(request);
+                ServiceEntity service = search.get();
 
                 entRequest.setId(null);
                 entRequest.setUpdatedAt(Date.from(Instant.now()));
@@ -82,7 +85,7 @@ public class ServicesService extends ApiService<ServiceDTO, Service, ServiceMapp
                 if (search.isPresent()) {
                     return search.get();
                 } else {
-                    throw new ApiNotFoundException(String.format("La chambre ID %s n'existe pas.", hospitalDto.getId()));
+                    throw new ApiNotFoundException(String.format("L'hôpital ID %s n'existe pas.", hospitalDto.getId()));
                 }
             }
         }
