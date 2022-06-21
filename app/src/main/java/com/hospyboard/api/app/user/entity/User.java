@@ -46,8 +46,8 @@ public class User extends ApiEntity implements UserDetails {
 
     @MapsId
     @ManyToOne
-    @JoinColumn(name = "hospital_room")
-    private Room hospitalRoom;
+    @JoinColumn(name = "hospital_room_id")
+    private Room room;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<UserToken> tokens;

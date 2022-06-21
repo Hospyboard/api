@@ -63,11 +63,11 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         this.userMapper = userMapper;
         this.currentUser = currentUser;
         this.tokenUtil = tokenUtil;
-        this.roomRepository = roomRepository;
         this.passwordEncoder = passwordEncoder;
         this.alertRepository = alertRepository;
         this.passwordResetRepository = passwordResetRepository;
         this.mailService = mailService;
+        this.roomRepository = roomRepository;
     }
 
     @Transactional
@@ -95,6 +95,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         if (res == null) {
             throw new ApiNotFoundException("L'utilisateur n'existe pas");
         } else {
+            updateRoomLinkedToUser(res);
             return res;
         }
     }
@@ -193,6 +194,28 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     }
 
     @Override
+    public UserDTO create(UserDTO request) {
+        final UserDTO res = super.create(request);
+        updateRoomLinkedToUser(res);
+
+        return res;
+    }
+
+    @Override
+    public UserDTO update(UserDTO request) {
+        return updateUser(request);
+    }
+
+    public List<UserDTO> update(final List<UserDTO> request) {
+        final List<UserDTO> users = new ArrayList<>();
+
+        for (final UserDTO userDTO : request) {
+            users.add(this.update(userDTO));
+        }
+        return users;
+    }
+
+    @Override
     @Transactional
     public void delete(String id) {
         final Optional<User> search = super.getRepository().findByUuid(id);
@@ -242,17 +265,6 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         this.passwordResetRepository.deleteAll(toRemove);
     }
 
-    @Override
-    public UserDTO update(UserDTO request) {
-        return updateUser(request);
-    }
-
-    @Override
-    public UserDTO create(UserDTO request) {
-        updateRoomLinkedToUser(request);
-        return super.create(request);
-    }
-
     private void updateRoomLinkedToUser(final UserDTO userDTO) {
         if (userDTO.getRoom() != null && userDTO.getRoom().getId() != null) {
             final Optional<Room> search = this.roomRepository.findByUuid(userDTO.getRoom().getId().toString());
@@ -274,4 +286,5 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
             }
         }
     }
+
 }

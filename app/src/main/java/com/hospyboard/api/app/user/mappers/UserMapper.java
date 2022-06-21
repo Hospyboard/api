@@ -14,18 +14,23 @@ public interface UserMapper extends ApiMapper<User, UserDTO> {
     @Mapping(target = "uuid", source = "id")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "tokens", ignore = true)
+    @Mapping(target = "room", ignore = true)
+    @Mapping(target = "room.uuid", source = "roomUuid")
     User toEntity(UserDTO dto);
 
     @Override
     @Mapping(target = "id", source = "uuid")
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "passwordConfirmation", ignore = true)
+    @Mapping(target = "roomUuid", source = "room.uuid")
     UserDTO toDto(User entity);
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", constant = UserRole.PATIENT)
     @Mapping(target = "tokens", ignore = true)
+    @Mapping(target = "room", ignore = true)
+    @Mapping(target = "room.uuid", source = "id")
     User fromUserCreationToEntity(UserCreationDTO userCreationDTO);
 
     @Override
