@@ -10,7 +10,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity(name = "service")
-public class Service extends ApiEntity {
+public class ServiceEntity extends ApiEntity {
     @Column(nullable = false)
     private String name;
 

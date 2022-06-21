@@ -17,5 +17,5 @@ public class Room extends ApiEntity {
     @MapsId
     @ManyToOne
     @JoinColumn(nullable = false, name = "service_id")
-    private Service service;
+    private ServiceEntity service;
 }

@@ -21,5 +21,5 @@ public class Hospital extends ApiEntity {
     private String address;
 
     @OneToMany(mappedBy = "hospital", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<Service> services;
+    private Set<ServiceEntity> services;
 }

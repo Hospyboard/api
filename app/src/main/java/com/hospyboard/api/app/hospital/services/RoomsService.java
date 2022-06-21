@@ -3,7 +3,7 @@ package com.hospyboard.api.app.hospital.services;
 import com.hospyboard.api.app.hospital.dto.RoomDTO;
 import com.hospyboard.api.app.hospital.dto.ServiceDTO;
 import com.hospyboard.api.app.hospital.entity.Room;
-import com.hospyboard.api.app.hospital.entity.Service;
+import com.hospyboard.api.app.hospital.entity.ServiceEntity;
 import com.hospyboard.api.app.hospital.mappers.RoomMapper;
 import com.hospyboard.api.app.hospital.repositories.RoomRepository;
 import com.hospyboard.api.app.hospital.repositories.ServiceRepository;
@@ -14,12 +14,14 @@ import com.hospyboard.api.app.user.repository.UserRepository;
 import fr.funixgaming.api.core.crud.services.ApiService;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.*;
 
-@org.springframework.stereotype.Service
+@Service
 public class RoomsService extends ApiService<RoomDTO, Room, RoomMapper, RoomRepository> {
 
     private final ServiceRepository serviceRepository;
@@ -47,11 +49,17 @@ public class RoomsService extends ApiService<RoomDTO, Room, RoomMapper, RoomRepo
         return list;
     }
 
+    @NonNull
     @Override
     public RoomDTO findById(String id) {
         final RoomDTO roomDTO = super.findById(id);
-        addUsersInRoom(roomDTO);
-        return roomDTO;
+
+        if (roomDTO == null) {
+            throw new ApiNotFoundException("Cette chambre n'existe pas.");
+        } else {
+            addUsersInRoom(roomDTO);
+            return roomDTO;
+        }
     }
 
     @Override
@@ -67,12 +75,15 @@ public class RoomsService extends ApiService<RoomDTO, Room, RoomMapper, RoomRepo
     @Override
     public RoomDTO create(RoomDTO request) {
         final Room room = getMapper().toEntity(request);
-        final Service service = findService(request.getService());
+        final ServiceEntity service = findService(request.getService());
         room.setService(service);
 
-        return getMapper().toDto(getRepository().save(room));
+        final RoomDTO roomDTO = getMapper().toDto(getRepository().save(room));
+        addUsersInRoom(roomDTO);
+        return roomDTO;
     }
 
+    @NonNull
     @Override
     public RoomDTO update(RoomDTO request) {
         if (request.getId() == null) {
@@ -88,10 +99,12 @@ public class RoomsService extends ApiService<RoomDTO, Room, RoomMapper, RoomRepo
                 entRequest.setUpdatedAt(Date.from(Instant.now()));
                 getMapper().patch(entRequest, room);
 
-                final Service service = findService(request.getService());
+                final ServiceEntity service = findService(request.getService());
                 room.setService(service);
 
-                return getMapper().toDto(getRepository().save(room));
+                final RoomDTO res = getMapper().toDto(getRepository().save(room));
+                addUsersInRoom(res);
+                return res;
             } else {
                 throw new ApiNotFoundException(String.format("La chambre id %s n'existe pas.", request.getId()));
             }
@@ -121,14 +134,14 @@ public class RoomsService extends ApiService<RoomDTO, Room, RoomMapper, RoomRepo
         roomDTO.setPatients(patients);
     }
 
-    private Service findService(@Nullable final ServiceDTO serviceDTO) {
+    private ServiceEntity findService(@Nullable final ServiceDTO serviceDTO) {
         if (serviceDTO == null) {
             throw new ApiBadRequestException("Vous n'avez pas spécifié de service id.");
         } else {
             if (serviceDTO.getId() == null) {
                 throw new ApiBadRequestException("Votre service n'a pas d'ID.");
             } else {
-                final Optional<Service> search = this.serviceRepository.findByUuid(serviceDTO.getId().toString());
+                final Optional<ServiceEntity> search = this.serviceRepository.findByUuid(serviceDTO.getId().toString());
 
                 if (search.isPresent()) {
                     return search.get();
