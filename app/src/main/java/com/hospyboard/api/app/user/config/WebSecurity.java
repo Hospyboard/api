@@ -64,10 +64,12 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/user/register").permitAll()
                 .antMatchers(HttpMethod.POST, "/user/login").permitAll()
-                .antMatchers("/userToken/**").hasAuthority(UserRole.ADMIN)
                 .antMatchers(HttpMethod.POST, "/user/forgotPassword").permitAll()
                 .antMatchers(HttpMethod.POST, "/user/forgotPassword/change").permitAll()
                 .antMatchers("/userToken/**").hasAuthority(UserRole.ADMIN)
+                .antMatchers("/hospital/**").hasAuthority(UserRole.ADMIN)
+                .antMatchers("/service/**").hasAuthority(UserRole.ADMIN)
+                .antMatchers("/room/**").hasAuthority(UserRole.ADMIN)
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);

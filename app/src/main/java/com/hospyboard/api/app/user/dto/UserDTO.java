@@ -1,5 +1,6 @@
 package com.hospyboard.api.app.user.dto;
 
+import com.hospyboard.api.app.hospital.dto.RoomDTO;
 import fr.funixgaming.api.core.crud.dtos.ApiDTO;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,5 +35,5 @@ public class UserDTO extends ApiDTO {
 
     private String infos;
 
-    private UUID roomUuid;
+    private RoomDTO room;
 }
