@@ -7,7 +7,7 @@
     <parent>
         <artifactId>funix-api</artifactId>
         <groupId>fr.funixgaming.api</groupId>
-        <version>1.0.2</version>
+        <version>1.0.8</version>
     </parent>
 
     <groupId>com.hospyboard.api</groupId>
@@ -18,9 +18,6 @@
     <properties>
         <swagger.version>2.9.2</swagger.version>
         <jackson.version>2.10.2</jackson.version>
-        <org.flyway.version>8.5.8</org.flyway.version>
-        <fr.funixgaming.api.version>1.0.2</fr.funixgaming.api.version>
-        <org.jacoco.coverage.version>0.8.8</org.jacoco.coverage.version>
     </properties>
 
     <modules>

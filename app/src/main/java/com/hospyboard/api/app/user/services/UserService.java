@@ -2,7 +2,6 @@ package com.hospyboard.api.app.user.services;
 
 import com.hospyboard.api.app.alert.repository.AlertRepository;
 import com.hospyboard.api.app.core.exceptions.ForbiddenException;
-import com.hospyboard.api.app.log_action.repositories.LogActionRepository;
 import com.hospyboard.api.app.user.config.JwtTokenUtil;
 import com.hospyboard.api.app.user.dto.UserCreationDTO;
 import com.hospyboard.api.app.user.dto.UserDTO;
@@ -150,5 +149,22 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                 .orElseThrow(
                         () -> new UsernameNotFoundException(String.format("Utilisateur non trouvé: %s", username))
                 );
+    }
+
+    @Override
+    public UserDTO update(UserDTO request) {
+        return updateUser(request);
+    }
+
+    @Override
+    public UserDTO create(UserDTO request) {
+        updateRoomLinkedToUser(request);
+        return super.create(request);
+    }
+
+    private void updateRoomLinkedToUser(final UserDTO userDTO) {
+        if (userDTO.getRoom() != null && userDTO.getRoom().getId() != null) {
+            final
+        }
     }
 }
