@@ -2,6 +2,8 @@ package com.hospyboard.api.app.user.services;
 
 import com.hospyboard.api.app.alert.repository.AlertRepository;
 import com.hospyboard.api.app.core.exceptions.ForbiddenException;
+import com.hospyboard.api.app.hospital.entity.Room;
+import com.hospyboard.api.app.hospital.repositories.RoomRepository;
 import com.hospyboard.api.app.user.config.JwtTokenUtil;
 import com.hospyboard.api.app.user.dto.UserCreationDTO;
 import com.hospyboard.api.app.user.dto.UserDTO;
@@ -23,6 +25,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,19 +39,22 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     private final JwtTokenUtil tokenUtil;
     private final PasswordEncoder passwordEncoder;
     private final AlertRepository alertRepository;
+    private final RoomRepository roomRepository;
 
     public UserService(UserRepository userRepository,
                        UserMapper userMapper,
                        JwtTokenUtil tokenUtil,
                        CurrentUser currentUser,
                        PasswordEncoder passwordEncoder,
-                       AlertRepository alertRepository) {
+                       AlertRepository alertRepository,
+                       RoomRepository roomRepository) {
         super(userRepository, userMapper);
         this.userMapper = userMapper;
         this.currentUser = currentUser;
         this.tokenUtil = tokenUtil;
         this.passwordEncoder = passwordEncoder;
         this.alertRepository = alertRepository;
+        this.roomRepository = roomRepository;
     }
 
     @Transactional
@@ -75,6 +82,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         if (res == null) {
             throw new ApiNotFoundException("L'utilisateur n'existe pas");
         } else {
+            updateRoomLinkedToUser(res);
             return res;
         }
     }
@@ -152,19 +160,47 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     }
 
     @Override
-    public UserDTO update(UserDTO request) {
-        return updateUser(request);
+    public UserDTO create(UserDTO request) {
+        final UserDTO res = super.create(request);
+        updateRoomLinkedToUser(res);
+
+        return res;
     }
 
     @Override
-    public UserDTO create(UserDTO request) {
-        updateRoomLinkedToUser(request);
-        return super.create(request);
+    public UserDTO update(UserDTO request) {
+        return this.updateUser(request);
+    }
+
+    @Override
+    public List<UserDTO> update(final List<UserDTO> request) {
+        final List<UserDTO> users = new ArrayList<>();
+
+        for (final UserDTO userDTO : request) {
+            users.add(this.update(userDTO));
+        }
+        return users;
     }
 
     private void updateRoomLinkedToUser(final UserDTO userDTO) {
-        if (userDTO.getRoom() != null && userDTO.getRoom().getId() != null) {
-            final
+        if (userDTO.getRoomUuid() != null) {
+            final Optional<Room> search = this.roomRepository.findByUuid(userDTO.getRoomUuid().toString());
+
+            if (search.isPresent()) {
+                final Room room = search.get();
+                final Optional<User> searchUser = getRepository().findByUuid(userDTO.getId().toString());
+
+                if (searchUser.isPresent()) {
+                    final User user = searchUser.get();
+                    user.setRoom(room);
+
+                    getRepository().save(user);
+                } else {
+                    throw new ApiNotFoundException(String.format("L'utilisateur id %s n'existe pas.", userDTO.getId()));
+                }
+            } else {
+                throw new ApiNotFoundException(String.format("La chambre id %s n'existe pas.", userDTO.getRoomUuid()));
+            }
         }
     }
 }

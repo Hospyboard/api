@@ -21,6 +21,6 @@ public class Room extends ApiEntity {
     @JoinColumn(nullable = false, name = "service_id")
     private Service service;
 
-    @OneToMany(mappedBy = "hospitalRoom")
+    @OneToMany(mappedBy = "room")
     private Set<User> patients;
 }
