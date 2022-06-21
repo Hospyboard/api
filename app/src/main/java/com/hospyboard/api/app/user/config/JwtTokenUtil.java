@@ -1,13 +1,11 @@
 package com.hospyboard.api.app.user.config;
 
-import com.hospyboard.api.app.user.dto.UserDTO;
 import com.hospyboard.api.app.user.dto.UserTokenDTO;
 import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.entity.UserToken;
 import com.hospyboard.api.app.user.mappers.UserTokenMapper;
 import com.hospyboard.api.app.user.repository.UserRepository;
 import com.hospyboard.api.app.user.repository.UserTokenRepository;
-import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;

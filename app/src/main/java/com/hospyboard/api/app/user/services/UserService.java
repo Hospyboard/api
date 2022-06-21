@@ -2,9 +2,9 @@ package com.hospyboard.api.app.user.services;
 
 import com.hospyboard.api.app.alert.repository.AlertRepository;
 import com.hospyboard.api.app.core.exceptions.ForbiddenException;
+import com.hospyboard.api.app.user.config.JwtTokenUtil;
 import com.hospyboard.api.app.mails.dtos.HospyboardMailDTO;
 import com.hospyboard.api.app.mails.services.HospyboardMailService;
-import com.hospyboard.api.app.user.config.JwtTokenUtil;
 import com.hospyboard.api.app.user.dto.UserCreationDTO;
 import com.hospyboard.api.app.user.dto.UserDTO;
 import com.hospyboard.api.app.user.dto.UserForgotPasswordDTO;

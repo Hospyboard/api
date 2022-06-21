@@ -1,5 +1,6 @@
 package com.hospyboard.api.app.user.config;
 
+import com.hospyboard.api.app.user.enums.UserRole;
 import com.hospyboard.api.app.user.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -65,6 +66,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/user/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/user/forgotPassword").permitAll()
                 .antMatchers(HttpMethod.POST, "/user/forgotPassword/change").permitAll()
+                .antMatchers("/userToken/**").hasAuthority(UserRole.ADMIN)
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
