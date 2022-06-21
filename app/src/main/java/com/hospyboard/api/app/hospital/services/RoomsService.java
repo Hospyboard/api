@@ -9,6 +9,7 @@ import com.hospyboard.api.app.hospital.repositories.RoomRepository;
 import com.hospyboard.api.app.hospital.repositories.ServiceRepository;
 import com.hospyboard.api.app.user.dto.UserDTO;
 import com.hospyboard.api.app.user.entity.User;
+import com.hospyboard.api.app.user.mappers.UserMapper;
 import com.hospyboard.api.app.user.repository.UserRepository;
 import fr.funixgaming.api.core.crud.services.ApiService;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
@@ -23,30 +24,49 @@ public class RoomsService extends ApiService<RoomDTO, Room, RoomMapper, RoomRepo
 
     private final ServiceRepository serviceRepository;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public RoomsService(RoomRepository repository,
                         RoomMapper mapper,
                         ServiceRepository serviceRepository,
-                        UserRepository userRepository) {
+                        UserRepository userRepository,
+                        UserMapper userMapper) {
         super(repository, mapper);
         this.serviceRepository = serviceRepository;
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
+    }
+
+    @Override
+    public List<RoomDTO> getAll(String page, String elemsPerPage) {
+        final List<RoomDTO> list = super.getAll(page, elemsPerPage);
+
+        for (final RoomDTO roomDTO : list) {
+            addUsersInRoom(roomDTO);
+        }
+        return list;
+    }
+
+    @Override
+    public RoomDTO findById(String id) {
+        final RoomDTO roomDTO = super.findById(id);
+        addUsersInRoom(roomDTO);
+        return roomDTO;
+    }
+
+    @Override
+    public List<RoomDTO> search(String search, String page, String elemsPerPage) {
+        final List<RoomDTO> list = super.search(search, page, elemsPerPage);
+
+        for (final RoomDTO roomDTO : list) {
+            addUsersInRoom(roomDTO);
+        }
+        return list;
     }
 
     @Override
     public RoomDTO create(RoomDTO request) {
         final Room room = getMapper().toEntity(request);
-        final Set<User> patients = new HashSet<>();
-
-        for (final UserDTO patient : request.getPatients()) {
-            final User toAdd = findUser(patient);
-
-            if (toAdd != null) {
-                patients.add(toAdd);
-            }
-        }
-        room.setPatients(patients);
-
         final Service service = findService(request.getService());
         room.setService(service);
 
@@ -88,23 +108,17 @@ public class RoomsService extends ApiService<RoomDTO, Room, RoomMapper, RoomRepo
         return result;
     }
 
-    @Nullable
-    private User findUser(@Nullable final UserDTO user) {
-        if (user == null) {
-            return null;
-        } else {
-            if (user.getId() == null) {
-                throw new ApiBadRequestException("Votre patient n'a pas d'ID.");
-            } else {
-                final Optional<User> search = this.userRepository.findByUuid(user.getId().toString());
-
-                if (search.isPresent()) {
-                    return search.get();
-                } else {
-                    throw new ApiNotFoundException(String.format("Le patient id %s n'existe pas.", user.getId()));
-                }
-            }
+    private void addUsersInRoom(@Nullable final RoomDTO roomDTO) {
+        if (roomDTO == null) {
+            return;
         }
+
+        final List<UserDTO> patients = new ArrayList<>();
+
+        for (final User user : userRepository.findAllByRoomUuid(roomDTO.getId().toString())) {
+            patients.add(userMapper.toDto(user));
+        }
+        roomDTO.setPatients(patients);
     }
 
     private Service findService(@Nullable final ServiceDTO serviceDTO) {

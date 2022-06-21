@@ -16,11 +16,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 public class TestHospitalMapper {
 
+    private final HospitalMapper hospitalMapper;
+
     @Autowired
-    private HospitalMapper hospitalMapper;
+    public TestHospitalMapper(HospitalMapper hospitalMapper) {
+        this.hospitalMapper = hospitalMapper;
+    }
 
     @Test
-    public void testCreate() {
+    public void testCreateEntity() {
         final HospitalDTO hospitalDTO = new HospitalDTO();
 
         hospitalDTO.setAddress("12 rue du test");
@@ -32,9 +36,56 @@ public class TestHospitalMapper {
         final Hospital hospital = hospitalMapper.toEntity(hospitalDTO);
         assertEquals(hospitalDTO.getAddress(), hospital.getAddress());
         assertEquals(hospitalDTO.getName(), hospital.getName());
-        assertEquals(hospital.getCreatedAt().getTime(), hospital.getCreatedAt().getTime());
-        assertEquals(hospital.getUpdatedAt().getTime(), hospital.getUpdatedAt().getTime());
+        assertEquals(hospitalDTO.getCreatedAt().getTime(), hospital.getCreatedAt().getTime());
+        assertEquals(hospitalDTO.getUpdatedAt().getTime(), hospital.getUpdatedAt().getTime());
         assertEquals(hospitalDTO.getId(), hospital.getUuid());
+    }
+
+    @Test
+    public void testCreateDto() {
+        final Hospital hospital = new Hospital();
+
+        hospital.setAddress("12 rue du test");
+        hospital.setName("HospitalTest");
+        hospital.setCreatedAt(Date.from(Instant.now()));
+        hospital.setUpdatedAt(Date.from(Instant.now()));
+        hospital.setId(1L);
+        hospital.setUuid(UUID.randomUUID());
+
+        final HospitalDTO hospitalDTO = hospitalMapper.toDto(hospital);
+        assertEquals(hospitalDTO.getAddress(), hospital.getAddress());
+        assertEquals(hospitalDTO.getName(), hospital.getName());
+        assertEquals(hospitalDTO.getCreatedAt().getTime(), hospital.getCreatedAt().getTime());
+        assertEquals(hospitalDTO.getUpdatedAt().getTime(), hospital.getUpdatedAt().getTime());
+        assertEquals(hospitalDTO.getId(), hospital.getUuid());
+    }
+
+    @Test
+    public void testPatch() {
+        final Hospital hospital = new Hospital();
+
+        hospital.setAddress("12 rue du test");
+        hospital.setName("HospitalTest");
+        hospital.setCreatedAt(Date.from(Instant.now()));
+        hospital.setUpdatedAt(Date.from(Instant.now()));
+        hospital.setId(1L);
+        hospital.setUuid(UUID.randomUUID());
+
+        final Hospital hospital2 = new Hospital();
+
+        hospital.setAddress("12 rue du test2");
+        hospital.setName("HospitalTest2");
+        hospital.setCreatedAt(Date.from(Instant.now()));
+        hospital.setUpdatedAt(Date.from(Instant.now()));
+        hospital.setId(1L);
+        hospital.setUuid(UUID.randomUUID());
+
+        hospitalMapper.patch(hospital2, hospital);
+        assertEquals(hospital2.getAddress(), hospital.getAddress());
+        assertEquals(hospital2.getName(), hospital.getName());
+        assertEquals(hospital2.getCreatedAt().getTime(), hospital.getCreatedAt().getTime());
+        assertEquals(hospital2.getUpdatedAt().getTime(), hospital.getUpdatedAt().getTime());
+        assertEquals(hospital2.getId(), hospital.getId());
     }
 
 }

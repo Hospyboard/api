@@ -183,8 +183,8 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     }
 
     private void updateRoomLinkedToUser(final UserDTO userDTO) {
-        if (userDTO.getRoomUuid() != null) {
-            final Optional<Room> search = this.roomRepository.findByUuid(userDTO.getRoomUuid().toString());
+        if (userDTO.getRoom() != null && userDTO.getRoom().getId() != null) {
+            final Optional<Room> search = this.roomRepository.findByUuid(userDTO.getRoom().getId().toString());
 
             if (search.isPresent()) {
                 final Room room = search.get();
@@ -192,14 +192,14 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
 
                 if (searchUser.isPresent()) {
                     final User user = searchUser.get();
-                    user.setRoom(room);
+                    user.setRoomUuid(room.getUuid());
 
                     getRepository().save(user);
                 } else {
                     throw new ApiNotFoundException(String.format("L'utilisateur id %s n'existe pas.", userDTO.getId()));
                 }
             } else {
-                throw new ApiNotFoundException(String.format("La chambre id %s n'existe pas.", userDTO.getRoomUuid()));
+                throw new ApiNotFoundException(String.format("La chambre id %s n'existe pas.", userDTO.getRoom().getId()));
             }
         }
     }

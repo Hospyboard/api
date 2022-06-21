@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,5 +17,5 @@ public class RoomDTO extends ApiDTO {
 
     private ServiceDTO service;
 
-    private Set<UserDTO> patients;
+    private List<UserDTO> patients;
 }

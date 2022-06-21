@@ -45,10 +45,8 @@ public class User extends ApiEntity implements UserDetails {
     @Convert(converter = EncryptionDatabaseString.class)
     private String infos;
 
-    @MapsId
-    @ManyToOne
-    @JoinColumn(name = "hospital_room_id")
-    private Room room;
+    @Column(name = "hospital_room_uuid")
+    private String roomUuid;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<UserToken> tokens;
@@ -76,5 +74,21 @@ public class User extends ApiEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public UUID getRoomUuid() {
+        if (roomUuid != null) {
+            return UUID.fromString(roomUuid);
+        } else {
+            return null;
+        }
+    }
+
+    public void setRoomUuid(UUID roomUuid) {
+        if (roomUuid == null) {
+            this.roomUuid = null;
+        } else {
+            this.roomUuid = roomUuid.toString();
+        }
     }
 }

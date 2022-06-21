@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends ApiRepository<User> {
     Optional<User> findByUsername(String username);
+    Iterable<User> findAllByRoomUuid(String roomUuid);
 }
