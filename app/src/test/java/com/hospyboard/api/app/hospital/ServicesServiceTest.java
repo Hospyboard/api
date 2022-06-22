@@ -7,11 +7,12 @@ import com.hospyboard.api.app.hospital.services.HospitalsService;
 import com.hospyboard.api.app.hospital.services.ServicesService;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.transaction.Transactional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,11 +22,15 @@ import static org.junit.jupiter.api.Assertions.fail;
 @AutoConfigureMockMvc
 public class ServicesServiceTest {
 
-    @Autowired
-    private ServicesService service;
+    private final ServicesService service;
+    private final HospitalsService hospitalsService;
 
     @Autowired
-    private HospitalsService hospitalsService;
+    public ServicesServiceTest(ServicesService servicesService,
+                               HospitalsService hospitalsService) {
+        this.service = servicesService;
+        this.hospitalsService = hospitalsService;
+    }
 
     @Test
     public void testServiceCreation() {
@@ -134,7 +139,8 @@ public class ServicesServiceTest {
         }
     }
 
-    private HospitalDTO createHospital() {
+    @Transactional
+    HospitalDTO createHospital() {
         Hospital hospital = new Hospital();
         hospital.setName("Hospital test");
         hospital.setAddress("hospital address");
