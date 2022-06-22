@@ -13,7 +13,7 @@ import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.repository.UserRepository;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,17 +29,21 @@ import static org.junit.jupiter.api.Assertions.fail;
 @AutoConfigureMockMvc
 public class RoomsServiceTest {
 
-    @Autowired
-    private RoomsService roomsService;
+    private final RoomsService roomsService;
+    private final ServicesService servicesService;
+    private final HospitalsService hospitalsService;
+    private final UserRepository userRepository;
 
     @Autowired
-    private ServicesService servicesService;
-
-    @Autowired
-    private HospitalsService hospitalsService;
-
-    @Autowired
-    private UserRepository userRepository;
+    public RoomsServiceTest(RoomsService roomsService,
+                            ServicesService servicesService,
+                            HospitalsService hospitalsService,
+                            UserRepository userRepository) {
+        this.roomsService = roomsService;
+        this.servicesService = servicesService;
+        this.hospitalsService = hospitalsService;
+        this.userRepository = userRepository;
+    }
 
     @Test
     public void testRoomCreation() {

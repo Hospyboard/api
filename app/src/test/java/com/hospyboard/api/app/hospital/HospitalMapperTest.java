@@ -1,10 +1,9 @@
 package com.hospyboard.api.app.hospital;
 
-import com.hospyboard.api.app.core.JsonHelper;
 import com.hospyboard.api.app.hospital.dto.HospitalDTO;
 import com.hospyboard.api.app.hospital.entity.Hospital;
 import com.hospyboard.api.app.hospital.mappers.HospitalMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,8 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @AutoConfigureMockMvc
 public class HospitalMapperTest {
 
+    private final HospitalMapper hospitalMapper;
+
     @Autowired
-    private HospitalMapper hospitalMapper;
+    public HospitalMapperTest(HospitalMapper hospitalMapper) {
+        this.hospitalMapper = hospitalMapper;
+    }
 
     @Test
     public void testCreateEntity() {
