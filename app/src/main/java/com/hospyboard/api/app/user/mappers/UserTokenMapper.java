@@ -14,7 +14,6 @@ public interface UserTokenMapper extends ApiMapper<UserToken, UserTokenDTO> {
 
     @Override
     @Mapping(target = "id", source = "uuid")
-    @Mapping(target = "token", ignore = true)
     UserTokenDTO toDto(UserToken entity);
 
     @Override
