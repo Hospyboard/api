@@ -17,6 +17,7 @@ public interface ServiceMapper extends ApiMapper<ServiceEntity, ServiceDTO> {
     @Override
     @Mapping(target = "id", source = "uuid")
     @Mapping(target = "hospital.id", source = "hospital.uuid")
+    @Mapping(target = "hospital.services", ignore = true)
     ServiceDTO toDto(ServiceEntity entity);
 
     @Override
