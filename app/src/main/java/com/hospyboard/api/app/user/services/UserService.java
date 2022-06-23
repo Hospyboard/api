@@ -214,7 +214,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     }
 
     private String generateRandomStringCode() {
-
+        return "";//TODO gen
     }
 
     @Scheduled(fixedRate = 10, timeUnit = TimeUnit.SECONDS)
