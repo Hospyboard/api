@@ -14,14 +14,16 @@ public interface RoomMapper extends ApiMapper<Room, RoomDTO> {
     @Mapping(target = "uuid", source = "id")
     @Mapping(target = "service.uuid", source = "service.id")
     @Mapping(target = "service.id", ignore = true)
-    @Mapping(target = "service.hospital.id", ignore = true)
+    @Mapping(target = "service.rooms", ignore = true)
+    @Mapping(target = "service.hospital", ignore = true)
     Room toEntity(RoomDTO dto);
 
     @Override
     @Mapping(target = "id", source = "uuid")
     @Mapping(target = "service.id", source = "service.uuid")
-    @Mapping(target = "service.hospital.id", source = "service.hospital.uuid")
     @Mapping(target = "patients", ignore = true)
+    @Mapping(target = "service.rooms", ignore = true)
+    @Mapping(target = "service.hospital", ignore = true)
     RoomDTO toDto(Room entity);
 
     @Override

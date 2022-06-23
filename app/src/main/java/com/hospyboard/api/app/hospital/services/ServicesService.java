@@ -14,6 +14,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
+import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.*;
 
@@ -30,6 +31,7 @@ public class ServicesService extends ApiService<ServiceDTO, ServiceEntity, Servi
     }
 
     @Override
+    @Transactional
     public ServiceDTO create(ServiceDTO request) {
         final ServiceEntity service = getMapper().toEntity(request);
         service.setHospital(findHospital(request.getHospital()));
@@ -39,6 +41,7 @@ public class ServicesService extends ApiService<ServiceDTO, ServiceEntity, Servi
 
     @NonNull
     @Override
+    @Transactional
     public ServiceDTO update(ServiceDTO request) {
         if (request.getId() == null) {
             throw new ApiBadRequestException("Pas d'id spécifié pour la mise à jour du service.");
@@ -64,6 +67,7 @@ public class ServicesService extends ApiService<ServiceDTO, ServiceEntity, Servi
     }
 
     @Override
+    @Transactional
     public List<ServiceDTO> update(List<ServiceDTO> request) {
         final List<ServiceDTO> result = new ArrayList<>();
 

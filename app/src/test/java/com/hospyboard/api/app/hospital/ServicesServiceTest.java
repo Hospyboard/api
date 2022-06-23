@@ -2,7 +2,6 @@ package com.hospyboard.api.app.hospital;
 
 import com.hospyboard.api.app.hospital.dto.HospitalDTO;
 import com.hospyboard.api.app.hospital.dto.ServiceDTO;
-import com.hospyboard.api.app.hospital.entity.Hospital;
 import com.hospyboard.api.app.hospital.services.HospitalsService;
 import com.hospyboard.api.app.hospital.services.ServicesService;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.transaction.Transactional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -139,14 +137,12 @@ public class ServicesServiceTest {
         }
     }
 
-    @Transactional
-    HospitalDTO createHospital() {
-        Hospital hospital = new Hospital();
+    public HospitalDTO createHospital() {
+        HospitalDTO hospital = new HospitalDTO();
         hospital.setName("Hospital test");
         hospital.setAddress("hospital address");
 
-        hospital = this.hospitalsService.getRepository().save(hospital);
-        return this.hospitalsService.getMapper().toDto(hospital);
+        return this.hospitalsService.create(hospital);
     }
 
 }
