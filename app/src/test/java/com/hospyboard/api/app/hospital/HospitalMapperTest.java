@@ -74,13 +74,12 @@ public class HospitalMapperTest {
         hospital.setUuid(UUID.randomUUID());
 
         final Hospital hospital2 = new Hospital();
-
-        hospital.setAddress("12 rue du test2");
-        hospital.setName("HospitalTest2");
-        hospital.setCreatedAt(Date.from(Instant.now()));
-        hospital.setUpdatedAt(Date.from(Instant.now()));
-        hospital.setId(1L);
-        hospital.setUuid(UUID.randomUUID());
+        hospital2.setAddress("12 rue du test2");
+        hospital2.setName("HospitalTest2");
+        hospital2.setCreatedAt(Date.from(Instant.now()));
+        hospital2.setUpdatedAt(Date.from(Instant.now()));
+        hospital2.setId(1L);
+        hospital2.setUuid(UUID.randomUUID());
 
         hospitalMapper.patch(hospital2, hospital);
         assertEquals(hospital2.getAddress(), hospital.getAddress());
