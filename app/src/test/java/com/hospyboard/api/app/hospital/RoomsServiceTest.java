@@ -210,7 +210,7 @@ public class RoomsServiceTest {
     public void testSearch() {
         final RoomDTO roomDTO = new RoomDTO();
         roomDTO.setService(createService());
-        roomDTO.setName("JE SUIS UNE RECHERCHE");
+        roomDTO.setName("JESUISUNERECHERCHE");
 
         final RoomDTO res = roomsService.create(roomDTO);
         final List<RoomDTO> roomDTOS = roomsService.search(

@@ -100,10 +100,8 @@ public class RoomsService extends ApiService<RoomDTO, Room, RoomMapper, RoomRepo
 
                 entRequest.setId(null);
                 entRequest.setUpdatedAt(Date.from(Instant.now()));
+                entRequest.setService(null);
                 getMapper().patch(entRequest, room);
-
-                final ServiceEntity service = findService(request.getService());
-                room.setService(service);
 
                 final RoomDTO res = getMapper().toDto(getRepository().save(room));
                 addUsersInRoom(res);
