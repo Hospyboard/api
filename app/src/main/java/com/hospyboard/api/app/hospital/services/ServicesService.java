@@ -54,10 +54,8 @@ public class ServicesService extends ApiService<ServiceDTO, ServiceEntity, Servi
 
                 entRequest.setId(null);
                 entRequest.setUpdatedAt(Date.from(Instant.now()));
+                entRequest.setHospital(null);
                 getMapper().patch(entRequest, service);
-
-                final Hospital hospital = findHospital(request.getHospital());
-                service.setHospital(hospital);
 
                 return getMapper().toDto(getRepository().save(service));
             } else {
