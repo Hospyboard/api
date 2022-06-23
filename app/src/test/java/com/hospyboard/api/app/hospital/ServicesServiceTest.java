@@ -1,8 +1,10 @@
 package com.hospyboard.api.app.hospital;
 
 import com.hospyboard.api.app.hospital.dto.HospitalDTO;
+import com.hospyboard.api.app.hospital.dto.RoomDTO;
 import com.hospyboard.api.app.hospital.dto.ServiceDTO;
 import com.hospyboard.api.app.hospital.services.HospitalsService;
+import com.hospyboard.api.app.hospital.services.RoomsService;
 import com.hospyboard.api.app.hospital.services.ServicesService;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
@@ -22,12 +24,15 @@ public class ServicesServiceTest {
 
     private final ServicesService service;
     private final HospitalsService hospitalsService;
+    private final RoomsService roomsService;
 
     @Autowired
     public ServicesServiceTest(ServicesService servicesService,
-                               HospitalsService hospitalsService) {
+                               HospitalsService hospitalsService,
+                               RoomsService roomsService) {
         this.service = servicesService;
         this.hospitalsService = hospitalsService;
+        this.roomsService = roomsService;
     }
 
     @Test
@@ -137,12 +142,38 @@ public class ServicesServiceTest {
         }
     }
 
+    @Test
+    public void testRemove() {
+        final ServiceDTO serviceDTO = new ServiceDTO();
+        serviceDTO.setName("test service");
+        serviceDTO.setHospital(createHospital());
+
+        final ServiceDTO res = service.create(serviceDTO);
+        final RoomDTO roomDTO = createRoom(res);
+
+        service.delete(res.getId().toString());
+
+        try {
+            roomsService.findById(roomDTO.getId().toString());
+            fail("found");
+        } catch (ApiNotFoundException ignored) {
+        }
+    }
+
     public HospitalDTO createHospital() {
         HospitalDTO hospital = new HospitalDTO();
         hospital.setName("Hospital test");
         hospital.setAddress("hospital address");
 
         return this.hospitalsService.create(hospital);
+    }
+
+    public RoomDTO createRoom(final ServiceDTO serviceDTO) {
+        final RoomDTO roomDTO = new RoomDTO();
+        roomDTO.setService(serviceDTO);
+        roomDTO.setName("Chambre test a supprimer");
+
+        return roomsService.create(roomDTO);
     }
 
 }
