@@ -5,6 +5,9 @@ import com.hospyboard.api.app.core.UserHelper;
 import com.hospyboard.api.app.mails.dtos.HospyboardMailDTO;
 import com.hospyboard.api.app.mails.services.HospyboardMailService;
 import com.hospyboard.api.app.user.dto.UserTokenDTO;
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,9 +16,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,6 +26,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class TestMails {
 
     private static final String ROUTE = "/mail";
+
+    private final GreenMail greenMail = new GreenMail(ServerSetupTest.SMTP)
+            .withConfiguration(
+                    GreenMailConfiguration.aConfig()
+                    .withDisabledAuthentication()
+            );
+
     private final MockMvc mockMvc;
     private final JsonHelper jsonHelper;
     private final UserTokenDTO adminToken;
@@ -54,10 +63,7 @@ public class TestMails {
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
 
-        Thread.sleep(1000);
-        final Instant expiration = Instant.now().plusSeconds(13);
-        while (Instant.now().isBefore(expiration) && !mailService.getMailQueue().isEmpty());
-
+        assertTrue(greenMail.waitForIncomingEmail(15000, 1));
         assertEquals(0, mailService.getMailQueue().size());
     }
 
