@@ -18,6 +18,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
+import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.*;
 
@@ -73,6 +74,7 @@ public class RoomsService extends ApiService<RoomDTO, Room, RoomMapper, RoomRepo
     }
 
     @Override
+    @Transactional
     public RoomDTO create(RoomDTO request) {
         final Room room = getMapper().toEntity(request);
         final ServiceEntity service = findService(request.getService());
@@ -85,6 +87,7 @@ public class RoomsService extends ApiService<RoomDTO, Room, RoomMapper, RoomRepo
 
     @NonNull
     @Override
+    @Transactional
     public RoomDTO update(RoomDTO request) {
         if (request.getId() == null) {
             throw new ApiBadRequestException("Pas d'id spécifié pour la mise à jour de la chambre.");
@@ -112,6 +115,7 @@ public class RoomsService extends ApiService<RoomDTO, Room, RoomMapper, RoomRepo
     }
 
     @Override
+    @Transactional
     public List<RoomDTO> update(List<RoomDTO> request) {
         final List<RoomDTO> result = new ArrayList<>();
 

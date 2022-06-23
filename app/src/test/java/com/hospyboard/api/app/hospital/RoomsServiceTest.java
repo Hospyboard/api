@@ -1,6 +1,7 @@
 package com.hospyboard.api.app.hospital;
 
 import com.hospyboard.api.app.core.exceptions.BadRequestException;
+import com.hospyboard.api.app.hospital.dto.HospitalDTO;
 import com.hospyboard.api.app.hospital.dto.RoomDTO;
 import com.hospyboard.api.app.hospital.dto.ServiceDTO;
 import com.hospyboard.api.app.hospital.entity.Hospital;
@@ -18,12 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -53,7 +54,7 @@ public class RoomsServiceTest {
 
         final RoomDTO res = roomsService.create(roomDTO);
         assertEquals(roomDTO.getService().getId(), res.getService().getId());
-        assertEquals(roomDTO.getId(), res.getId());
+        assertNotNull(res.getId());
         assertEquals(roomDTO.getName(), res.getName());
     }
 
@@ -83,7 +84,7 @@ public class RoomsServiceTest {
 
             roomsService.create(roomDTO);
             fail("Service found");
-        } catch (BadRequestException ignored) {
+        } catch (ApiBadRequestException ignored) {
         } catch (ApiNotFoundException e) {
             fail(e);
         }
@@ -212,7 +213,11 @@ public class RoomsServiceTest {
         roomDTO.setName("JE SUIS UNE RECHERCHE");
 
         final RoomDTO res = roomsService.create(roomDTO);
-        final List<RoomDTO> roomDTOS = roomsService.search(String.format("name:%s", roomDTO.getName()), "0", "100");
+        final List<RoomDTO> roomDTOS = roomsService.search(
+                "name:" + roomDTO.getName(),
+                "0",
+                "100"
+        );
 
         for (final RoomDTO search : roomDTOS) {
             if (search.getId().equals(res.getId())) {
@@ -250,19 +255,18 @@ public class RoomsServiceTest {
         fail("user not found");
     }
 
-    private ServiceDTO createService() {
-        Hospital hospital = new Hospital();
-
+    public ServiceDTO createService() {
+        HospitalDTO hospital = new HospitalDTO();
         hospital.setAddress("Test adress");
         hospital.setName("Hospital Test name");
-        hospital = hospitalsService.getRepository().save(hospital);
+        hospital = hospitalsService.create(hospital);
 
-        ServiceEntity service = new ServiceEntity();
+        ServiceDTO service = new ServiceDTO();
         service.setHospital(hospital);
         service.setName("Service test name");
-        service = servicesService.getRepository().save(service);
+        service = servicesService.create(service);
 
-        return servicesService.getMapper().toDto(service);
+        return service;
     }
 
 }
