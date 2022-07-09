@@ -28,10 +28,7 @@ public class TestMails {
     private static final String ROUTE = "/mail";
 
     private final GreenMail greenMail = new GreenMail(ServerSetupTest.SMTP)
-            .withConfiguration(
-                    GreenMailConfiguration.aConfig()
-                    .withDisabledAuthentication()
-            );
+            .withConfiguration(GreenMailConfiguration.aConfig().withDisabledAuthentication());
 
     private final MockMvc mockMvc;
     private final JsonHelper jsonHelper;
@@ -47,6 +44,7 @@ public class TestMails {
         this.mailService = mailService;
         this.jsonHelper = jsonHelper;
         this.adminToken = userHelper.generateAdminToken();
+        this.greenMail.start();
     }
 
     @Test
