@@ -20,6 +20,7 @@ import com.hospyboard.api.app.user.repository.UserRepository;
 import fr.funixgaming.api.core.crud.services.ApiService;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
+import fr.funixgaming.api.core.utils.string.PasswordGenerator;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -146,10 +147,9 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                 final Optional<UserPasswordReset> search = this.passwordResetRepository.findUserPasswordResetByCode(request.getCode());
 
                 if (search.isPresent()) {
-                    final Instant now = Instant.now();
                     final UserPasswordReset passwordReset = search.get();
 
-                    if (passwordReset.getExpirationDate().toInstant().isBefore(now)) {
+                    if (!passwordReset.isValid()) {
                         throw new ApiBadRequestException("Le code entré est invalide.");
                     } else {
                         final User user = passwordReset.getUser();
@@ -157,6 +157,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                         if (request.getPassword().equals(request.getPasswordConfirmation())) {
                             user.setPassword(passwordEncoder.encode(request.getPassword()));
                             super.getRepository().save(user);
+                            this.passwordResetRepository.delete(passwordReset);
                         } else {
                             throw new ApiBadRequestException("Les mots de passe ne correspondent pas.");
                         }
@@ -214,17 +215,22 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     }
 
     private String generateRandomStringCode() {
-        return "";//TODO gen
+        final PasswordGenerator passwordGenerator = new PasswordGenerator();
+        passwordGenerator.setAlphaDown(20);
+        passwordGenerator.setAlphaUpper(20);
+        passwordGenerator.setNumbersAmount(20);
+        passwordGenerator.setSpecialCharsAmount(20);
+
+        return passwordGenerator.generateRandomPassword();
     }
 
     @Scheduled(fixedRate = 10, timeUnit = TimeUnit.SECONDS)
     public void cleanPasswordResetExpired() {
-        final Instant now = Instant.now();
         final Iterable<UserPasswordReset> passwordResets = this.passwordResetRepository.findAll();
         final List<UserPasswordReset> toRemove = new ArrayList<>();
 
         for (final UserPasswordReset passwordReset : passwordResets) {
-            if (passwordReset.getExpirationDate().toInstant().isBefore(now)) {
+            if (!passwordReset.isValid()) {
                 toRemove.add(passwordReset);
             }
         }

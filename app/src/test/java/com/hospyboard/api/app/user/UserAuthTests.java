@@ -24,7 +24,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -53,7 +54,6 @@ public class UserAuthTests {
 
     @Test
     public void testRegisterSuccess() throws Exception {
-        new UserRole();
         final UserCreationDTO userCreationDTO = new UserCreationDTO();
 
         userCreationDTO.setUsername("testUser");
