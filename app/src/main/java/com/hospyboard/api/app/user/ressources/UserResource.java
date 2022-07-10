@@ -73,6 +73,18 @@ public class UserResource {
         this.service.changePassword(request);
     }
 
+    @PostMapping("forgotPassword")
+    public void forgotPassword(@RequestBody final UserForgotPasswordDTO request) {
+        request.setPasswordSet(false);
+        this.service.resetPassword(request);
+    }
+
+    @PostMapping("forgotPassword/change")
+    public void changePassword(@RequestBody final UserForgotPasswordDTO request) {
+        request.setPasswordSet(true);
+        this.service.resetPassword(request);
+    }
+
     @PostMapping
     public UserDTO createUser(@RequestBody @Valid final UserDTO user) {
         final UserDTO currentUser = this.currentUser.getCurrentUser();

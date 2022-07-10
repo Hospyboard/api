@@ -2,20 +2,27 @@ package com.hospyboard.api.app.user.services;
 
 import com.hospyboard.api.app.alert.repository.AlertRepository;
 import com.hospyboard.api.app.core.exceptions.ForbiddenException;
+import com.hospyboard.api.app.mails.dtos.HospyboardMailDTO;
+import com.hospyboard.api.app.mails.services.HospyboardMailService;
 import com.hospyboard.api.app.user.config.JwtTokenUtil;
 import com.hospyboard.api.app.user.dto.UserCreationDTO;
 import com.hospyboard.api.app.user.dto.UserDTO;
+import com.hospyboard.api.app.user.dto.UserForgotPasswordDTO;
 import com.hospyboard.api.app.user.dto.UserResetPasswordDTO;
 import com.hospyboard.api.app.user.entity.User;
+import com.hospyboard.api.app.user.entity.UserPasswordReset;
 import com.hospyboard.api.app.user.enums.UserRole;
 import com.hospyboard.api.app.user.exception.RegisterHospyboardException;
 import com.hospyboard.api.app.user.exception.UserUpdateException;
 import com.hospyboard.api.app.user.mappers.UserMapper;
+import com.hospyboard.api.app.user.repository.UserForgotPasswordResetRepository;
 import com.hospyboard.api.app.user.repository.UserRepository;
 import fr.funixgaming.api.core.crud.services.ApiService;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
+import fr.funixgaming.api.core.utils.string.PasswordGenerator;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,8 +30,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepository> implements UserDetailsService {
@@ -35,19 +44,25 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     private final JwtTokenUtil tokenUtil;
     private final PasswordEncoder passwordEncoder;
     private final AlertRepository alertRepository;
+    private final UserForgotPasswordResetRepository passwordResetRepository;
+    private final HospyboardMailService mailService;
 
     public UserService(UserRepository userRepository,
                        UserMapper userMapper,
                        JwtTokenUtil tokenUtil,
                        CurrentUser currentUser,
                        PasswordEncoder passwordEncoder,
-                       AlertRepository alertRepository) {
+                       AlertRepository alertRepository,
+                       UserForgotPasswordResetRepository passwordResetRepository,
+                       HospyboardMailService mailService) {
         super(userRepository, userMapper);
         this.userMapper = userMapper;
         this.currentUser = currentUser;
         this.tokenUtil = tokenUtil;
         this.passwordEncoder = passwordEncoder;
         this.alertRepository = alertRepository;
+        this.passwordResetRepository = passwordResetRepository;
+        this.mailService = mailService;
     }
 
     @Transactional
@@ -124,6 +139,54 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         }
     }
 
+    public void resetPassword(final UserForgotPasswordDTO request) {
+        if (request.isPasswordSet()) {
+            if (request.getCode() == null) {
+                throw new ApiBadRequestException("Le code entré est invalide.");
+            } else {
+                final Optional<UserPasswordReset> search = this.passwordResetRepository.findUserPasswordResetByCode(request.getCode());
+
+                if (search.isPresent()) {
+                    final UserPasswordReset passwordReset = search.get();
+
+                    if (!passwordReset.isValid()) {
+                        throw new ApiBadRequestException("Le code entré est invalide.");
+                    } else {
+                        final User user = passwordReset.getUser();
+
+                        if (request.getPassword().equals(request.getPasswordConfirmation())) {
+                            user.setPassword(passwordEncoder.encode(request.getPassword()));
+                            super.getRepository().save(user);
+                            this.passwordResetRepository.delete(passwordReset);
+                        } else {
+                            throw new ApiBadRequestException("Les mots de passe ne correspondent pas.");
+                        }
+                    }
+                } else {
+                    throw new ApiBadRequestException("Le code entré est invalide.");
+                }
+            }
+        } else {
+            final Iterable<User> users = getRepository().findAllByEmail(request.getEmail());
+
+            for (final User user : users) {
+                UserPasswordReset userPasswordReset = new UserPasswordReset();
+                userPasswordReset.setExpirationDate(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)));
+                userPasswordReset.setUser(user);
+                userPasswordReset.setCode(generateRandomStringCode());
+
+                userPasswordReset = this.passwordResetRepository.save(userPasswordReset);
+
+                final HospyboardMailDTO mailDTO = new HospyboardMailDTO();
+                mailDTO.setFrom("noreply@hospyboard.com");
+                mailDTO.setSubject("Changement de mot de passe Hospyboard");
+                mailDTO.setTo(userPasswordReset.getUser().getEmail());
+                mailDTO.setText(String.format("Code de reset: %s", userPasswordReset.getCode()));
+                mailService.getMailQueue().add(mailDTO);
+            }
+        }
+    }
+
     @Override
     @Transactional
     public void delete(String id) {
@@ -149,5 +212,28 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                 .orElseThrow(
                         () -> new UsernameNotFoundException(String.format("Utilisateur non trouvé: %s", username))
                 );
+    }
+
+    private String generateRandomStringCode() {
+        final PasswordGenerator passwordGenerator = new PasswordGenerator();
+        passwordGenerator.setAlphaDown(20);
+        passwordGenerator.setAlphaUpper(20);
+        passwordGenerator.setNumbersAmount(20);
+        passwordGenerator.setSpecialCharsAmount(20);
+
+        return passwordGenerator.generateRandomPassword();
+    }
+
+    @Scheduled(fixedRate = 10, timeUnit = TimeUnit.SECONDS)
+    public void cleanPasswordResetExpired() {
+        final Iterable<UserPasswordReset> passwordResets = this.passwordResetRepository.findAll();
+        final List<UserPasswordReset> toRemove = new ArrayList<>();
+
+        for (final UserPasswordReset passwordReset : passwordResets) {
+            if (!passwordReset.isValid()) {
+                toRemove.add(passwordReset);
+            }
+        }
+        this.passwordResetRepository.deleteAll(toRemove);
     }
 }
