@@ -4,9 +4,9 @@ import com.hospyboard.api.app.alert.repository.AlertRepository;
 import com.hospyboard.api.app.core.exceptions.ForbiddenException;
 import com.hospyboard.api.app.hospital.entity.Room;
 import com.hospyboard.api.app.hospital.repositories.RoomRepository;
-import com.hospyboard.api.app.user.config.JwtTokenUtil;
 import com.hospyboard.api.app.mails.dtos.HospyboardMailDTO;
 import com.hospyboard.api.app.mails.services.HospyboardMailService;
+import com.hospyboard.api.app.user.config.JwtTokenUtil;
 import com.hospyboard.api.app.user.dto.UserCreationDTO;
 import com.hospyboard.api.app.user.dto.UserDTO;
 import com.hospyboard.api.app.user.dto.UserForgotPasswordDTO;
@@ -65,9 +65,9 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         this.tokenUtil = tokenUtil;
         this.passwordEncoder = passwordEncoder;
         this.alertRepository = alertRepository;
+        this.roomRepository = roomRepository;
         this.passwordResetRepository = passwordResetRepository;
         this.mailService = mailService;
-        this.roomRepository = roomRepository;
     }
 
     @Transactional
@@ -95,7 +95,6 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         if (res == null) {
             throw new ApiNotFoundException("L'utilisateur n'existe pas");
         } else {
-            updateRoomLinkedToUser(res);
             return res;
         }
     }
@@ -194,28 +193,6 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     }
 
     @Override
-    public UserDTO create(UserDTO request) {
-        final UserDTO res = super.create(request);
-        updateRoomLinkedToUser(res);
-
-        return res;
-    }
-
-    @Override
-    public UserDTO update(UserDTO request) {
-        return updateUser(request);
-    }
-
-    public List<UserDTO> update(final List<UserDTO> request) {
-        final List<UserDTO> users = new ArrayList<>();
-
-        for (final UserDTO userDTO : request) {
-            users.add(this.update(userDTO));
-        }
-        return users;
-    }
-
-    @Override
     @Transactional
     public void delete(String id) {
         final Optional<User> search = super.getRepository().findByUuid(id);
@@ -240,6 +217,29 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                 .orElseThrow(
                         () -> new UsernameNotFoundException(String.format("Utilisateur non trouvé: %s", username))
                 );
+    }
+
+    @Override
+    public UserDTO create(UserDTO request) {
+        final UserDTO res = super.create(request);
+        updateRoomLinkedToUser(res);
+
+        return res;
+    }
+
+    @Override
+    public UserDTO update(UserDTO request) {
+        return this.updateUser(request);
+    }
+
+    @Override
+    public List<UserDTO> update(final List<UserDTO> request) {
+        final List<UserDTO> users = new ArrayList<>();
+
+        for (final UserDTO userDTO : request) {
+            users.add(this.update(userDTO));
+        }
+        return users;
     }
 
     private String generateRandomStringCode() {
