@@ -14,6 +14,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.Instant;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -59,7 +61,9 @@ public class TestMails {
         ).andExpect(status().isOk());
 
         assertTrue(mailHelper.getGreenMail().waitForIncomingEmail(15000, 1));
-        Thread.sleep(1000);
+
+        final Instant limit = Instant.now().plusSeconds(20);
+        while (mailService.getMailQueue().size() > 0 && Instant.now().isBefore(limit)) ;
         assertEquals(0, mailService.getMailQueue().size());
     }
 
