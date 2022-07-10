@@ -1,6 +1,5 @@
 package com.hospyboard.api.app.user.entity;
 
-import com.hospyboard.api.app.alert.entity.AlertEntity;
 import com.hospyboard.api.app.core.db_converters.EncryptionDatabaseString;
 import com.hospyboard.api.app.hospital.entity.Room;
 import fr.funixgaming.api.core.crud.entities.ApiEntity;
@@ -50,6 +49,9 @@ public class User extends ApiEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<UserToken> tokens;
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<UserPasswordReset> passwordResets;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

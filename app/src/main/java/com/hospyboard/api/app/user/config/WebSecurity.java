@@ -67,6 +67,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers("/hospital/**").hasAuthority(UserRole.ADMIN)
                 .antMatchers("/service/**").hasAuthority(UserRole.ADMIN)
                 .antMatchers("/room/**").hasAuthority(UserRole.ADMIN)
+                .antMatchers(HttpMethod.POST, "/user/forgotPassword").permitAll()
+                .antMatchers(HttpMethod.POST, "/user/forgotPassword/change").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
