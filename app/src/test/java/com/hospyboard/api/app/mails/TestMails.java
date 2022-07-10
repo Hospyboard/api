@@ -59,6 +59,7 @@ public class TestMails {
         ).andExpect(status().isOk());
 
         assertTrue(mailHelper.getGreenMail().waitForIncomingEmail(15000, 1));
+        Thread.sleep(1000);
         assertEquals(0, mailService.getMailQueue().size());
     }
 
