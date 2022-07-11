@@ -28,15 +28,15 @@ public class HospyboardMailResource {
         mail.setTo("hospyboard_2023@labeip.epitech.eu");
         mail.setFrom("hospyboard@funixgaming.fr");
 
-        if (Strings.isEmpty(request.getFrom())) {
-            throw new ApiBadRequestException("No from email");
-        } else if (Strings.isEmpty(request.getSubject())) {
+        if (Strings.isEmpty(request.getSubject())) {
             throw new ApiBadRequestException("No subject");
         } else if (Strings.isEmpty(request.getText())) {
             throw new ApiBadRequestException("No text");
         }
+
         mail.setText(request.getText());
         mail.setSubject(request.getSubject());
+
         mailService.getMailQueue().add(mail);
     }
 
