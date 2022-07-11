@@ -24,7 +24,9 @@ public class HospyboardMailResource {
 
     @PostMapping("contact")
     public void sendContactMail(@RequestBody HospyboardMailDTO request) {
-        request.setTo("hospyboard_2023@labeip.epitech.eu");
+        final HospyboardMailDTO mail = new HospyboardMailDTO();
+        mail.setTo("hospyboard_2023@labeip.epitech.eu");
+        mail.setFrom("hospyboard@funixgaming.fr");
 
         if (Strings.isEmpty(request.getFrom())) {
             throw new ApiBadRequestException("No from email");
@@ -33,7 +35,9 @@ public class HospyboardMailResource {
         } else if (Strings.isEmpty(request.getText())) {
             throw new ApiBadRequestException("No text");
         }
-        mailService.getMailQueue().add(request);
+        mail.setText(request.getText());
+        mail.setSubject(request.getSubject());
+        mailService.getMailQueue().add(mail);
     }
 
 }
