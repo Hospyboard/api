@@ -29,8 +29,9 @@ public class HospyboardMailService extends ApiMailService {
 
         while (mailDTO != null) {
             try {
+                mailDTO.setFrom("contact@hospyboard.eu");
                 super.sendMail(mailDTO);
-                log.info("Mail envoyé ! {}", mailDTO.toString());
+                log.info("Mail envoyé ! {}", mailDTO);
             } catch (ApiException e) {
                 mailQueue.add(mailDTO);
                 log.error("Erreur lors de l'envoi d'un mail.", e);

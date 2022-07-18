@@ -183,7 +183,6 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                 userPasswordReset = this.passwordResetRepository.save(userPasswordReset);
 
                 final HospyboardMailDTO mailDTO = new HospyboardMailDTO();
-                mailDTO.setFrom("hospyboard@funixgaming.fr");
                 mailDTO.setSubject("Changement de mot de passe Hospyboard");
                 mailDTO.setTo(userPasswordReset.getUser().getEmail());
                 mailDTO.setText(String.format("Code de reset: %s", userPasswordReset.getCode()));
