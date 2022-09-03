@@ -79,7 +79,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
 
         if (!Strings.isEmpty(request.getPassword()) && !Strings.isEmpty(request.getPasswordConfirmation())) {
             if (request.getPassword().equals(request.getPasswordConfirmation())) {
-                request.setPassword(passwordEncoder.encode(request.getPassword()));
+                request.setPassword(request.getPassword());
                 tokenUtil.invalidateTokens(request.getId());
             } else {
                 throw new UserUpdateException("Les mots de passe ne correspondent pas.");
@@ -114,7 +114,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                 user.setRole(UserRole.HOSPYTAL_WORKER);
             }
 
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setPassword(user.getPassword());
             return this.userMapper.toDto(super.getRepository().save(user));
         } else {
             throw new RegisterHospyboardException("Vos mots de passe ne correspondent pas.");
@@ -130,7 +130,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
             final User user = search.get();
 
             if (request.getNewPassword().equals(request.getNewPasswordConfirmation())) {
-                user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                user.setPassword(request.getNewPassword());
                 tokenUtil.invalidateTokens(userDTO.getId());
                 super.getRepository().save(user);
             } else {
@@ -156,7 +156,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                         final User user = passwordReset.getUser();
 
                         if (request.getPassword().equals(request.getPasswordConfirmation())) {
-                            user.setPassword(passwordEncoder.encode(request.getPassword()));
+                            user.setPassword(request.getPassword());
                             super.getRepository().save(user);
                             this.passwordResetRepository.delete(passwordReset);
                         } else {
