@@ -11,6 +11,9 @@ import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
@@ -121,6 +124,9 @@ public class JwtTokenUtil {
         final Instant now = Instant.now();
         final Instant expiresAt = now.plusSeconds(EXPIRATION_SECONDS_TOKEN - 20);
         final UserToken userToken = new UserToken();
+
+        user.setLastLoginAt(Date.from(Instant.now()));
+        userRepository.save(user);
 
         userToken.setUser(user);
         userToken.setUuid(UUID.randomUUID());

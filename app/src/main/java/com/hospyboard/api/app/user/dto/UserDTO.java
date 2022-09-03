@@ -7,7 +7,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import java.util.UUID;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -29,6 +29,8 @@ public class UserDTO extends ApiDTO {
     private String password;
 
     private String passwordConfirmation;
+
+    private Date lastLoginAt;
 
     @NotBlank
     private String role;

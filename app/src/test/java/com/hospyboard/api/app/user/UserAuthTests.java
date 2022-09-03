@@ -150,6 +150,7 @@ public class UserAuthTests {
         assertNotNull(result.getExpirationDate());
         assertNotNull(result.getToken());
         assertNotNull(result.getUser());
+        assertNotNull(result.getUser().getLastLoginAt());
     }
 
     @Test

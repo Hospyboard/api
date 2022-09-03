@@ -16,10 +16,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <swagger.version>2.9.2</swagger.version>
-        <jackson.version>2.10.2</jackson.version>
-        <org.flyway.version>8.5.8</org.flyway.version>
-        <org.jacoco.coverage.version>0.8.8</org.jacoco.coverage.version>
+        <jackson.version>2.13.3</jackson.version>
     </properties>
 
     <modules>
