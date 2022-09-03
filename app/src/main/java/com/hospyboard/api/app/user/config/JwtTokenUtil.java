@@ -7,7 +7,9 @@ import com.hospyboard.api.app.user.mappers.UserTokenMapper;
 import com.hospyboard.api.app.user.repository.UserRepository;
 import com.hospyboard.api.app.user.repository.UserTokenRepository;
 import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,6 +43,9 @@ public class JwtTokenUtil {
         final Instant now = Instant.now();
         final Instant expiresAt = now.plusSeconds(EXPIRATION_SECONDS_TOKEN - 20);
         final UserToken userToken = new UserToken();
+
+        user.setLastLoginAt(Date.from(Instant.now()));
+        userRepository.save(user);
 
         userToken.setUser(user);
         userToken.setUuid(UUID.randomUUID());

@@ -1,7 +1,6 @@
 package com.hospyboard.api.app.user.entity;
 
 import com.hospyboard.api.app.core.db_converters.EncryptionDatabaseString;
-import com.hospyboard.api.app.hospital.entity.Room;
 import fr.funixgaming.api.core.crud.entities.ApiEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,6 +45,9 @@ public class User extends ApiEntity implements UserDetails {
 
     @Column(name = "hospital_room_uuid")
     private String roomUuid;
+
+    @Column(name = "last_login_at")
+    private Date lastLoginAt;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<UserToken> tokens;
