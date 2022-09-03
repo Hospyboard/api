@@ -28,7 +28,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -44,7 +43,6 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     private final UserMapper userMapper;
 
     private final JwtTokenUtil tokenUtil;
-    private final PasswordEncoder passwordEncoder;
     private final AlertRepository alertRepository;
     private final RoomRepository roomRepository;
     private final UserForgotPasswordResetRepository passwordResetRepository;
@@ -54,7 +52,6 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                        UserMapper userMapper,
                        JwtTokenUtil tokenUtil,
                        CurrentUser currentUser,
-                       PasswordEncoder passwordEncoder,
                        AlertRepository alertRepository,
                        RoomRepository roomRepository,
                        UserForgotPasswordResetRepository passwordResetRepository,
@@ -63,7 +60,6 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         this.userMapper = userMapper;
         this.currentUser = currentUser;
         this.tokenUtil = tokenUtil;
-        this.passwordEncoder = passwordEncoder;
         this.alertRepository = alertRepository;
         this.roomRepository = roomRepository;
         this.passwordResetRepository = passwordResetRepository;
