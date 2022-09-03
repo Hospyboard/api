@@ -1,27 +1,27 @@
 package com.hospyboard.api.app.core.db_converters;
 
-import com.hospyboard.api.app.core.configs.CryptSecretConfig;
+import fr.funixgaming.api.core.utils.encryption.ApiConverter;
+import fr.funixgaming.api.core.utils.encryption.Encryption;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
-import javax.crypto.NoSuchPaddingException;
-import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 
+@Component
 @Converter
-public class EncryptionDatabaseInstant extends AEncryptionDatabase implements AttributeConverter<Instant, String> {
+@RequiredArgsConstructor
+public class EncryptionDatabaseInstant implements ApiConverter<Instant> {
 
-    public EncryptionDatabaseInstant(CryptSecretConfig cryptSecretConfig) throws NoSuchPaddingException, NoSuchAlgorithmException {
-        super(cryptSecretConfig);
-    }
+    private final Encryption encryption;
 
     @Override
     public String convertToDatabaseColumn(Instant instant) {
-        return super.convertToDatabase(Long.toString(instant.getEpochSecond()));
+        return encryption.convertToDatabase(Long.toString(instant.getEpochSecond()));
     }
 
     @Override
     public Instant convertToEntityAttribute(String dbData) {
-        return Instant.ofEpochSecond(Long.parseLong(super.convertToEntity(dbData)));
+        return Instant.ofEpochSecond(Long.parseLong(encryption.convertToEntity(dbData)));
     }
 }

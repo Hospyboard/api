@@ -1,26 +1,26 @@
 package com.hospyboard.api.app.core.db_converters;
 
-import com.hospyboard.api.app.core.configs.CryptSecretConfig;
+import fr.funixgaming.api.core.utils.encryption.ApiConverter;
+import fr.funixgaming.api.core.utils.encryption.Encryption;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
-import javax.crypto.NoSuchPaddingException;
-import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
-import java.security.NoSuchAlgorithmException;
 
+@Component
 @Converter
-public class EncryptionDatabaseString extends AEncryptionDatabase implements AttributeConverter<String, String> {
+@RequiredArgsConstructor
+public class EncryptionDatabaseString implements ApiConverter<String> {
 
-    public EncryptionDatabaseString(CryptSecretConfig cryptSecretConfig) throws NoSuchPaddingException, NoSuchAlgorithmException {
-        super(cryptSecretConfig);
-    }
+    private final Encryption encryption;
 
     @Override
     public String convertToDatabaseColumn(String attribute) {
-        return this.convertToDatabase(attribute);
+        return encryption.convertToDatabase(attribute);
     }
 
     @Override
     public String convertToEntityAttribute(String dbData) {
-        return this.convertToEntity(dbData);
+        return encryption.convertToEntity(dbData);
     }
 }

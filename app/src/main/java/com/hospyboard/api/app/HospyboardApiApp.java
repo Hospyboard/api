@@ -9,7 +9,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableAsync
 @EnableSwagger2
 @EnableScheduling
-@SpringBootApplication(scanBasePackages = "com.hospyboard.api")
+@SpringBootApplication(scanBasePackages = {"com.hospyboard.api", "fr.funixgaming.api.core.utils.encryption"})
 public class HospyboardApiApp {
     public static void main(String[] args) {
         SpringApplication.run(HospyboardApiApp.class, args);
