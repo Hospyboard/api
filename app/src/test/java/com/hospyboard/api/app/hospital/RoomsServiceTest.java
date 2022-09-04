@@ -4,8 +4,7 @@ import com.hospyboard.api.app.core.exceptions.BadRequestException;
 import com.hospyboard.api.app.hospital.dto.HospitalDTO;
 import com.hospyboard.api.app.hospital.dto.RoomDTO;
 import com.hospyboard.api.app.hospital.dto.ServiceDTO;
-import com.hospyboard.api.app.hospital.entity.Hospital;
-import com.hospyboard.api.app.hospital.entity.ServiceEntity;
+import com.hospyboard.api.app.hospital.dto.requests.LinkRoomAndPatientDTO;
 import com.hospyboard.api.app.hospital.services.HospitalsService;
 import com.hospyboard.api.app.hospital.services.RoomsService;
 import com.hospyboard.api.app.hospital.services.ServicesService;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -236,13 +234,13 @@ public class RoomsServiceTest {
         final RoomDTO res = roomsService.create(roomDTO);
 
         User user = new User();
-        user.setPassword("123");
-        user.setEmail("oui@test.fr");
-        user.setFirstName("oui");
-        user.setLastName("sq");
+        user.setPassword("123111");
+        user.setEmail("1oui@test.fr");
+        user.setFirstName("oui1");
+        user.setLastName("sq1");
         user.setRole("ADMIN");
         user.setRoomUuid(res.getId());
-        user.setUsername("dmflfj");
+        user.setUsername("ddddmflfj");
         user = this.userRepository.save(user);
 
         final RoomDTO search = roomsService.findById(res.getId().toString());
@@ -253,6 +251,29 @@ public class RoomsServiceTest {
             }
         }
         fail("user not found");
+    }
+
+    @Test
+    public void testAddUserToRoom() {
+        final RoomDTO roomDTO = new RoomDTO();
+        roomDTO.setService(createService());
+        roomDTO.setName("JE SUIS UNE RECHERCHE");
+
+        final RoomDTO room = roomsService.create(roomDTO);
+
+        User user = new User();
+        user.setPassword("123");
+        user.setEmail("oui@test.fr");
+        user.setFirstName("oui");
+        user.setLastName("sq");
+        user.setRole("ADMIN");
+        user.setUsername("dmflfj");
+        user = this.userRepository.save(user);
+
+        final LinkRoomAndPatientDTO linkRoomAndPatientDTO = new LinkRoomAndPatientDTO(room.getId(), user.getUuid());
+        final RoomDTO result = roomsService.addPatient(linkRoomAndPatientDTO);
+        assertEquals(1, result.getPatients().size());
+        assertEquals(user.getUuid(), result.getPatients().get(0).getId());
     }
 
     public ServiceDTO createService() {
