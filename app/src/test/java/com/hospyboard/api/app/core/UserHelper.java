@@ -37,8 +37,8 @@ public class UserHelper {
             userCreationDTO.setFirstName("testFirstName");
             userCreationDTO.setLastName("testLastName");
             userCreationDTO.setEmail("test@gmail.com");
-            userCreationDTO.setPassword("12345");
-            userCreationDTO.setPasswordConfirmation("12345");
+            userCreationDTO.setPassword("passwordOfTestAccount");
+            userCreationDTO.setPasswordConfirmation("passwordOfTestAccount");
 
             this.mockMvc.perform(post(UserAuthTests.ROUTE + "register")
                             .contentType(MediaType.APPLICATION_JSON)
