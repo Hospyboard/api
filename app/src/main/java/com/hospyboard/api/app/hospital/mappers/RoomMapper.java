@@ -29,6 +29,7 @@ public interface RoomMapper extends ApiMapper<Room, RoomDTO> {
 
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "service", ignore = true)
     void patch(Room request, @MappingTarget Room toPatch);
 
 }

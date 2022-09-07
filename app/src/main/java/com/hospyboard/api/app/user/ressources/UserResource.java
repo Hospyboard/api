@@ -9,6 +9,7 @@ import com.hospyboard.api.app.user.services.CurrentUser;
 import com.hospyboard.api.app.user.services.UserService;
 import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("user")
@@ -59,8 +59,11 @@ public class UserResource {
     }
 
     @GetMapping
-    public List<UserDTO> getAllUsers() {
-        return this.service.getAll(null, null);
+    public Page<UserDTO> getAllUsers(@RequestParam(value = "page", defaultValue = "0") String page,
+                                     @RequestParam(value = "elemsPerPage", defaultValue = "300") String elemsPerPage,
+                                     @RequestParam(value = "search", defaultValue = "") String search,
+                                     @RequestParam(value = "sort", defaultValue = "") String sort) {
+        return this.service.getAll(page, elemsPerPage, search, sort);
     }
 
     @PatchMapping

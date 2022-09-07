@@ -15,8 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -152,12 +151,7 @@ public class ServicesServiceTest {
         final RoomDTO roomDTO = createRoom(res);
 
         service.delete(res.getId().toString());
-
-        try {
-            roomsService.findById(roomDTO.getId().toString());
-            fail("found");
-        } catch (ApiNotFoundException ignored) {
-        }
+        assertNull(roomsService.findById(roomDTO.getId().toString()));
     }
 
     public HospitalDTO createHospital() {

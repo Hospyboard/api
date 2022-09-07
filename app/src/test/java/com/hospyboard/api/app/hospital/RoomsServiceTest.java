@@ -176,7 +176,7 @@ public class RoomsServiceTest {
 
         final RoomDTO res = roomsService.create(roomDTO);
 
-        for (final RoomDTO search : roomsService.getAll("0", "100")) {
+        for (final RoomDTO search : roomsService.getAll("0", "100", null, null)) {
             if (search.getId().equals(res.getId())) {
                 return;
             }
@@ -197,32 +197,7 @@ public class RoomsServiceTest {
 
     @Test
     public void testFindByIdFail() {
-        try {
-            roomsService.findById(UUID.randomUUID().toString());
-            fail("found");
-        } catch (ApiNotFoundException ignored) {
-        }
-    }
-
-    @Test
-    public void testSearch() {
-        final RoomDTO roomDTO = new RoomDTO();
-        roomDTO.setService(createService());
-        roomDTO.setName("JESUISUNERECHERCHE");
-
-        final RoomDTO res = roomsService.create(roomDTO);
-        final List<RoomDTO> roomDTOS = roomsService.search(
-                "name:" + roomDTO.getName(),
-                "0",
-                "100"
-        );
-
-        for (final RoomDTO search : roomDTOS) {
-            if (search.getId().equals(res.getId())) {
-                return;
-            }
-        }
-        fail("search not found");
+        assertNull(roomsService.findById(UUID.randomUUID().toString()));
     }
 
     @Test
@@ -244,6 +219,9 @@ public class RoomsServiceTest {
         user = this.userRepository.save(user);
 
         final RoomDTO search = roomsService.findById(res.getId().toString());
+        if (search == null) {
+            fail("room not found");
+        }
 
         for (final UserDTO userDTO : search.getPatients()) {
             if (userDTO.getId().equals(user.getUuid())) {
