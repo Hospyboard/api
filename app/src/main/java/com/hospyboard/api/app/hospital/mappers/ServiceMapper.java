@@ -22,5 +22,6 @@ public interface ServiceMapper extends ApiMapper<ServiceEntity, ServiceDTO> {
 
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "hospital", ignore = true)
     void patch(ServiceEntity request, @MappingTarget ServiceEntity toPatch);
 }

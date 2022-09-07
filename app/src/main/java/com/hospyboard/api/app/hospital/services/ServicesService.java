@@ -10,13 +10,11 @@ import com.hospyboard.api.app.hospital.repositories.ServiceRepository;
 import fr.funixgaming.api.core.crud.services.ApiService;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
-import org.springframework.lang.NonNull;
+import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
-import javax.transaction.Transactional;
-import java.time.Instant;
-import java.util.*;
+import java.util.Optional;
 
 @Service
 public class ServicesService extends ApiService<ServiceDTO, ServiceEntity, ServiceMapper, ServiceRepository> {
@@ -31,48 +29,11 @@ public class ServicesService extends ApiService<ServiceDTO, ServiceEntity, Servi
     }
 
     @Override
-    @Transactional
-    public ServiceDTO create(ServiceDTO request) {
-        final ServiceEntity service = getMapper().toEntity(request);
-        service.setHospital(findHospital(request.getHospital()));
-
-        return getMapper().toDto(getRepository().save(service));
-    }
-
-    @NonNull
-    @Override
-    @Transactional
-    public ServiceDTO update(ServiceDTO request) {
+    public void beforeSavingEntity(@NonNull ServiceDTO request, @NonNull ServiceEntity entity) {
         if (request.getId() == null) {
-            throw new ApiBadRequestException("Pas d'id spécifié pour la mise à jour du service.");
-        } else {
-            final Optional<ServiceEntity> search = getRepository().findByUuid(request.getId().toString());
-
-            if (search.isPresent()) {
-                final ServiceEntity entRequest = getMapper().toEntity(request);
-                ServiceEntity service = search.get();
-
-                entRequest.setId(null);
-                entRequest.setUpdatedAt(Date.from(Instant.now()));
-                entRequest.setHospital(null);
-                getMapper().patch(entRequest, service);
-
-                return getMapper().toDto(getRepository().save(service));
-            } else {
-                throw new ApiNotFoundException(String.format("Le service id %s n'existe pas.", request.getId()));
-            }
+            final Hospital hospital = findHospital(request.getHospital());
+            entity.setHospital(hospital);
         }
-    }
-
-    @Override
-    @Transactional
-    public List<ServiceDTO> update(List<ServiceDTO> request) {
-        final List<ServiceDTO> result = new ArrayList<>();
-
-        for (final ServiceDTO req : request) {
-            result.add(this.update(req));
-        }
-        return result;
     }
 
     private Hospital findHospital(@Nullable final HospitalDTO hospitalDto) {

@@ -33,7 +33,7 @@ public class AlertEntity extends ApiEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private AlertStatus status;
+    private AlertStatus status = AlertStatus.PENDING;
 
     @Column(length = 10000)
     private String infos;

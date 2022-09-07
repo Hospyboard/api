@@ -24,6 +24,7 @@ import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
 import fr.funixgaming.api.core.utils.string.PasswordGenerator;
 import org.apache.logging.log4j.util.Strings;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -214,6 +215,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                 );
     }
 
+    @NotNull
     @Override
     public UserDTO create(UserDTO request) {
         final UserDTO res = super.create(request);
@@ -222,6 +224,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         return res;
     }
 
+    @NotNull
     @Override
     public UserDTO update(UserDTO request) {
         return this.updateUser(request);

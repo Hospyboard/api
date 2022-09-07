@@ -2,7 +2,6 @@ package com.hospyboard.api.app.alert.services;
 
 import com.hospyboard.api.app.alert.dto.AlertDTO;
 import com.hospyboard.api.app.alert.entity.AlertEntity;
-import com.hospyboard.api.app.alert.enums.AlertStatus;
 import com.hospyboard.api.app.alert.mappers.AlertMapper;
 import com.hospyboard.api.app.alert.repository.AlertRepository;
 import com.hospyboard.api.app.user.dto.UserDTO;
@@ -11,15 +10,12 @@ import com.hospyboard.api.app.user.enums.UserRole;
 import com.hospyboard.api.app.user.repository.UserRepository;
 import com.hospyboard.api.app.user.services.CurrentUser;
 import fr.funixgaming.api.core.crud.services.ApiService;
-import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
-import fr.funixgaming.api.core.exceptions.ApiException;
 import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.time.Instant;
-import java.util.*;
+import java.util.Optional;
 
 @Service
 public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper, AlertRepository> {
@@ -37,64 +33,16 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
     }
 
     @Override
-    @Transactional
-    public AlertDTO create(AlertDTO request) throws ApiException {
-        final Optional<User> patientSearch = userRepository.findByUuid(currentUser.getCurrentUser().getId().toString());
-
-        if (patientSearch.isPresent()) {
-            final User patient = patientSearch.get();
-            AlertEntity alert = super.getMapper().toEntity(request);
-
-            alert.setPatient(patient);
-            alert.setStaff(null);
-            alert.setStatus(AlertStatus.PENDING);
-            alert = super.getRepository().save(alert);
-            return super.getMapper().toDto(alert);
-        } else {
-            throw new ApiBadRequestException("Ce patient n'existe pas.");
-        }
-    }
-
-    @Override
-    @Transactional
-    public List<AlertDTO> update(List<AlertDTO> request) throws ApiException {
-        final List<AlertDTO> data = new ArrayList<>();
-
-        for (final AlertDTO alertDTO : request) {
-            data.add(editDto(alertDTO));
-        }
-        return data;
-    }
-
-    @Override
-    @Transactional
-    public AlertDTO update(AlertDTO request) throws ApiException {
-        return editDto(request);
-    }
-
-    private AlertDTO editDto(final AlertDTO request) throws ApiException {
+    public void beforeSavingEntity(@NotNull AlertDTO request, @NotNull AlertEntity alert) {
         final UserDTO userDto = currentUser.getCurrentUser();
-        final Optional<AlertEntity> search = super.getRepository().findByUuid(request.getId().toString());
         final Optional<User> searchUser = userRepository.findByUuid(userDto.getId().toString());
-        final AlertEntity alert;
         final User user;
-
-        if (search.isPresent()) {
-            alert = search.get();
-        } else {
-            throw new ApiNotFoundException("Cette alerte n'existe pas.");
-        }
 
         if (searchUser.isPresent()) {
             user = searchUser.get();
         } else {
             throw new ApiNotFoundException("L'utilisateur connecté est introuvable.");
         }
-
-        AlertEntity requestEnt = super.getMapper().toEntity(request);
-        requestEnt.setId(null);
-        requestEnt.setUpdatedAt(Date.from(Instant.now()));
-        super.getMapper().patch(requestEnt, alert);
 
         if (user.getRole().equals(UserRole.PATIENT)) {
             if (request.getId() != null) {
@@ -109,8 +57,6 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
         } else {
             alert.setStaff(user);
         }
-
-        return super.getMapper().toDto(super.getRepository().save(alert));
     }
 
 }
