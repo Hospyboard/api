@@ -6,13 +6,12 @@ services:
     container_name: hospyboard_db
     volumes:
       - ./config/init.sql:/docker-entrypoint-initdb.d/init.sql
-    restart: on-failure
     environment:
       MYSQL_ROOT_PASSWORD: root
     networks:
       - default
     ports:
-      - "3306:3306"
+      - "3387:3306"
 
   hospyboard:
     build:
@@ -24,18 +23,16 @@ services:
       - mysql
     networks:
       - default
-    restart: on-failure
     environment:
       - "SPRING_PROFILES_ACTIVE=docker"
     ports:
-      - "9090:9090"
+      - "9097:9090"
 
   mail:
     image: maildev/maildev
     container_name: hospyboard_api_mail
     networks:
       - default
-    restart: on-failure
     ports:
       - "1080:1080"
       - "1025:1025"

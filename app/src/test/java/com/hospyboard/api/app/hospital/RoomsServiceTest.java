@@ -176,7 +176,7 @@ public class RoomsServiceTest {
 
         final RoomDTO res = roomsService.create(roomDTO);
 
-        for (final RoomDTO search : roomsService.getAll("0", "100", null, null)) {
+        for (final RoomDTO search : roomsService.getAll("0", "100", null, null).getContent()) {
             if (search.getId().equals(res.getId())) {
                 return;
             }
