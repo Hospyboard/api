@@ -2,8 +2,8 @@ package com.hospyboard.api.app.user.services;
 
 import com.hospyboard.api.app.alert.repository.AlertRepository;
 import com.hospyboard.api.app.core.configs.HospyboardConfig;
-import com.hospyboard.api.app.core.exceptions.ForbiddenException;
 import com.hospyboard.api.app.hospital.entity.Room;
+import com.hospyboard.api.app.hospital.mappers.RoomMapper;
 import com.hospyboard.api.app.hospital.repositories.RoomRepository;
 import com.hospyboard.api.app.mails.dtos.HospyboardMailDTO;
 import com.hospyboard.api.app.mails.services.HospyboardMailService;
@@ -24,8 +24,9 @@ import fr.funixgaming.api.core.crud.services.ApiService;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
 import fr.funixgaming.api.core.utils.string.PasswordGenerator;
+import lombok.NonNull;
 import org.apache.logging.log4j.util.Strings;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -35,7 +36,10 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -47,6 +51,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     private final JwtTokenUtil tokenUtil;
     private final AlertRepository alertRepository;
     private final RoomRepository roomRepository;
+    private final RoomMapper roomMapper;
     private final UserForgotPasswordResetRepository passwordResetRepository;
     private final HospyboardMailService mailService;
     private final HospyboardConfig hospyboardConfig;
@@ -57,6 +62,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                        CurrentUser currentUser,
                        AlertRepository alertRepository,
                        RoomRepository roomRepository,
+                       RoomMapper roomMapper,
                        HospyboardConfig hospyboardConfig,
                        UserForgotPasswordResetRepository passwordResetRepository,
                        HospyboardMailService mailService) {
@@ -66,32 +72,10 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         this.tokenUtil = tokenUtil;
         this.alertRepository = alertRepository;
         this.roomRepository = roomRepository;
+        this.roomMapper = roomMapper;
         this.passwordResetRepository = passwordResetRepository;
         this.hospyboardConfig = hospyboardConfig;
         this.mailService = mailService;
-    }
-
-    @Transactional
-    public UserDTO updateUser(final UserDTO request) {
-        final UserDTO currentUser = this.currentUser.getCurrentUser();
-
-        if (!currentUser.getRole().equals(UserRole.ADMIN)) {
-            throw new ForbiddenException("Impossible de mettre à jour les comptes utilisateurs. Vous devez être admin.");
-        }
-        if (request.getId() == null) {
-            throw new UserUpdateException("L'utilisateur que vous voulez mettre à jour ne possède pas d'id.");
-        }
-
-        if (!Strings.isEmpty(request.getPassword()) && !Strings.isEmpty(request.getPasswordConfirmation())) {
-            if (request.getPassword().equals(request.getPasswordConfirmation())) {
-                request.setPassword(request.getPassword());
-                tokenUtil.invalidateTokens(request.getId());
-            } else {
-                throw new UserUpdateException("Les mots de passe ne correspondent pas.");
-            }
-        }
-
-        return super.update(request);
     }
 
     @Transactional
@@ -144,98 +128,57 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
             if (request.getCode() == null) {
                 throw new ApiBadRequestException("Le code entré est invalide.");
             } else {
-                final Optional<UserPasswordReset> search = this.passwordResetRepository.findUserPasswordResetByCode(request.getCode());
+                passwordReset(request);
+            }
+        } else {
+            sendMailPasswordReset(request);
+        }
+    }
 
-                if (search.isPresent()) {
-                    final UserPasswordReset passwordReset = search.get();
+    private void passwordReset(final UserForgotPasswordDTO request) {
+        final Optional<UserPasswordReset> search = this.passwordResetRepository.findUserPasswordResetByCode(request.getCode());
 
-                    if (!passwordReset.isValid()) {
-                        throw new ApiBadRequestException("Le code entré est invalide.");
-                    } else {
-                        final User user = passwordReset.getUser();
+        if (search.isPresent()) {
+            final UserPasswordReset passwordReset = search.get();
 
-                        if (request.getPassword().equals(request.getPasswordConfirmation())) {
-                            user.setPassword(request.getPassword());
-                            super.getRepository().save(user);
-                            this.passwordResetRepository.delete(passwordReset);
-                        } else {
-                            throw new ApiBadRequestException("Les mots de passe ne correspondent pas.");
-                        }
-                    }
+            if (!passwordReset.isValid()) {
+                throw new ApiBadRequestException("Le code entré est invalide.");
+            } else {
+                final User user = passwordReset.getUser();
+
+                if (request.getPassword().equals(request.getPasswordConfirmation())) {
+                    user.setPassword(request.getPassword());
+                    super.getRepository().save(user);
+                    this.passwordResetRepository.delete(passwordReset);
                 } else {
-                    throw new ApiBadRequestException("Le code entré est invalide.");
+                    throw new ApiBadRequestException("Les mots de passe ne correspondent pas.");
                 }
             }
         } else {
-            final Iterable<User> users = getRepository().findAllByEmail(request.getEmail());
-
-            for (final User user : users) {
-                UserPasswordReset userPasswordReset = new UserPasswordReset();
-                userPasswordReset.setExpirationDate(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)));
-                userPasswordReset.setUser(user);
-                userPasswordReset.setCode(generateRandomStringCode());
-
-                userPasswordReset = this.passwordResetRepository.save(userPasswordReset);
-
-                final HospyboardMailDTO mailDTO = new HospyboardMailDTO();
-                mailDTO.setSubject("Changement de mot de passe Hospyboard");
-                mailDTO.setTo(userPasswordReset.getUser().getEmail());
-                mailDTO.setText(String.format("Lien de réinitialisation de mot de passe : %s/resetpassword/%s", hospyboardConfig.getUrlDashboard(), userPasswordReset.getCode()));
-                mailService.getMailQueue().add(mailDTO);
-            }
+            throw new ApiBadRequestException("Le code entré est invalide.");
         }
     }
 
-    @Override
-    @Transactional
-    public void delete(String id) {
-        final Optional<User> search = super.getRepository().findByUuid(id);
+    private void sendMailPasswordReset(final UserForgotPasswordDTO request) {
+        final Iterable<User> users = getRepository().findAllByEmail(request.getEmail());
 
-        if (search.isPresent()) {
-            final User user = search.get();
+        for (final User user : users) {
+            UserPasswordReset userPasswordReset = new UserPasswordReset();
+            userPasswordReset.setExpirationDate(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)));
+            userPasswordReset.setUser(user);
+            userPasswordReset.setCode(generateRandomStringCode());
 
-            this.alertRepository.deleteAllByPatient(user);
-            this.alertRepository.deleteAllByStaff(user);
-        } else {
-            throw new ApiNotFoundException("L'utilisateur que vous souhaitez supprimer n'existe pas.");
+            userPasswordReset = this.passwordResetRepository.save(userPasswordReset);
+
+            final HospyboardMailDTO mailDTO = new HospyboardMailDTO();
+            mailDTO.setSubject("Changement de mot de passe Hospyboard");
+            mailDTO.setTo(userPasswordReset.getUser().getEmail());
+            mailDTO.setText(String.format("Lien de réinitialisation de mot de passe : %s/resetpassword/%s",
+                    hospyboardConfig.getUrlDashboard(),
+                    userPasswordReset.getCode())
+            );
+            mailService.getMailQueue().add(mailDTO);
         }
-
-        this.tokenUtil.invalidateTokens(UUID.fromString(id));
-        super.delete(id);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return super.getRepository()
-                .findByUsername(username)
-                .orElseThrow(
-                        () -> new UsernameNotFoundException(String.format("Utilisateur non trouvé: %s", username))
-                );
-    }
-
-    @NotNull
-    @Override
-    public UserDTO create(UserDTO request) {
-        final UserDTO res = super.create(request);
-        updateRoomLinkedToUser(res);
-
-        return res;
-    }
-
-    @NotNull
-    @Override
-    public UserDTO update(UserDTO request) {
-        return this.updateUser(request);
-    }
-
-    @Override
-    public List<UserDTO> update(final List<UserDTO> request) {
-        final List<UserDTO> users = new ArrayList<>();
-
-        for (final UserDTO userDTO : request) {
-            users.add(this.update(userDTO));
-        }
-        return users;
     }
 
     private String generateRandomStringCode() {
@@ -248,7 +191,61 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         return passwordGenerator.generateRandomPassword();
     }
 
-    @Scheduled(fixedRate = 10, timeUnit = TimeUnit.SECONDS)
+    @Override
+    public void beforeDeletingEntity(@NonNull User entity) {
+        this.alertRepository.deleteAllByPatient(entity);
+        this.alertRepository.deleteAllByStaff(entity);
+    }
+
+    @Override
+    public void beforeSavingEntity(@NonNull UserDTO request, @NonNull User entity) {
+        if (request.getId() == null) {
+            if (request.getRoom() != null && request.getRoom().getId() != null) {
+                final Optional<Room> search = this.roomRepository.findByUuid(request.getRoom().getId().toString());
+
+                if (search.isPresent()) {
+                    final Room room = search.get();
+                    entity.setRoomUuid(room.getUuid());
+                } else {
+                    throw new ApiNotFoundException(String.format("La chambre id %s n'existe pas.", request.getRoom().getId()));
+                }
+            }
+        }
+
+        if (!Strings.isEmpty(request.getPassword()) && !Strings.isEmpty(request.getPasswordConfirmation())) {
+            if (request.getPassword().equals(request.getPasswordConfirmation())) {
+                entity.setPassword(request.getPassword());
+                tokenUtil.invalidateTokens(request.getId());
+            } else {
+                throw new UserUpdateException("Les mots de passe ne correspondent pas.");
+            }
+        }
+    }
+
+    @Override
+    public void beforeSendingDTO(@NonNull UserDTO dto, @Nullable User entity) {
+        if (dto.getRoom() != null && dto.getRoom().getId() != null) {
+            final Optional<Room> search = this.roomRepository.findByUuid(dto.getRoom().getId().toString());
+
+            if (search.isPresent()) {
+                final Room room = search.get();
+                dto.setRoom(this.roomMapper.toDto(room));
+            } else {
+                throw new ApiNotFoundException(String.format("La chambre id %s n'existe pas.", dto.getRoom().getId()));
+            }
+        }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return super.getRepository()
+                .findByUsername(username)
+                .orElseThrow(
+                        () -> new UsernameNotFoundException(String.format("Utilisateur non trouvé: %s", username))
+                );
+    }
+
+    @Scheduled(fixedRate = 30, timeUnit = TimeUnit.SECONDS)
     public void cleanPasswordResetExpired() {
         final Iterable<UserPasswordReset> passwordResets = this.passwordResetRepository.findAll();
         final List<UserPasswordReset> toRemove = new ArrayList<>();
@@ -259,28 +256,6 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
             }
         }
         this.passwordResetRepository.deleteAll(toRemove);
-    }
-
-    private void updateRoomLinkedToUser(final UserDTO userDTO) {
-        if (userDTO.getRoom() != null && userDTO.getRoom().getId() != null) {
-            final Optional<Room> search = this.roomRepository.findByUuid(userDTO.getRoom().getId().toString());
-
-            if (search.isPresent()) {
-                final Room room = search.get();
-                final Optional<User> searchUser = getRepository().findByUuid(userDTO.getId().toString());
-
-                if (searchUser.isPresent()) {
-                    final User user = searchUser.get();
-                    user.setRoomUuid(room.getUuid());
-
-                    getRepository().save(user);
-                } else {
-                    throw new ApiNotFoundException(String.format("L'utilisateur id %s n'existe pas.", userDTO.getId()));
-                }
-            } else {
-                throw new ApiNotFoundException(String.format("La chambre id %s n'existe pas.", userDTO.getRoom().getId()));
-            }
-        }
     }
 
 }

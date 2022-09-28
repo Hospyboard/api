@@ -6,6 +6,7 @@ import com.hospyboard.api.app.user.dto.UserDTO;
 import com.hospyboard.api.app.user.dto.UserResetPasswordDTO;
 import com.hospyboard.api.app.user.dto.UserTokenDTO;
 import com.hospyboard.api.app.user.enums.UserRole;
+import com.hospyboard.api.app.user.services.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,8 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -26,18 +26,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class UserCrudTests {
 
-    private final MockMvc mockMvc;
-    private final JsonHelper objectMapper;
-    private final UserHelper userHelper;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
-    public UserCrudTests(MockMvc mockMvc,
-                         JsonHelper objectMapper,
-                         UserHelper userHelper) {
-        this.mockMvc = mockMvc;
-        this.objectMapper = objectMapper;
-        this.userHelper = userHelper;
-    }
+    private JsonHelper jsonHelper;
+
+    @Autowired
+    private UserHelper userHelper;
+
+    @Autowired
+    private UserService userService;
 
     @Test
     public void testPatchUser() throws Exception {
@@ -47,15 +46,69 @@ public class UserCrudTests {
 
         patchUser.setId(userDTO.getId());
         patchUser.setFirstName("heyChanged");
+        patchUser.setPassword("heyChanged2");
+        patchUser.setPasswordConfirmation("heyChanged2");
 
-        final MvcResult result = this.mockMvc.perform(patch(UserAuthTests.ROUTE)
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
-                .content(objectMapper.toJson(patchUser))
+                .content(jsonHelper.toJson(patchUser))
                 .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk()).andReturn();
+        ).andExpect(status().isOk());
 
-        final UserDTO res = objectMapper.fromJson(result.getResponse().getContentAsString(), UserDTO.class);
+        final UserDTO res = userService.update(patchUser);
         assertEquals(res.getFirstName(), patchUser.getFirstName());
+    }
+
+    @Test
+    public void testPatchUserFailPasswordsNoMatch() throws Exception {
+        final UserTokenDTO credentials = userHelper.generateAdminToken();
+        final UserDTO userDTO = credentials.getUser();
+        final UserDTO patchUser = new UserDTO();
+
+        patchUser.setId(userDTO.getId());
+        patchUser.setPassword("heyChanged");
+        patchUser.setPasswordConfirmation("heyChanged2");
+
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
+                .content(jsonHelper.toJson(patchUser))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testPatchUserInvalidAuth() throws Exception {
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE)
+                .content(jsonHelper.toJson(new UserDTO()))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isUnauthorized());
+
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE)
+                .content(jsonHelper.toJson(new UserDTO()))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.generatePatientToken().getToken())
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testPatchMultipleValid() throws Exception {
+        final String replacement = "ça alors";
+        final UserTokenDTO credentials = userHelper.generateAdminToken();
+        final List<UserDTO> users = userHelper.generateUsers(5, UserRole.PATIENT);
+
+        for (UserDTO user : users) {
+            user.setInfos(replacement);
+        }
+
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE + "/batch")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
+                .content(jsonHelper.toJson(users))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+
+        for (final UserDTO user : userService.update(users)) {
+            assertEquals(replacement, user.getInfos());
+        }
     }
 
     @Test
@@ -71,13 +124,14 @@ public class UserCrudTests {
         request.setRole(UserRole.ADMIN);
         request.setInfos("très naze comme patient");
 
-        final MvcResult result = this.mockMvc.perform(post(UserAuthTests.ROUTE)
+        this.mockMvc.perform(post(UserAuthTests.ROUTE)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
-                .content(objectMapper.toJson(request))
+                .content(jsonHelper.toJson(request))
                 .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk()).andReturn();
+        ).andExpect(status().isOk());
 
-        final UserDTO res = objectMapper.fromJson(result.getResponse().getContentAsString(StandardCharsets.UTF_8), UserDTO.class);
+        request.setUsername("funix2");
+        final UserDTO res = userService.create(request);
         assertNotNull(res.getId());
         assertEquals(res.getUsername(), request.getUsername());
         assertEquals(res.getFirstName(), request.getFirstName());
@@ -87,64 +141,6 @@ public class UserCrudTests {
         assertEquals(res.getInfos(), request.getInfos());
         assertNull(res.getPassword());
         assertNull(res.getPasswordConfirmation());
-    }
-
-    @Test
-    public void testUpdateUserNoAdminCallerFail() throws Exception {
-        final UserTokenDTO credentials = userHelper.generatePatientToken();
-        final UserDTO userDTO = credentials.getUser();
-
-        this.mockMvc.perform(patch(UserAuthTests.ROUTE)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
-                .content(objectMapper.toJson(userDTO))
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isForbidden());
-    }
-
-    @Test
-    public void testUpdateWithPasswordAndMissmatchFail() throws Exception {
-        final UserTokenDTO credentials = userHelper.generateAdminToken();
-        final UserDTO userDTO = credentials.getUser();
-        final UserDTO patchUser = new UserDTO();
-
-        patchUser.setId(userDTO.getId());
-        patchUser.setFirstName("heyChanged");
-        patchUser.setPassword("oui");
-        patchUser.setPasswordConfirmation("non");
-
-        this.mockMvc.perform(patch(UserAuthTests.ROUTE)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
-                .content(objectMapper.toJson(patchUser))
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void testUpdateWithIdNotFound() throws Exception {
-        final UserTokenDTO credentials = userHelper.generateAdminToken();
-        final UserDTO patchUser = new UserDTO();
-
-        patchUser.setId(UUID.randomUUID());
-
-        this.mockMvc.perform(patch(UserAuthTests.ROUTE)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
-                .content(objectMapper.toJson(patchUser))
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void testUpdateWithNoId() throws Exception {
-        final UserTokenDTO credentials = userHelper.generateAdminToken();
-        final UserDTO patchUser = new UserDTO();
-
-        patchUser.setId(null);
-
-        this.mockMvc.perform(patch(UserAuthTests.ROUTE)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
-                .content(objectMapper.toJson(patchUser))
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -180,7 +176,7 @@ public class UserCrudTests {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
         ).andExpect(status().isOk()).andReturn();
 
-        final UserDTO res = objectMapper.fromJson(result.getResponse().getContentAsString(), UserDTO.class);
+        final UserDTO res = jsonHelper.fromJson(result.getResponse().getContentAsString(), UserDTO.class);
         assertNotNull(res.getId());
     }
 
@@ -203,7 +199,7 @@ public class UserCrudTests {
 
         this.mockMvc.perform(patch(UserAuthTests.ROUTE + "changePassword")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
-                .content(objectMapper.toJson(resetPasswordDTO))
+                .content(jsonHelper.toJson(resetPasswordDTO))
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
     }
@@ -218,7 +214,7 @@ public class UserCrudTests {
 
         this.mockMvc.perform(patch(UserAuthTests.ROUTE + "changePassword")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
-                .content(objectMapper.toJson(resetPasswordDTO))
+                .content(jsonHelper.toJson(resetPasswordDTO))
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isBadRequest());
     }
@@ -233,7 +229,7 @@ public class UserCrudTests {
 
         this.mockMvc.perform(patch(UserAuthTests.ROUTE + "changePassword")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
-                .content(objectMapper.toJson(resetPasswordDTO))
+                .content(jsonHelper.toJson(resetPasswordDTO))
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isBadRequest());
     }

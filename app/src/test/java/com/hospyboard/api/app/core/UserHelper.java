@@ -2,6 +2,7 @@ package com.hospyboard.api.app.core;
 
 import com.hospyboard.api.app.user.UserAuthTests;
 import com.hospyboard.api.app.user.dto.UserAuthDTO;
+import com.hospyboard.api.app.user.dto.UserDTO;
 import com.hospyboard.api.app.user.dto.UserTokenDTO;
 import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.enums.UserRole;
@@ -12,7 +13,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,8 +33,21 @@ public class UserHelper {
         return generateToken("patient", UserRole.PATIENT);
     }
 
+    public UserTokenDTO generateHospitalToken() throws Exception {
+        return generateToken("hospital", UserRole.HOSPYTAL_WORKER);
+    }
+
     public UserTokenDTO generateAdminToken() throws Exception {
         return generateToken("admin", UserRole.ADMIN);
+    }
+
+    public List<UserDTO> generateUsers(int amount, String role) throws Exception {
+        final List<UserDTO> users = new ArrayList<>();
+
+        for (int i = 0; i < amount; i++) {
+            users.add(generateToken(UUID.randomUUID().toString(), role).getUser());
+        }
+        return users;
     }
 
     private UserTokenDTO generateToken(final String username, final String role) throws Exception {

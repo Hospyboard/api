@@ -64,11 +64,22 @@ public class WebSecurity {
                 .antMatchers(HttpMethod.POST, "/user/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/user/forgotPassword").permitAll()
                 .antMatchers(HttpMethod.POST, "/user/forgotPassword/change").permitAll()
+                .antMatchers(HttpMethod.POST, "/user/changePassword").permitAll()
+                .antMatchers(HttpMethod.GET, "/user/session").authenticated()
+                .antMatchers(HttpMethod.GET, "/user/logout").authenticated()
+                .antMatchers("/user/").hasAuthority(UserRole.ADMIN)
+                .antMatchers("/user/batch/").hasAuthority(UserRole.ADMIN)
+
                 .antMatchers("/mail/contact").permitAll()
+
                 .antMatchers("/userToken/**").hasAuthority(UserRole.ADMIN)
+
                 .antMatchers("/hospital/**").hasAuthority(UserRole.ADMIN)
+
                 .antMatchers("/service/**").hasAuthority(UserRole.ADMIN)
+
                 .antMatchers("/room/**").hasAuthority(UserRole.ADMIN)
+
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
