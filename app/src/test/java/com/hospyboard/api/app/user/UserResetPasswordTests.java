@@ -1,7 +1,7 @@
 package com.hospyboard.api.app.user;
 
+import com.hospyboard.api.app.configs.MailTestConfig;
 import com.hospyboard.api.app.core.JsonHelper;
-import com.hospyboard.api.app.core.MailHelper;
 import com.hospyboard.api.app.core.UserHelper;
 import com.hospyboard.api.app.user.dto.UserDTO;
 import com.hospyboard.api.app.user.dto.UserForgotPasswordDTO;
@@ -10,10 +10,12 @@ import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.entity.UserPasswordReset;
 import com.hospyboard.api.app.user.repository.UserForgotPasswordResetRepository;
 import com.hospyboard.api.app.user.repository.UserRepository;
+import com.icegreen.greenmail.util.GreenMail;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -25,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(MailTestConfig.class)
 public class UserResetPasswordTests {
 
     private final MockMvc mockMvc;
@@ -32,7 +35,7 @@ public class UserResetPasswordTests {
     private final UserForgotPasswordResetRepository forgotPasswordResetRepository;
     private final UserRepository userRepository;
     private final JsonHelper jsonHelper;
-    private final MailHelper mailHelper;
+    private final GreenMail mailHelper;
     private final String route = "/user/forgotPassword";
 
     @Autowired
@@ -40,7 +43,7 @@ public class UserResetPasswordTests {
                                   UserHelper userHelper,
                                   JsonHelper jsonHelper,
                                   UserRepository userRepository,
-                                  MailHelper mailHelper,
+                                  GreenMail mailHelper,
                                   UserForgotPasswordResetRepository userForgotPasswordResetRepository) {
         this.mockMvc = mockMvc;
         this.userHelper = userHelper;
@@ -60,7 +63,7 @@ public class UserResetPasswordTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonHelper.toJson(forgotPasswordDTO))
         ).andExpect(status().isOk());
-        assertTrue(mailHelper.getGreenMail().waitForIncomingEmail(15000, 1));
+        assertTrue(mailHelper.waitForIncomingEmail(15000, 1));
 
         final UserForgotPasswordDTO forgotPasswordDTO1 = new UserForgotPasswordDTO();
         forgotPasswordDTO1.setCode(getCode(userTokenDTO.getUser()).getCode());

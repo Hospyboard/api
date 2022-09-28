@@ -3,13 +3,10 @@ package com.hospyboard.api.app.user.ressources;
 import com.hospyboard.api.app.user.config.JwtTokenUtil;
 import com.hospyboard.api.app.user.dto.*;
 import com.hospyboard.api.app.user.entity.User;
-import com.hospyboard.api.app.user.enums.UserRole;
 import com.hospyboard.api.app.user.exception.LoginHospyboardException;
 import com.hospyboard.api.app.user.services.CurrentUser;
 import com.hospyboard.api.app.user.services.UserService;
-import fr.funixgaming.api.core.crud.dtos.PageDTO;
-import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
-import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
+import fr.funixgaming.api.core.crud.resources.ApiResource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,9 +17,8 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("user")
-public class UserResource {
+public class UserResource extends ApiResource<UserDTO, UserService> {
 
-    private final UserService service;
     private final CurrentUser currentUser;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
@@ -31,7 +27,7 @@ public class UserResource {
                         AuthenticationManager authenticationManager,
                         CurrentUser currentUser,
                         JwtTokenUtil jwtTokenUtil) {
-        this.service = userService;
+        super(userService);
         this.currentUser = currentUser;
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
@@ -42,70 +38,26 @@ public class UserResource {
         return currentUser.getCurrentUser();
     }
 
-    @GetMapping("{id}")
-    public UserDTO getUserById(@PathVariable String id) {
-        final UserDTO userDTO = service.findById(id);
-
-        if (userDTO == null) {
-            throw new ApiNotFoundException("Utilisateur non trouvé.");
-        } else {
-            return userDTO;
-        }
-    }
-
     @GetMapping("logout")
     public void logoutUser() {
         this.jwtTokenUtil.invalidateTokens(currentUser.getCurrentUser().getId());
     }
 
-    @GetMapping
-    public PageDTO<UserDTO> getAllUsers(@RequestParam(value = "page", defaultValue = "0") String page,
-                                        @RequestParam(value = "elemsPerPage", defaultValue = "300") String elemsPerPage,
-                                        @RequestParam(value = "search", defaultValue = "") String search,
-                                        @RequestParam(value = "sort", defaultValue = "") String sort) {
-        return this.service.getAll(page, elemsPerPage, search, sort);
-    }
-
-    @PatchMapping
-    public UserDTO patchUser(@RequestBody final UserDTO user) {
-        return this.service.updateUser(user);
-    }
-
     @PatchMapping("changePassword")
     public void changePassword(@RequestBody final UserResetPasswordDTO request) {
-        this.service.changePassword(request);
+        getService().changePassword(request);
     }
 
     @PostMapping("forgotPassword")
     public void forgotPassword(@RequestBody final UserForgotPasswordDTO request) {
         request.setPasswordSet(false);
-        this.service.resetPassword(request);
+        getService().resetPassword(request);
     }
 
     @PostMapping("forgotPassword/change")
     public void changePassword(@RequestBody final UserForgotPasswordDTO request) {
         request.setPasswordSet(true);
-        this.service.resetPassword(request);
-    }
-
-    @PostMapping
-    public UserDTO createUser(@RequestBody @Valid final UserDTO user) {
-        final UserDTO currentUser = this.currentUser.getCurrentUser();
-
-        if (currentUser.getRole().equals(UserRole.ADMIN)) {
-            return this.service.create(user);
-        } else {
-            throw new ApiForbiddenException("Vous n'êtes pas un admin.");
-        }
-    }
-
-    @DeleteMapping
-    public void deleteUser(@RequestParam("id") String id) {
-        if (this.currentUser.getCurrentUser().getRole().equals(UserRole.ADMIN)) {
-            this.service.delete(id);
-        } else {
-            throw new ApiForbiddenException("Vous n'êtes pas un admin.");
-        }
+        getService().resetPassword(request);
     }
 
     @PostMapping("login")
@@ -128,7 +80,7 @@ public class UserResource {
 
     @PostMapping("register")
     public UserDTO register(@RequestBody @Valid final UserCreationDTO userCreationDTO) {
-        return service.register(userCreationDTO);
+        return getService().register(userCreationDTO);
     }
 
 }
