@@ -1,6 +1,7 @@
 package com.hospyboard.api.app.user.services;
 
 import com.hospyboard.api.app.alert.repository.AlertRepository;
+import com.hospyboard.api.app.core.configs.HospyboardConfig;
 import com.hospyboard.api.app.core.exceptions.ForbiddenException;
 import com.hospyboard.api.app.hospital.entity.Room;
 import com.hospyboard.api.app.hospital.repositories.RoomRepository;
@@ -48,6 +49,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     private final RoomRepository roomRepository;
     private final UserForgotPasswordResetRepository passwordResetRepository;
     private final HospyboardMailService mailService;
+    private final HospyboardConfig hospyboardConfig;
 
     public UserService(UserRepository userRepository,
                        UserMapper userMapper,
@@ -55,6 +57,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                        CurrentUser currentUser,
                        AlertRepository alertRepository,
                        RoomRepository roomRepository,
+                       HospyboardConfig hospyboardConfig,
                        UserForgotPasswordResetRepository passwordResetRepository,
                        HospyboardMailService mailService) {
         super(userRepository, userMapper);
@@ -64,6 +67,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         this.alertRepository = alertRepository;
         this.roomRepository = roomRepository;
         this.passwordResetRepository = passwordResetRepository;
+        this.hospyboardConfig = hospyboardConfig;
         this.mailService = mailService;
     }
 
@@ -87,13 +91,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
             }
         }
 
-        final UserDTO res = super.update(request);
-
-        if (res == null) {
-            throw new ApiNotFoundException("L'utilisateur n'existe pas");
-        } else {
-            return res;
-        }
+        return super.update(request);
     }
 
     @Transactional
@@ -182,7 +180,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                 final HospyboardMailDTO mailDTO = new HospyboardMailDTO();
                 mailDTO.setSubject("Changement de mot de passe Hospyboard");
                 mailDTO.setTo(userPasswordReset.getUser().getEmail());
-                mailDTO.setText(String.format("Code de reset: %s", userPasswordReset.getCode()));
+                mailDTO.setText(String.format("Lien de réinitialisation de mot de passe : %s/resetpassword/%s", hospyboardConfig.getUrlDashboard(), userPasswordReset.getCode()));
                 mailService.getMailQueue().add(mailDTO);
             }
         }
@@ -245,7 +243,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         passwordGenerator.setAlphaDown(20);
         passwordGenerator.setAlphaUpper(20);
         passwordGenerator.setNumbersAmount(20);
-        passwordGenerator.setSpecialCharsAmount(20);
+        passwordGenerator.setSpecialCharsAmount(0);
 
         return passwordGenerator.generateRandomPassword();
     }
