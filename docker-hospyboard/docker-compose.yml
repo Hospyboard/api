@@ -6,6 +6,7 @@ services:
     container_name: hospyboard_db
     volumes:
       - ./config/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - hospyboard_api_db:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
     networks:
@@ -41,3 +42,6 @@ networks:
   default:
     name: hospyboard_network
     driver: bridge
+
+volumes:
+  hospyboard_api_db:

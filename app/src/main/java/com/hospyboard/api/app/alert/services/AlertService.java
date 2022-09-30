@@ -2,6 +2,7 @@ package com.hospyboard.api.app.alert.services;
 
 import com.hospyboard.api.app.alert.dto.AlertDTO;
 import com.hospyboard.api.app.alert.entity.AlertEntity;
+import com.hospyboard.api.app.alert.enums.AlertStatus;
 import com.hospyboard.api.app.alert.mappers.AlertMapper;
 import com.hospyboard.api.app.alert.repository.AlertRepository;
 import com.hospyboard.api.app.user.dto.UserDTO;
@@ -52,10 +53,13 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
                     throw new ApiForbiddenException("Vous ne pouvez pas modifier une alerte que vous n'avez pas crée.");
                 }
             }
-
-            alert.setPatient(user);
         } else {
             alert.setStaff(user);
+        }
+
+        if (request.getId() == null) {
+            alert.setStatus(AlertStatus.PENDING);
+            alert.setPatient(user);
         }
     }
 
