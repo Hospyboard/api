@@ -3,8 +3,7 @@ package com.hospyboard.api.app.user.services;
 import com.hospyboard.api.app.alert.repository.AlertRepository;
 import com.hospyboard.api.app.core.configs.HospyboardConfig;
 import com.hospyboard.api.app.hospital.entity.Room;
-import com.hospyboard.api.app.hospital.mappers.RoomMapper;
-import com.hospyboard.api.app.hospital.repositories.RoomRepository;
+import com.hospyboard.api.app.hospital.services.RoomsService;
 import com.hospyboard.api.app.mails.dtos.HospyboardMailDTO;
 import com.hospyboard.api.app.mails.services.HospyboardMailService;
 import com.hospyboard.api.app.user.config.JwtTokenUtil;
@@ -50,8 +49,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
 
     private final JwtTokenUtil tokenUtil;
     private final AlertRepository alertRepository;
-    private final RoomRepository roomRepository;
-    private final RoomMapper roomMapper;
+    private final RoomsService roomsService;
     private final UserForgotPasswordResetRepository passwordResetRepository;
     private final HospyboardMailService mailService;
     private final HospyboardConfig hospyboardConfig;
@@ -61,8 +59,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                        JwtTokenUtil tokenUtil,
                        CurrentUser currentUser,
                        AlertRepository alertRepository,
-                       RoomRepository roomRepository,
-                       RoomMapper roomMapper,
+                       RoomsService roomsService,
                        HospyboardConfig hospyboardConfig,
                        UserForgotPasswordResetRepository passwordResetRepository,
                        HospyboardMailService mailService) {
@@ -70,9 +67,8 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         this.userMapper = userMapper;
         this.currentUser = currentUser;
         this.tokenUtil = tokenUtil;
+        this.roomsService = roomsService;
         this.alertRepository = alertRepository;
-        this.roomRepository = roomRepository;
-        this.roomMapper = roomMapper;
         this.passwordResetRepository = passwordResetRepository;
         this.hospyboardConfig = hospyboardConfig;
         this.mailService = mailService;
@@ -201,7 +197,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     public void beforeSavingEntity(@NonNull UserDTO request, @NonNull User entity) {
         if (request.getId() == null) {
             if (request.getRoom() != null && request.getRoom().getId() != null) {
-                final Optional<Room> search = this.roomRepository.findByUuid(request.getRoom().getId().toString());
+                final Optional<Room> search = this.roomsService.getRepository().findByUuid(request.getRoom().getId().toString());
 
                 if (search.isPresent()) {
                     final Room room = search.get();
@@ -224,15 +220,8 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
 
     @Override
     public void beforeSendingDTO(@NonNull UserDTO dto, @Nullable User entity) {
-        if (dto.getRoom() != null && dto.getRoom().getId() != null) {
-            final Optional<Room> search = this.roomRepository.findByUuid(dto.getRoom().getId().toString());
-
-            if (search.isPresent()) {
-                final Room room = search.get();
-                dto.setRoom(this.roomMapper.toDto(room));
-            } else {
-                throw new ApiNotFoundException(String.format("La chambre id %s n'existe pas.", dto.getRoom().getId()));
-            }
+        if (dto.getId() != null) {
+            dto.setRoom(this.roomsService.findRoomByPatientId(dto.getId().toString()));
         }
     }
 

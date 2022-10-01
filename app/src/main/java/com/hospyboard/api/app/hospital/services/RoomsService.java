@@ -78,6 +78,23 @@ public class RoomsService extends ApiService<RoomDTO, Room, RoomMapper, RoomRepo
         }
     }
 
+    @Nullable
+    public RoomDTO findRoomByPatientId(@NonNull String patientId) {
+        final Optional<User> patientSearch = userRepository.findByUuid(patientId);
+
+        if (patientSearch.isPresent()) {
+            final User patient = patientSearch.get();
+            if (patient.getRoomUuid() == null) {
+                return null;
+            }
+
+            final Optional<Room> roomSearch = getRepository().findByUuid(patient.getRoomUuid().toString());
+            return roomSearch.map(room -> getMapper().toDto(room)).orElse(null);
+        } else {
+            throw new ApiNotFoundException("Le patient n'existe pas.");
+        }
+    }
+
     private ServiceEntity findService(@Nullable final ServiceDTO serviceDTO) {
         if (serviceDTO == null) {
             throw new ApiBadRequestException("Vous n'avez pas spécifié de service id.");
