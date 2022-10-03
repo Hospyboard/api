@@ -46,8 +46,8 @@ public class UserCrudTests {
 
         patchUser.setId(userDTO.getId());
         patchUser.setFirstName("heyChanged");
-        patchUser.setPassword("heyChanged2");
-        patchUser.setPasswordConfirmation("heyChanged2");
+        patchUser.setPassword("heyChanged2A2");
+        patchUser.setPasswordConfirmation("heyChanged2A2");
 
         this.mockMvc.perform(patch(UserAuthTests.ROUTE)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
@@ -66,7 +66,7 @@ public class UserCrudTests {
         final UserDTO patchUser = new UserDTO();
 
         patchUser.setId(userDTO.getId());
-        patchUser.setPassword("heyChanged");
+        patchUser.setPassword("heyChanged33D");
         patchUser.setPasswordConfirmation("heyChanged2");
 
         this.mockMvc.perform(patch(UserAuthTests.ROUTE)
@@ -120,9 +120,9 @@ public class UserCrudTests {
         request.setFirstName("funixName");
         request.setLastName("funixLast");
         request.setEmail("email@funix.fr");
-        request.setPassword("1234567");
+        request.setPassword("aa1234567AAA");
         request.setRole(UserRole.ADMIN);
-        request.setInfos("très naze comme patient");
+        request.setInfos("patient");
 
         this.mockMvc.perform(post(UserAuthTests.ROUTE)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
@@ -194,8 +194,8 @@ public class UserCrudTests {
         final UserTokenDTO credentials = userHelper.generatePatientToken();
         final UserResetPasswordDTO resetPasswordDTO = new UserResetPasswordDTO();
 
-        resetPasswordDTO.setNewPassword("12345");
-        resetPasswordDTO.setNewPasswordConfirmation("12345");
+        resetPasswordDTO.setNewPassword("12345dxcfAS");
+        resetPasswordDTO.setNewPasswordConfirmation("12345dxcfAS");
 
         this.mockMvc.perform(patch(UserAuthTests.ROUTE + "changePassword")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())

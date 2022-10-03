@@ -60,12 +60,12 @@ public class UserAuthTests {
         userCreationDTO.setFirstName("testFirstName");
         userCreationDTO.setLastName("testLastName");
         userCreationDTO.setEmail("test@gmail.com");
-        userCreationDTO.setPassword("12345");
-        userCreationDTO.setPasswordConfirmation("12345");
+        userCreationDTO.setPassword("12345dfsdfdsPOIU");
+        userCreationDTO.setPasswordConfirmation("12345dfsdfdsPOIU");
 
         MvcResult mvcResult = this.mockMvc.perform(post(ROUTE + "register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.toJson(userCreationDTO)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.toJson(userCreationDTO)))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -108,8 +108,8 @@ public class UserAuthTests {
         userCreationDTO.setFirstName("testFirstName");
         userCreationDTO.setLastName("testLastName");
         userCreationDTO.setEmail("test@gmail.com");
-        userCreationDTO.setPassword("12345");
-        userCreationDTO.setPasswordConfirmation("12345");
+        userCreationDTO.setPassword("12345xwfxwwcHGJF");
+        userCreationDTO.setPasswordConfirmation("12345xwfxwwcHGJF");
 
         this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -128,8 +128,8 @@ public class UserAuthTests {
         userCreationDTO.setFirstName("testFirstName");
         userCreationDTO.setLastName("testLastName");
         userCreationDTO.setEmail("test@gmail.com");
-        userCreationDTO.setPassword("12345");
-        userCreationDTO.setPasswordConfirmation("12345");
+        userCreationDTO.setPassword("12345xcfcxkjhvYTRF");
+        userCreationDTO.setPasswordConfirmation("12345xcfcxkjhvYTRF");
 
         this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -160,8 +160,8 @@ public class UserAuthTests {
         userCreationDTO.setFirstName("testFirstName");
         userCreationDTO.setLastName("testLastName");
         userCreationDTO.setEmail("test@gmail.com");
-        userCreationDTO.setPassword("12345");
-        userCreationDTO.setPasswordConfirmation("12345");
+        userCreationDTO.setPassword("12345dfdsCD");
+        userCreationDTO.setPasswordConfirmation("12345dfdsCD");
 
         this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -197,8 +197,8 @@ public class UserAuthTests {
         userCreationDTO.setFirstName("testFirstName");
         userCreationDTO.setLastName("testLastName");
         userCreationDTO.setEmail("test@gmail.com");
-        userCreationDTO.setPassword("12345");
-        userCreationDTO.setPasswordConfirmation("12345");
+        userCreationDTO.setPassword("12345dsfkljVS");
+        userCreationDTO.setPasswordConfirmation("12345dsfkljVS");
 
         this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -240,8 +240,8 @@ public class UserAuthTests {
         userCreationDTO.setFirstName("testFirstName");
         userCreationDTO.setLastName("testLastName");
         userCreationDTO.setEmail("test@gmail.com");
-        userCreationDTO.setPassword("12345");
-        userCreationDTO.setPasswordConfirmation("12345");
+        userCreationDTO.setPassword("12345dsfdxfOI");
+        userCreationDTO.setPasswordConfirmation("12345dsfdxfOI");
 
         this.mockMvc.perform(post(ROUTE + "register")
                         .contentType(MediaType.APPLICATION_JSON)
