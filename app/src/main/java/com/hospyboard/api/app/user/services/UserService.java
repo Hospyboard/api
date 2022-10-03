@@ -211,7 +211,10 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         if (!Strings.isEmpty(request.getPassword()) && !Strings.isEmpty(request.getPasswordConfirmation())) {
             if (request.getPassword().equals(request.getPasswordConfirmation())) {
                 entity.setPassword(request.getPassword());
-                tokenUtil.invalidateTokens(request.getId());
+
+                if (request.getId() != null) {
+                    tokenUtil.invalidateTokens(request.getId());
+                }
             } else {
                 throw new UserUpdateException("Les mots de passe ne correspondent pas.");
             }
