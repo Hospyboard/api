@@ -7,7 +7,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableAsync
 @EnableScheduling
-@SpringBootApplication(scanBasePackages = {"com.hospyboard.api", "fr.funixgaming.api.core.utils.encryption"})
+@SpringBootApplication(scanBasePackages = {
+        "com.hospyboard.api",
+        "fr.funixgaming.api.core.utils.encryption",
+        "fr.funixgaming.api.core.utils.network",
+        "fr.funixgaming.api.core.config"
+})
 public class HospyboardApiApp {
     public static void main(String[] args) {
         SpringApplication.run(HospyboardApiApp.class, args);
