@@ -53,6 +53,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     private final UserForgotPasswordResetRepository passwordResetRepository;
     private final HospyboardMailService mailService;
     private final HospyboardConfig hospyboardConfig;
+    private final UserUtils userUtils;
 
     public UserService(UserRepository userRepository,
                        UserMapper userMapper,
@@ -61,6 +62,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                        AlertRepository alertRepository,
                        RoomsService roomsService,
                        HospyboardConfig hospyboardConfig,
+                       UserUtils userUtils,
                        UserForgotPasswordResetRepository passwordResetRepository,
                        HospyboardMailService mailService) {
         super(userRepository, userMapper);
@@ -72,6 +74,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         this.passwordResetRepository = passwordResetRepository;
         this.hospyboardConfig = hospyboardConfig;
         this.mailService = mailService;
+        this.userUtils = userUtils;
     }
 
     @Transactional
@@ -93,6 +96,10 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                 user.setRole(UserRole.HOSPYTAL_WORKER);
             }
 
+            final UserDTO tmpDto = new UserDTO();
+            tmpDto.setPassword(userCreationDTO.getPassword());
+            userUtils.checkUserPassword(tmpDto);
+
             user.setPassword(user.getPassword());
             return this.userMapper.toDto(super.getRepository().save(user));
         } else {
@@ -102,6 +109,10 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
 
     @Transactional
     public void changePassword(final UserResetPasswordDTO request) throws ApiBadRequestException {
+        final UserDTO tmpDto = new UserDTO();
+        tmpDto.setPassword(request.getNewPassword());
+        userUtils.checkUserPassword(tmpDto);
+
         final UserDTO userDTO = this.currentUser.getCurrentUser();
         final Optional<User> search = this.getRepository().findByUuid(userDTO.getId().toString());
 
@@ -143,6 +154,10 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                 final User user = passwordReset.getUser();
 
                 if (request.getPassword().equals(request.getPasswordConfirmation())) {
+                    final UserDTO tmpDto = new UserDTO();
+                    tmpDto.setPassword(request.getPassword());
+                    userUtils.checkUserPassword(tmpDto);
+
                     user.setPassword(request.getPassword());
                     super.getRepository().save(user);
                     this.passwordResetRepository.delete(passwordReset);
@@ -195,6 +210,8 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
 
     @Override
     public void beforeSavingEntity(@NonNull UserDTO request, @NonNull User entity) {
+        userUtils.checkUserPassword(request);
+
         if (request.getId() == null) {
             if (request.getRoom() != null && request.getRoom().getId() != null) {
                 final Optional<Room> search = this.roomsService.getRepository().findByUuid(request.getRoom().getId().toString());

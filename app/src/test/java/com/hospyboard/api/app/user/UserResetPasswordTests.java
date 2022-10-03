@@ -67,8 +67,8 @@ public class UserResetPasswordTests {
 
         final UserForgotPasswordDTO forgotPasswordDTO1 = new UserForgotPasswordDTO();
         forgotPasswordDTO1.setCode(getCode(userTokenDTO.getUser()).getCode());
-        forgotPasswordDTO1.setPassword("Oui");
-        forgotPasswordDTO1.setPasswordConfirmation("Oui");
+        forgotPasswordDTO1.setPassword("OuiSCXE234sdf");
+        forgotPasswordDTO1.setPasswordConfirmation("OuiSCXE234sdf");
 
         this.mockMvc.perform(post(route + "/change")
                 .contentType(MediaType.APPLICATION_JSON)
