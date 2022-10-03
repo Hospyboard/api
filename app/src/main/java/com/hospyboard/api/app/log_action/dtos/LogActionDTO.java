@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -13,4 +14,5 @@ public class LogActionDTO extends ApiDTO {
     private String route;
     private String httpMethod;
     private String ip;
+    private UUID userUuid;
 }

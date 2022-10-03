@@ -4,7 +4,6 @@ import com.hospyboard.api.app.user.dto.UserDTO;
 import com.hospyboard.api.app.user.entity.User;
 import com.hospyboard.api.app.user.mappers.UserMapper;
 import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
-import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
