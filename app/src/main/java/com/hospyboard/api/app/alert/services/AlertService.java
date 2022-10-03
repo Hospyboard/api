@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper, AlertRepository> {
@@ -86,7 +87,10 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
             final User user = searchUser.get();
             final List<AlertDTO> toSend = new ArrayList<>();
 
-            for (final AlertEntity alert : getRepository().findAllByPatientOrderByCreatedAtDesc(user)) {
+            for (final AlertEntity alert : getRepository().findAllByPatientAndStatusInOrderByCreatedAtDesc(user, Set.of(
+                    AlertStatus.PENDING,
+                    AlertStatus.IN_PROGRESS
+            ))) {
                 final AlertDTO dto = getMapper().toDto(alert);
 
                 beforeSendingDTO(dto, alert);
