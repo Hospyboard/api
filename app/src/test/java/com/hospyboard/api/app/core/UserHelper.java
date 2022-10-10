@@ -1,5 +1,8 @@
 package com.hospyboard.api.app.core;
 
+import com.hospyboard.api.app.hospital.repositories.HospitalRepository;
+import com.hospyboard.api.app.hospital.repositories.RoomRepository;
+import com.hospyboard.api.app.hospital.repositories.ServiceRepository;
 import com.hospyboard.api.app.user.UserAuthTests;
 import com.hospyboard.api.app.user.dto.UserAuthDTO;
 import com.hospyboard.api.app.user.dto.UserDTO;
@@ -28,6 +31,9 @@ public class UserHelper {
     private final MockMvc mockMvc;
     private final JsonHelper objectMapper;
     private final UserRepository userRepository;
+    private final HospitalRepository hospitalRepository;
+    private final ServiceRepository serviceRepository;
+    private final RoomRepository roomRepository;
 
     public UserTokenDTO generatePatientToken() throws Exception {
         return generateToken("patient", UserRole.PATIENT);
@@ -50,8 +56,8 @@ public class UserHelper {
         return users;
     }
 
-    private UserTokenDTO generateToken(final String username, final String role) throws Exception {
-        final String password = "passwordOfTestAccount";
+    public UserTokenDTO generateToken(final String username, final String role) throws Exception {
+        final String password = "passwordOfTestAccount22ZZ";
         final Optional<User> search = userRepository.findByUsername(username);
         final User user;
 

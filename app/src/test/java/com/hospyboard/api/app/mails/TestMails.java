@@ -70,4 +70,36 @@ public class TestMails {
         assertEquals(0, mailService.getMailQueue().size());
     }
 
+    @Test
+    public void sendContactMail() throws Exception {
+        final HospyboardMailDTO mailDTO = new HospyboardMailDTO();
+        mailDTO.setFrom("test@test.com");
+        mailDTO.setTo("antoine@test.com");
+        mailDTO.setSubject("test mail");
+        mailDTO.setText("oui");
+
+        mockMvc.perform(post(ROUTE + "/contact")
+                .content(jsonHelper.toJson(mailDTO))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+
+        assertTrue(mailHelper.waitForIncomingEmail(15000, 1));
+
+        final Instant limit = Instant.now().plusSeconds(20);
+        while (mailService.getMailQueue().size() > 0 && Instant.now().isBefore(limit)) ;
+        assertEquals(0, mailService.getMailQueue().size());
+    }
+
+    @Test
+    public void sendContactMailNoSubjectNoBody() throws Exception {
+        final HospyboardMailDTO mailDTO = new HospyboardMailDTO();
+        mailDTO.setFrom("test@test.com");
+        mailDTO.setTo("antoine@test.com");
+
+        mockMvc.perform(post(ROUTE + "/contact")
+                .content(jsonHelper.toJson(mailDTO))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isBadRequest());
+    }
+
 }

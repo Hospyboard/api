@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -41,6 +42,8 @@ public class HospitalMapperTest {
         assertEquals(hospitalDTO.getCreatedAt().getTime(), hospital.getCreatedAt().getTime());
         assertEquals(hospitalDTO.getUpdatedAt().getTime(), hospital.getUpdatedAt().getTime());
         assertEquals(hospitalDTO.getId(), hospital.getUuid());
+
+        assertNull(hospitalMapper.toEntity(null));
     }
 
     @Test
@@ -60,6 +63,8 @@ public class HospitalMapperTest {
         assertEquals(hospitalDTO.getCreatedAt().getTime(), hospital.getCreatedAt().getTime());
         assertEquals(hospitalDTO.getUpdatedAt().getTime(), hospital.getUpdatedAt().getTime());
         assertEquals(hospitalDTO.getId(), hospital.getUuid());
+
+        assertNull(hospitalMapper.toDto(null));
     }
 
     @Test
@@ -87,6 +92,14 @@ public class HospitalMapperTest {
         assertEquals(hospital2.getCreatedAt().getTime(), hospital.getCreatedAt().getTime());
         assertEquals(hospital2.getUpdatedAt().getTime(), hospital.getUpdatedAt().getTime());
         assertEquals(hospital2.getId(), hospital.getId());
+
+        hospitalMapper.patch(null, new Hospital());
+        hospitalMapper.patch(new Hospital(), new Hospital());
+    }
+
+    @Test
+    public void testPatchNull() {
+        final Hospital hospital = new Hospital();
     }
 
 }

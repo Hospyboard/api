@@ -19,7 +19,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -126,6 +127,25 @@ public class AlertCrudTests {
         assertEquals(alertDTO.getType(), response.getType());
         assertEquals(alertDTO.getInfos(), response.getInfos());
         assertEquals(alertDTO.getStatus(), response.getStatus());
+    }
+
+    @Test
+    public void testGetPatientAlertsForMobile() throws Exception {
+        final AlertDTO alertDTO = new AlertDTO();
+        alertDTO.setImportance(AlertImportance.URGENT);
+        alertDTO.setType(AlertType.BODY_ISSUE);
+        alertDTO.setInfos("mal de crane");
+
+        mockMvc.perform(post(ROUTE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + patientToken.getToken())
+                .content(jsonHelper.toJson(alertDTO))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+
+        mockMvc.perform(get(ROUTE + "/patient")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + patientToken.getToken())
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
     }
 
     @Test

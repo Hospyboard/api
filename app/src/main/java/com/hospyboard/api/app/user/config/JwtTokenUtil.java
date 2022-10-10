@@ -11,9 +11,6 @@ import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
@@ -139,7 +136,8 @@ public class JwtTokenUtil {
                 .signWith(jwtSecretKey)
                 .compact());
 
-        return tokenMapper.toDto(tokenRepository.save(userToken));
+        final UserTokenDTO tokenDTO = tokenMapper.toDto(tokenRepository.save(userToken));
+        return tokenDTO;
     }
 
     public boolean isTokenValid(final String token) {
@@ -159,7 +157,7 @@ public class JwtTokenUtil {
 
     @Transactional
     public void invalidateTokens(final UUID userUuid) {
-        final Optional<User> search = this.userRepository.findByUuid(userUuid.toString());
+        final Optional<User> search = userRepository.findByUuid(userUuid.toString());
 
         if (search.isPresent()) {
             final User user = search.get();

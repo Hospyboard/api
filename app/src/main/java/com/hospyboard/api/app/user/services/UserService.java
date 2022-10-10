@@ -212,16 +212,14 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     public void beforeSavingEntity(@NonNull UserDTO request, @NonNull User entity) {
         userUtils.checkUserPassword(request);
 
-        if (request.getId() == null) {
-            if (request.getRoom() != null && request.getRoom().getId() != null) {
-                final Optional<Room> search = this.roomsService.getRepository().findByUuid(request.getRoom().getId().toString());
+        if (request.getRoom() != null && request.getRoom().getId() != null) {
+            final Optional<Room> search = this.roomsService.getRepository().findByUuid(request.getRoom().getId().toString());
 
-                if (search.isPresent()) {
-                    final Room room = search.get();
-                    entity.setRoomUuid(room.getUuid());
-                } else {
-                    throw new ApiNotFoundException(String.format("La chambre id %s n'existe pas.", request.getRoom().getId()));
-                }
+            if (search.isPresent()) {
+                final Room room = search.get();
+                entity.setRoomUuid(room.getUuid());
+            } else {
+                throw new ApiNotFoundException(String.format("La chambre id %s n'existe pas.", request.getRoom().getId()));
             }
         }
 
