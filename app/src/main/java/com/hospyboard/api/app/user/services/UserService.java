@@ -93,7 +93,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
             if (userCreationDTO.getUsername().equalsIgnoreCase("admin") && admin.isEmpty()) {
                 user.setRole(UserRole.ADMIN);
             } else if (userCreationDTO.getUsername().equalsIgnoreCase("hospital") && hospital.isEmpty()) {
-                user.setRole(UserRole.HOSPYTAL_WORKER);
+                user.setRole(UserRole.HOSPITAL_WORKER);
             }
 
             final UserDTO tmpDto = new UserDTO();
