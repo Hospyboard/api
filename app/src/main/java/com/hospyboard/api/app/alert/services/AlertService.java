@@ -31,15 +31,19 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
     private final CurrentUser currentUser;
     private final RoomsService roomsService;
 
+    private final AlertWebSocketService alertWebSocketService;
+
     public AlertService(AlertRepository alertRepository,
                         AlertMapper alertMapper,
                         CurrentUser currentUser,
                         RoomsService roomsService,
-                        UserRepository userRepository) {
+                        UserRepository userRepository,
+                        AlertWebSocketService alertWebSocketService) {
         super(alertRepository, alertMapper);
         this.currentUser = currentUser;
         this.userRepository = userRepository;
         this.roomsService = roomsService;
+        this.alertWebSocketService = alertWebSocketService;
     }
 
     @Override
@@ -70,6 +74,11 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
             alert.setStatus(AlertStatus.PENDING);
             alert.setPatient(user);
         }
+    }
+
+    @Override
+    public void afterSavingEntity(@NonNull AlertDTO dto, @NonNull AlertEntity entity) {
+        alertWebSocketService.sendAlert(dto);
     }
 
     @Override

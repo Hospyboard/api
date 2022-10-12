@@ -16,12 +16,12 @@ public class EncryptionDatabaseInstant implements ApiConverter<Instant> {
     private final Encryption encryption;
 
     @Override
-    public String convertToDatabaseColumn(Instant instant) {
+    public synchronized String convertToDatabaseColumn(Instant instant) {
         return encryption.convertToDatabase(Long.toString(instant.getEpochSecond()));
     }
 
     @Override
-    public Instant convertToEntityAttribute(String dbData) {
+    public synchronized Instant convertToEntityAttribute(String dbData) {
         return Instant.ofEpochSecond(Long.parseLong(encryption.convertToEntity(dbData)));
     }
 }
