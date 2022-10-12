@@ -21,5 +21,4 @@ public class AlertResource extends ApiResource<AlertDTO, AlertService> {
     public List<AlertDTO> fetchPatientAlerts() {
         return getService().fetchPatientAlerts();
     }
-
 }

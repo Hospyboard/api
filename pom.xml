@@ -15,10 +15,6 @@
     <version>1.0.4</version>
     <packaging>pom</packaging>
 
-    <properties>
-        <jackson.version>2.13.3</jackson.version>
-    </properties>
-
     <modules>
         <module>app</module>
     </modules>

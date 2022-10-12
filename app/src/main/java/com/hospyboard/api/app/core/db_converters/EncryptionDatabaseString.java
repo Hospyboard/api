@@ -15,12 +15,12 @@ public class EncryptionDatabaseString implements ApiConverter<String> {
     private final Encryption encryption;
 
     @Override
-    public String convertToDatabaseColumn(String attribute) {
+    public synchronized String convertToDatabaseColumn(String attribute) {
         return encryption.convertToDatabase(attribute);
     }
 
     @Override
-    public String convertToEntityAttribute(String dbData) {
+    public synchronized String convertToEntityAttribute(String dbData) {
         return encryption.convertToEntity(dbData);
     }
 }
