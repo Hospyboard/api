@@ -40,7 +40,7 @@ public class UserHelper {
     }
 
     public UserTokenDTO generateHospitalToken() throws Exception {
-        return generateToken("hospital", UserRole.HOSPYTAL_WORKER);
+        return generateToken("hospital", UserRole.HOSPITAL_WORKER);
     }
 
     public UserTokenDTO generateAdminToken() throws Exception {
