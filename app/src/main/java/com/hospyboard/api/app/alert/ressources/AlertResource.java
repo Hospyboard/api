@@ -5,6 +5,7 @@ import com.hospyboard.api.app.alert.services.AlertService;
 import fr.funixgaming.api.core.crud.resources.ApiResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -20,5 +21,10 @@ public class AlertResource extends ApiResource<AlertDTO, AlertService> {
     @GetMapping("patient")
     public List<AlertDTO> fetchPatientAlerts() {
         return getService().fetchPatientAlerts();
+    }
+
+    @GetMapping("patientId")
+    public List<AlertDTO> fetchPatientAlertsById(@RequestParam String patientId) {
+        return getService().fetchPatientAlertsById(patientId);
     }
 }
