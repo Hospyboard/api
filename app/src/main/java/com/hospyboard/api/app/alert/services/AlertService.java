@@ -110,4 +110,27 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
             throw new ApiNotFoundException("L'utilisateur connecté est introuvable.");
         }
     }
+
+    //TODO to remove when new search done with sub objects
+    public List<AlertDTO> fetchPatientAlertsById(String patientId) {
+        final Optional<User> searchUser = userRepository.findByUuid(patientId);
+
+        if (searchUser.isPresent()) {
+            final User user = searchUser.get();
+            final List<AlertDTO> toSend = new ArrayList<>();
+
+            for (final AlertEntity alert : getRepository().findAllByPatientAndStatusInOrderByCreatedAtDesc(user, Set.of(
+                    AlertStatus.PENDING,
+                    AlertStatus.IN_PROGRESS
+            ))) {
+                final AlertDTO dto = getMapper().toDto(alert);
+
+                beforeSendingDTO(dto, alert);
+                toSend.add(dto);
+            }
+            return toSend;
+        } else {
+            throw new ApiNotFoundException("L'utilisateur connecté est introuvable.");
+        }
+    }
 }
