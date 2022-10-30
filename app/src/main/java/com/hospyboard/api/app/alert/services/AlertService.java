@@ -111,18 +111,14 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
         }
     }
 
-    //TODO to remove when new search done with sub objects
-    public List<AlertDTO> fetchPatientAlertsById(String patientId) {
+    public List<AlertDTO> fetchPatientAlertsById(String patientId, Set<AlertStatus> alertStatuses) {
         final Optional<User> searchUser = userRepository.findByUuid(patientId);
 
         if (searchUser.isPresent()) {
             final User user = searchUser.get();
             final List<AlertDTO> toSend = new ArrayList<>();
 
-            for (final AlertEntity alert : getRepository().findAllByPatientAndStatusInOrderByCreatedAtDesc(user, Set.of(
-                    AlertStatus.PENDING,
-                    AlertStatus.IN_PROGRESS
-            ))) {
+            for (final AlertEntity alert : getRepository().findAllByPatientAndStatusInOrderByCreatedAtDesc(user, alertStatuses)) {
                 final AlertDTO dto = getMapper().toDto(alert);
 
                 beforeSendingDTO(dto, alert);
