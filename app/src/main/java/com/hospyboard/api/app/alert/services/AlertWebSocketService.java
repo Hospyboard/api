@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.hospyboard.api.app.alert.dto.AlertDTO;
 import fr.funixgaming.api.core.exceptions.ApiException;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class AlertWebSocketService extends TextWebSocketHandler {
     private final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
 
     @Override
-    public void afterConnectionEstablished(@NonNull WebSocketSession session) {
+    public void afterConnectionEstablished(@NotNull WebSocketSession session) {
         if (session.isOpen()) {
             sessions.add(session);
         }
@@ -48,7 +49,7 @@ public class AlertWebSocketService extends TextWebSocketHandler {
             final TextMessage message = new TextMessage(gson.toJson(alert));
 
             for (final WebSocketSession session : sessions) {
-                if (session.isOpen()) {
+                if (session != null && session.isOpen()) {
                     session.sendMessage(message);
                 }
             }
@@ -62,7 +63,7 @@ public class AlertWebSocketService extends TextWebSocketHandler {
         final TextMessage ping = new TextMessage("ping");
 
         for (final WebSocketSession session : sessions) {
-            if (session.isOpen()) {
+            if (session != null && session.isOpen()) {
                 try {
                     session.sendMessage(ping);
                 } catch (IOException e) {
