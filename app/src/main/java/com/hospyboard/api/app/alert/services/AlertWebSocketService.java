@@ -1,7 +1,7 @@
 package com.hospyboard.api.app.alert.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.hospyboard.api.app.alert.dto.AlertDTO;
 import fr.funixgaming.api.core.exceptions.ApiException;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class AlertWebSocketService extends TextWebSocketHandler {
 
     private final List<WebSocketSession> sessions = new ArrayList<>();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
 
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) {
@@ -45,15 +45,13 @@ public class AlertWebSocketService extends TextWebSocketHandler {
 
     public void sendAlert(final AlertDTO alert) throws ApiException {
         try {
-            final TextMessage message = new TextMessage(objectMapper.writeValueAsString(alert));
+            final TextMessage message = new TextMessage(gson.toJson(alert));
 
             for (final WebSocketSession session : sessions) {
                 if (session.isOpen()) {
                     session.sendMessage(message);
                 }
             }
-        } catch (JsonProcessingException e) {
-            throw new ApiException("Erreur lors de la sérialisation de l'alerte websocket.", e);
         } catch (IOException ioException) {
             throw new ApiException("Erreur lors de l'envoi de l'alerte websocket.", ioException);
         }
