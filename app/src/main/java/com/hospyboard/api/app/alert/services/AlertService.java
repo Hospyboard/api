@@ -77,6 +77,15 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
     }
 
     @Override
+    public void beforeDeletingEntity(@NonNull AlertEntity entity) {
+        final UserDTO userDto = currentUser.getCurrentUser();
+
+        if (userDto.getRole().equals(UserRole.PATIENT) && !entity.getPatient().getUuid().equals(userDto.getId())) {
+            throw new ApiForbiddenException("Vous ne pouvez pas supprimer une alerte que vous n'avez pas crée.");
+        }
+    }
+
+    @Override
     public void afterSavingEntity(@NonNull AlertDTO dto, @NonNull AlertEntity entity) {
         alertWebSocketService.sendAlert(dto);
     }
