@@ -13,3 +13,5 @@ target
 # Secret keys
 *.key
 *.iv
+
+files_storage

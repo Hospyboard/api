@@ -2,6 +2,7 @@ package com.hospyboard.api.app.user.services;
 
 import com.hospyboard.api.app.alert.repository.AlertRepository;
 import com.hospyboard.api.app.core.configs.HospyboardConfig;
+import com.hospyboard.api.app.file_storage.services.FileStorageService;
 import com.hospyboard.api.app.hospital.entity.Room;
 import com.hospyboard.api.app.hospital.services.RoomsService;
 import com.hospyboard.api.app.mails.dtos.HospyboardMailDTO;
@@ -49,6 +50,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
 
     private final JwtTokenUtil tokenUtil;
     private final AlertRepository alertRepository;
+    private final FileStorageService fileStorageService;
     private final RoomsService roomsService;
     private final UserForgotPasswordResetRepository passwordResetRepository;
     private final HospyboardMailService mailService;
@@ -60,6 +62,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
                        JwtTokenUtil tokenUtil,
                        CurrentUser currentUser,
                        AlertRepository alertRepository,
+                       FileStorageService fileStorageService,
                        RoomsService roomsService,
                        HospyboardConfig hospyboardConfig,
                        UserUtils userUtils,
@@ -71,6 +74,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         this.tokenUtil = tokenUtil;
         this.roomsService = roomsService;
         this.alertRepository = alertRepository;
+        this.fileStorageService = fileStorageService;
         this.passwordResetRepository = passwordResetRepository;
         this.hospyboardConfig = hospyboardConfig;
         this.mailService = mailService;
@@ -206,6 +210,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
     public void beforeDeletingEntity(@NonNull User entity) {
         this.alertRepository.deleteAllByPatient(entity);
         this.alertRepository.deleteAllByStaff(entity);
+        this.fileStorageService.deleteAllFilesByUser(entity);
     }
 
     @Override
