@@ -63,7 +63,7 @@ public class TestMails {
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
 
-        assertTrue(mailHelper.waitForIncomingEmail(15000, 1));
+        assertTrue(mailHelper.waitForIncomingEmail(20000, 1));
 
         final Instant limit = Instant.now().plusSeconds(20);
         while (mailService.getMailQueue().size() > 0 && Instant.now().isBefore(limit)) ;
