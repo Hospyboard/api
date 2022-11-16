@@ -4,9 +4,11 @@ import com.hospyboard.api.app.alert.dto.AlertDTO;
 import com.hospyboard.api.app.alert.enums.AlertImportance;
 import com.hospyboard.api.app.alert.enums.AlertStatus;
 import com.hospyboard.api.app.alert.enums.AlertType;
+import com.hospyboard.api.app.alert.services.AlertService;
 import com.hospyboard.api.app.core.JsonHelper;
 import com.hospyboard.api.app.core.UserHelper;
 import com.hospyboard.api.app.user.dto.UserTokenDTO;
+import fr.funixgaming.api.core.exceptions.ApiException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,8 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,15 +34,18 @@ public class AlertCrudTests {
     private final JsonHelper jsonHelper;
     private final UserTokenDTO patientToken;
     private final UserTokenDTO adminToken;
+    private final AlertService alertService;
 
     @Autowired
     public AlertCrudTests(MockMvc mockMvc,
                           JsonHelper jsonHelper,
-                          UserHelper userHelper) throws Exception {
+                          UserHelper userHelper,
+                          AlertService alertService) throws Exception {
         this.mockMvc = mockMvc;
         this.jsonHelper = jsonHelper;
         this.patientToken = userHelper.generatePatientToken();
         this.adminToken = userHelper.generateAdminToken();
+        this.alertService = alertService;
     }
 
     @Test
@@ -186,6 +190,76 @@ public class AlertCrudTests {
         mockMvc.perform(patch(ROUTE + "/batch")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken.getToken())
                 .content(jsonHelper.toJson(alertDTOS))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    public void testSaveEntityWithNoUser() {
+        try {
+            this.alertService.create(new AlertDTO());
+            fail("Should fail");
+        } catch (ApiException ignored) {
+        }
+    }
+
+    @Test
+    public void testPatchAlertNotOwn() throws Exception {
+        AlertDTO alertDTO = new AlertDTO();
+        alertDTO.setImportance(AlertImportance.URGENT);
+        alertDTO.setType(AlertType.BODY_ISSUE);
+        alertDTO.setInfos("mal de crane");
+
+        MvcResult mvcResult = mockMvc.perform(post(ROUTE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken.getToken())
+                .content(jsonHelper.toJson(alertDTO))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk()).andReturn();
+        alertDTO = convert(mvcResult);
+
+        mockMvc.perform(patch(ROUTE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + patientToken.getToken())
+                .content(jsonHelper.toJson(alertDTO))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testDeleteAlertNotOwn() throws Exception {
+        AlertDTO alertDTO = new AlertDTO();
+        alertDTO.setImportance(AlertImportance.URGENT);
+        alertDTO.setType(AlertType.BODY_ISSUE);
+        alertDTO.setInfos("mal de crane");
+
+        MvcResult mvcResult = mockMvc.perform(post(ROUTE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken.getToken())
+                .content(jsonHelper.toJson(alertDTO))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk()).andReturn();
+        alertDTO = convert(mvcResult);
+
+        mockMvc.perform(delete(ROUTE + "?id=" + alertDTO.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + patientToken.getToken())
+                .content(jsonHelper.toJson(alertDTO))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testGetAlertByPatientId() throws Exception {
+        AlertDTO alertDTO = new AlertDTO();
+        alertDTO.setImportance(AlertImportance.URGENT);
+        alertDTO.setType(AlertType.BODY_ISSUE);
+        alertDTO.setInfos("mal de crane");
+
+        mockMvc.perform(post(ROUTE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + patientToken.getToken())
+                .content(jsonHelper.toJson(alertDTO))
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+
+        mockMvc.perform(get(ROUTE + "/patientId?patientId=" + patientToken.getUser().getId() + "&status=" + AlertStatus.PENDING)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + patientToken.getToken())
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
     }
