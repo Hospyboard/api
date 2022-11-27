@@ -14,7 +14,6 @@ public class ServiceEntity extends ApiEntity {
     @Column(nullable = false)
     private String name;
 
-    @MapsId
     @ManyToOne
     @JoinColumn(nullable = false, name = "hospital_id")
     private Hospital hospital;

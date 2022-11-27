@@ -46,6 +46,22 @@ public class ServicesServiceTest {
     }
 
     @Test
+    public void testServiceDoubleInSameHospital() {
+        final ServiceDTO serviceDTO = new ServiceDTO();
+        serviceDTO.setName("test service");
+        serviceDTO.setHospital(createHospital());
+
+        ServiceDTO res = service.create(serviceDTO);
+        assertEquals(serviceDTO.getName(), res.getName());
+        assertEquals(serviceDTO.getHospital().getId(), res.getHospital().getId());
+
+        serviceDTO.setName("test 2 service");
+        res = service.create(serviceDTO);
+        assertEquals(serviceDTO.getName(), res.getName());
+        assertEquals(serviceDTO.getHospital().getId(), res.getHospital().getId());
+    }
+
+    @Test
     public void testServiceCreationNoHospital() {
         final ServiceDTO serviceDTO = new ServiceDTO();
         serviceDTO.setName("test service");

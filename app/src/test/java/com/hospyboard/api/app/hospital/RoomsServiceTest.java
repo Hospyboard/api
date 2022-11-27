@@ -57,6 +57,24 @@ public class RoomsServiceTest {
     }
 
     @Test
+    public void testRoomDoubleInSameServiceCreation() {
+        final RoomDTO roomDTO = new RoomDTO();
+        roomDTO.setService(createService());
+        roomDTO.setName("Room test");
+
+        RoomDTO res = roomsService.create(roomDTO);
+        assertEquals(roomDTO.getService().getId(), res.getService().getId());
+        assertNotNull(res.getId());
+        assertEquals(roomDTO.getName(), res.getName());
+
+        roomDTO.setName("Room 2 test");
+        res = roomsService.create(roomDTO);
+        assertEquals(roomDTO.getService().getId(), res.getService().getId());
+        assertNotNull(res.getId());
+        assertEquals(roomDTO.getName(), res.getName());
+    }
+
+    @Test
     public void testRoomCreationServiceNotFound() {
         try {
             final ServiceDTO serviceDTO = new ServiceDTO();
