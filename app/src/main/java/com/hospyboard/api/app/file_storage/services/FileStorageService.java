@@ -9,13 +9,16 @@ import com.hospyboard.api.app.user.repository.UserRepository;
 import fr.funixgaming.api.core.crud.services.ApiService;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiException;
+import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 
@@ -38,6 +41,27 @@ public class FileStorageService extends ApiService<FileDTO, FileEntity, FilesMap
             }
         } catch (IOException e) {
             throw new ApiException("Impossible de créer le dossier qui contient les fichiers upload.", e);
+        }
+    }
+
+    @Override
+    @NonNull
+    @Transactional
+    public FileDTO findById(String id) {
+        final Optional<FileEntity> search = getRepository().findByUuid(id);
+
+        try {
+            if (search.isPresent()) {
+                final FileEntity file = search.get();
+                final FileDTO toSend = getMapper().toDto(file);
+
+                toSend.setFile(Files.readAllBytes(Path.of(file.getFilePath())));
+                return toSend;
+            } else {
+                throw new ApiNotFoundException("Le fichier n'existe pas.");
+            }
+        } catch (IOException e) {
+            throw new ApiException("Erreur lors de la récupération du fichier.", e);
         }
     }
 

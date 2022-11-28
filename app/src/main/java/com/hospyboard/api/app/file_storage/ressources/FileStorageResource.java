@@ -6,6 +6,8 @@ import com.hospyboard.api.app.user.services.CurrentUser;
 import fr.funixgaming.api.core.crud.dtos.PageDTO;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,6 +45,15 @@ public class FileStorageResource {
                                      @RequestParam(value = "search", defaultValue = "") String search,
                                      @RequestParam(value = "sort", defaultValue = "") String sort) {
         return this.fileStorageService.getAll(page, elemsPerPage, search, sort);
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<byte[]> getFile(@PathVariable("id") String id) {
+        final FileDTO fileDTO = fileStorageService.findById(id);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", fileDTO.getFileName()))
+                .body(fileDTO.getFile());
     }
 
     @PostMapping
