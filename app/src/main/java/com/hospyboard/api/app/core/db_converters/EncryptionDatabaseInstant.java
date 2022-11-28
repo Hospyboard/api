@@ -2,7 +2,6 @@ package com.hospyboard.api.app.core.db_converters;
 
 import fr.funixgaming.api.core.utils.encryption.ApiConverter;
 import fr.funixgaming.api.core.utils.encryption.Encryption;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.Converter;
@@ -10,10 +9,9 @@ import java.time.Instant;
 
 @Component
 @Converter
-@RequiredArgsConstructor
 public class EncryptionDatabaseInstant implements ApiConverter<Instant> {
 
-    private final Encryption encryption;
+    private final Encryption encryption = new Encryption();
 
     @Override
     public synchronized String convertToDatabaseColumn(Instant instant) {
