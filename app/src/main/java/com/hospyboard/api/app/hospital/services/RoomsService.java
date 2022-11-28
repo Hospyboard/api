@@ -61,18 +61,39 @@ public class RoomsService extends ApiService<RoomDTO, Room, RoomMapper, RoomRepo
     }
 
     @Transactional
-    public RoomDTO addPatient(LinkRoomAndPatientDTO request) {
+    public RoomDTO setPatient(LinkRoomAndPatientDTO request) {
+        if (request.getPatientId() == null) {
+            throw new ApiBadRequestException("Pas de patient id spécifié");
+        }
+
         final Optional<User> patientSearch = userRepository.findByUuid(request.getPatientId().toString());
-        final Optional<Room> roomSearch = getRepository().findByUuid(request.getRoomId().toString());
-
-        if (patientSearch.isPresent() && roomSearch.isPresent()) {
+        if (patientSearch.isPresent()) {
             final User patient = patientSearch.get();
-            final Room room = roomSearch.get();
 
-            patient.setRoomUuid(room.getUuid());
-            userRepository.save(patient);
+            if (request.getRoomId() == null) {
+                patient.setRoomUuid(null);
+                userRepository.save(patient);
 
-            return this.findById(room.getUuid().toString());
+                return new RoomDTO();
+            } else {
+                final Optional<Room> roomSearch = getRepository().findByUuid(request.getRoomId().toString());
+
+                if (roomSearch.isPresent()) {
+                    final Room room = roomSearch.get();
+
+                    final Iterable<User> usersInRoom = userRepository.findAllByRoomUuid(room.getUuid().toString());
+                    for (final User user : usersInRoom) {
+                        user.setRoomUuid(null);
+                    }
+                    userRepository.saveAll(usersInRoom);
+
+                    patient.setRoomUuid(room.getUuid());
+                    userRepository.save(patient);
+                    return this.findById(room.getUuid().toString());
+                } else {
+                    throw new ApiNotFoundException("La chambre demandée n'existe pas.");
+                }
+            }
         } else {
             throw new ApiNotFoundException("Le patient ou la chambre n'existe pas.");
         }

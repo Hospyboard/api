@@ -267,7 +267,7 @@ public class RoomsServiceTest {
         user = this.userRepository.save(user);
 
         final LinkRoomAndPatientDTO linkRoomAndPatientDTO = new LinkRoomAndPatientDTO(room.getId(), user.getUuid());
-        final RoomDTO result = roomsService.addPatient(linkRoomAndPatientDTO);
+        final RoomDTO result = roomsService.setPatient(linkRoomAndPatientDTO);
         assertEquals(1, result.getPatients().size());
         assertEquals(user.getUuid(), result.getPatients().get(0).getId());
     }
