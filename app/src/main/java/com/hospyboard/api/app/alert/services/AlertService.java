@@ -85,6 +85,13 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
 
     @Override
     public void afterSavingEntity(@NonNull AlertDTO dto, @NonNull AlertEntity entity) {
+        if (dto.getCreatedAt() != null) {
+            dto.setCreatedAt(Date.from(dto.getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+        }
+        if (dto.getUpdatedAt() != null) {
+            dto.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+        }
+
         alertWebSocketService.sendAlert(dto);
     }
 
@@ -92,13 +99,6 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
     public void beforeSendingDTO(@NonNull AlertDTO dto, @Nullable AlertEntity entity) {
         if (dto.getPatient() != null && dto.getPatient().getId() != null) {
             dto.getPatient().setRoom(roomsService.findRoomByPatientId(dto.getPatient().getId().toString()));
-        }
-
-        if (dto.getCreatedAt() != null) {
-            dto.setCreatedAt(Date.from(dto.getCreatedAt().toInstant().plus(0, ChronoUnit.HOURS)));
-        }
-        if (dto.getUpdatedAt() != null) {
-            dto.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant().plus(0, ChronoUnit.HOURS)));
         }
     }
 
