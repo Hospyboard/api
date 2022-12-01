@@ -9,6 +9,7 @@
 
 # Target build folder
 target
+target*
 
 # Secret keys
 *.key

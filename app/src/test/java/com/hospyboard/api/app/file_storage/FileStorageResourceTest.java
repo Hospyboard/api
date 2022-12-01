@@ -13,6 +13,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.UUID;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -51,7 +53,7 @@ public class FileStorageResourceTest {
     }
 
     @Test
-    void testDownload() throws Exception {
+    void testRemove() throws Exception {
         MockMultipartFile file = new MockMultipartFile("data", "filename.txt", "text/plain", "some xml".getBytes());
 
         MvcResult result = mockMvc.perform(multipart("/files")
@@ -63,6 +65,25 @@ public class FileStorageResourceTest {
         mockMvc.perform(delete("/files?id=" + fileDTO.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken.getToken())
         ).andExpect(status().isOk());
+    }
+
+    @Test
+    void testDownload() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("data", "filename.txt", "text/plain", "some xml".getBytes());
+
+        MvcResult result = mockMvc.perform(multipart("/files")
+                .file(file)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken.getToken())
+        ).andExpect(status().isOk()).andReturn();
+        final FileDTO fileDTO = jsonHelper.fromJson(result.getResponse().getContentAsString(), FileDTO.class);
+
+        mockMvc.perform(get("/files/" + fileDTO.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken.getToken())
+        ).andExpect(status().isOk());
+
+        mockMvc.perform(get("/files/" + UUID.randomUUID())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken.getToken())
+        ).andExpect(status().isNotFound());
     }
 
 }

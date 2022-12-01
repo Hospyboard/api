@@ -28,6 +28,7 @@
                     <excludes>
                         <exclude>com/hospyboard/**/*Mapper*</exclude>
                         <exclude>com/hospyboard/**/*mapper*</exclude>
+                        <exclude>com/hospyboard/**/*AlertWebSocketService*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
