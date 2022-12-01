@@ -57,7 +57,7 @@ public class FileStorageResource {
     }
 
     @PostMapping
-    public FileDTO uploadFile(@RequestParam @NotNull final MultipartFile file) {
+    public FileDTO uploadFile(@RequestParam(value = "data") @NotNull final MultipartFile file) {
         try {
             if (isFileValid(file)) {
                 final FileDTO fileDTO = new FileDTO();
