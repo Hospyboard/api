@@ -19,10 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Service
 public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper, AlertRepository> {
@@ -94,6 +92,13 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
     public void beforeSendingDTO(@NonNull AlertDTO dto, @Nullable AlertEntity entity) {
         if (dto.getPatient() != null && dto.getPatient().getId() != null) {
             dto.getPatient().setRoom(roomsService.findRoomByPatientId(dto.getPatient().getId().toString()));
+        }
+
+        if (dto.getCreatedAt() != null) {
+            dto.setCreatedAt(Date.from(dto.getCreatedAt().toInstant().plus(0, ChronoUnit.HOURS)));
+        }
+        if (dto.getUpdatedAt() != null) {
+            dto.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant().plus(0, ChronoUnit.HOURS)));
         }
     }
 

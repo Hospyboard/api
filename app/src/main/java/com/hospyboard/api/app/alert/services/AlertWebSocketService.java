@@ -15,7 +15,9 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -46,6 +48,13 @@ public class AlertWebSocketService extends TextWebSocketHandler {
 
     public void sendAlert(final AlertDTO alert) throws ApiException {
         try {
+            if (alert.getCreatedAt() != null) {
+                alert.setCreatedAt(Date.from(alert.getCreatedAt().toInstant().plus(0, ChronoUnit.HOURS)));
+            }
+            if (alert.getUpdatedAt() != null) {
+                alert.setUpdatedAt(Date.from(alert.getUpdatedAt().toInstant().plus(0, ChronoUnit.HOURS)));
+            }
+
             final TextMessage message = new TextMessage(gson.toJson(alert));
 
             for (final WebSocketSession session : sessions) {

@@ -6,9 +6,9 @@ import com.hospyboard.api.app.user.mappers.UserTokenMapper;
 import com.hospyboard.api.app.user.repository.UserTokenRepository;
 import fr.funixgaming.api.core.crud.services.ApiService;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Service
