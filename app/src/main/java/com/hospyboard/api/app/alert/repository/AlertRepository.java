@@ -14,4 +14,6 @@ public interface AlertRepository extends ApiRepository<AlertEntity> {
     void deleteAllByStaff(User staff);
 
     Iterable<AlertEntity> findAllByPatientAndStatusInOrderByCreatedAtDesc(User patient, Collection<AlertStatus> types);
+
+    void deleteAll();
 }

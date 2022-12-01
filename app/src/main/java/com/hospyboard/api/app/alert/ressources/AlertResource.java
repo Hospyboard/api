@@ -5,10 +5,7 @@ import com.hospyboard.api.app.alert.enums.AlertStatus;
 import com.hospyboard.api.app.alert.services.AlertService;
 import fr.funixgaming.api.core.crud.resources.ApiResource;
 import org.bouncycastle.util.Strings;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -36,5 +33,10 @@ public class AlertResource extends ApiResource<AlertDTO, AlertService> {
             alertStatuses.add(AlertStatus.valueOf(statusGet));
         }
         return getService().fetchPatientAlertsById(patientId, alertStatuses);
+    }
+
+    @PostMapping("removeAll")
+    public void removeAllAlerts() {
+        getService().getRepository().deleteAll();
     }
 }
