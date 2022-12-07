@@ -246,6 +246,14 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         if (dto.getId() != null) {
             dto.setRoom(this.roomsService.findRoomByPatientId(dto.getId().toString()));
         }
+
+        if (dto.getLastLoginAt() != null) {
+            dto.setLastLoginAt(Date.from(dto.getLastLoginAt().toInstant().plus(1, ChronoUnit.HOURS)));
+        }
+        if (dto.getUpdatedAt() != null) {
+            dto.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+        }
+        dto.setCreatedAt(Date.from(dto.getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
     }
 
     @Override
