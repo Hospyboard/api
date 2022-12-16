@@ -113,6 +113,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
             if (userDTO.getUpdatedAt() != null) {
                 userDTO.setUpdatedAt(Date.from(userDTO.getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
             }
+            userDTO.setCreatedAt(Date.from(userDTO.getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
             return userDTO;
         } else {
             throw new RegisterHospyboardException("Vos mots de passe ne correspondent pas.");
