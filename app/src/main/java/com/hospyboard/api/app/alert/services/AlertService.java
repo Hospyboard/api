@@ -133,8 +133,32 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
                 final AlertDTO dto = getMapper().toDto(alert);
 
                 beforeSendingDTO(dto, alert);
+
+                if (dto.getCreatedAt() != null) {
+                    dto.setCreatedAt(Date.from(dto.getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+                }
+                if (dto.getUpdatedAt() != null) {
+                    dto.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+                }
+                if (dto.getPatient() != null) {
+                    if (dto.getPatient().getCreatedAt() != null) {
+                        dto.getPatient().setCreatedAt(Date.from(dto.getPatient().getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+                    }
+                    if (dto.getPatient().getUpdatedAt() != null) {
+                        dto.getPatient().setUpdatedAt(Date.from(dto.getPatient().getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+                    }
+                }
+                if (dto.getStaff() != null) {
+                    if (dto.getStaff().getCreatedAt() != null) {
+                        dto.getStaff().setCreatedAt(Date.from(dto.getStaff().getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+                    }
+                    if (dto.getStaff().getUpdatedAt() != null) {
+                        dto.getStaff().setUpdatedAt(Date.from(dto.getStaff().getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+                    }
+                }
                 toSend.add(dto);
             }
+
             return toSend;
         } else {
             throw new ApiNotFoundException("L'utilisateur connecté est introuvable.");
@@ -152,6 +176,29 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
                 final AlertDTO dto = getMapper().toDto(alert);
 
                 beforeSendingDTO(dto, alert);
+
+                if (dto.getCreatedAt() != null) {
+                    dto.setCreatedAt(Date.from(dto.getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+                }
+                if (dto.getUpdatedAt() != null) {
+                    dto.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+                }
+                if (dto.getPatient() != null) {
+                    if (dto.getPatient().getCreatedAt() != null) {
+                        dto.getPatient().setCreatedAt(Date.from(dto.getPatient().getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+                    }
+                    if (dto.getPatient().getUpdatedAt() != null) {
+                        dto.getPatient().setUpdatedAt(Date.from(dto.getPatient().getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+                    }
+                }
+                if (dto.getStaff() != null) {
+                    if (dto.getStaff().getCreatedAt() != null) {
+                        dto.getStaff().setCreatedAt(Date.from(dto.getStaff().getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+                    }
+                    if (dto.getStaff().getUpdatedAt() != null) {
+                        dto.getStaff().setUpdatedAt(Date.from(dto.getStaff().getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+                    }
+                }
                 toSend.add(dto);
             }
             return toSend;
