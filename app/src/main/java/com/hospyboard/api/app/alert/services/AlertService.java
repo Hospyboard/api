@@ -91,6 +91,22 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
         if (dto.getUpdatedAt() != null) {
             dto.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
         }
+        if (dto.getPatient() != null) {
+            if (dto.getPatient().getCreatedAt() != null) {
+                dto.getPatient().setCreatedAt(Date.from(dto.getPatient().getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+            }
+            if (dto.getPatient().getUpdatedAt() != null) {
+                dto.getPatient().setUpdatedAt(Date.from(dto.getPatient().getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+            }
+        }
+        if (dto.getStaff() != null) {
+            if (dto.getStaff().getCreatedAt() != null) {
+                dto.getStaff().setCreatedAt(Date.from(dto.getStaff().getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+            }
+            if (dto.getStaff().getUpdatedAt() != null) {
+                dto.getStaff().setUpdatedAt(Date.from(dto.getStaff().getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+            }
+        }
 
         alertWebSocketService.sendAlert(dto);
     }
