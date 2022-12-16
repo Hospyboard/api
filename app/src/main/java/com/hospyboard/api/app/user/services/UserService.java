@@ -105,7 +105,15 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
             userUtils.checkUserPassword(tmpDto);
 
             user.setPassword(user.getPassword());
-            return this.userMapper.toDto(super.getRepository().save(user));
+            final UserDTO userDTO = this.userMapper.toDto(super.getRepository().save(user));
+
+            if (userDTO.getLastLoginAt() != null) {
+                userDTO.setLastLoginAt(Date.from(userDTO.getLastLoginAt().toInstant().plus(1, ChronoUnit.HOURS)));
+            }
+            if (userDTO.getUpdatedAt() != null) {
+                userDTO.setUpdatedAt(Date.from(userDTO.getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+            }
+            return userDTO;
         } else {
             throw new RegisterHospyboardException("Vos mots de passe ne correspondent pas.");
         }
