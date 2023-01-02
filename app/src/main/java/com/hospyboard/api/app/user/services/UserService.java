@@ -105,16 +105,7 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
             userUtils.checkUserPassword(tmpDto);
 
             user.setPassword(user.getPassword());
-            final UserDTO userDTO = this.userMapper.toDto(super.getRepository().save(user));
-
-            if (userDTO.getLastLoginAt() != null) {
-                userDTO.setLastLoginAt(Date.from(userDTO.getLastLoginAt().toInstant().plus(1, ChronoUnit.HOURS)));
-            }
-            if (userDTO.getUpdatedAt() != null) {
-                userDTO.setUpdatedAt(Date.from(userDTO.getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-            }
-            userDTO.setCreatedAt(Date.from(userDTO.getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-            return userDTO;
+            return this.userMapper.toDto(super.getRepository().save(user));
         } else {
             throw new RegisterHospyboardException("Vos mots de passe ne correspondent pas.");
         }
@@ -255,14 +246,6 @@ public class UserService extends ApiService<UserDTO, User, UserMapper, UserRepos
         if (dto.getId() != null) {
             dto.setRoom(this.roomsService.findRoomByPatientId(dto.getId().toString()));
         }
-
-        if (dto.getLastLoginAt() != null) {
-            dto.setLastLoginAt(Date.from(dto.getLastLoginAt().toInstant().plus(1, ChronoUnit.HOURS)));
-        }
-        if (dto.getUpdatedAt() != null) {
-            dto.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-        }
-        dto.setCreatedAt(Date.from(dto.getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
     }
 
     @Override

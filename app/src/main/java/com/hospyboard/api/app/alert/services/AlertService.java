@@ -19,8 +19,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper, AlertRepository> {
@@ -85,32 +87,6 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
 
     @Override
     public void afterSavingEntity(@NonNull AlertDTO dto, @NonNull AlertEntity entity) {
-        if (dto.getCreatedAt() != null) {
-            dto.setCreatedAt(Date.from(dto.getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-        }
-        if (dto.getUpdatedAt() != null) {
-            dto.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-        }
-        if (dto.getPatient() != null) {
-            if (dto.getPatient().getCreatedAt() != null) {
-                dto.getPatient().setCreatedAt(Date.from(dto.getPatient().getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-            }
-            if (dto.getPatient().getUpdatedAt() != null) {
-                dto.getPatient().setUpdatedAt(Date.from(dto.getPatient().getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-            }
-            if (dto.getPatient().getLastLoginAt() != null) {
-                dto.getPatient().setLastLoginAt(Date.from(dto.getPatient().getLastLoginAt().toInstant().plus(1, ChronoUnit.HOURS)));
-            }
-        }
-        if (dto.getStaff() != null) {
-            if (dto.getStaff().getCreatedAt() != null) {
-                dto.getStaff().setCreatedAt(Date.from(dto.getStaff().getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-            }
-            if (dto.getStaff().getUpdatedAt() != null) {
-                dto.getStaff().setUpdatedAt(Date.from(dto.getStaff().getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-            }
-        }
-
         alertWebSocketService.sendAlert(dto);
     }
 
@@ -134,31 +110,7 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
                     AlertStatus.IN_PROGRESS
             ))) {
                 final AlertDTO dto = getMapper().toDto(alert);
-
                 beforeSendingDTO(dto, alert);
-
-                if (dto.getCreatedAt() != null) {
-                    dto.setCreatedAt(Date.from(dto.getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-                }
-                if (dto.getUpdatedAt() != null) {
-                    dto.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-                }
-                if (dto.getPatient() != null) {
-                    if (dto.getPatient().getCreatedAt() != null) {
-                        dto.getPatient().setCreatedAt(Date.from(dto.getPatient().getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-                    }
-                    if (dto.getPatient().getUpdatedAt() != null) {
-                        dto.getPatient().setUpdatedAt(Date.from(dto.getPatient().getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-                    }
-                }
-                if (dto.getStaff() != null) {
-                    if (dto.getStaff().getCreatedAt() != null) {
-                        dto.getStaff().setCreatedAt(Date.from(dto.getStaff().getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-                    }
-                    if (dto.getStaff().getUpdatedAt() != null) {
-                        dto.getStaff().setUpdatedAt(Date.from(dto.getStaff().getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-                    }
-                }
                 toSend.add(dto);
             }
 
@@ -177,31 +129,7 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
 
             for (final AlertEntity alert : getRepository().findAllByPatientAndStatusInOrderByCreatedAtDesc(user, alertStatuses)) {
                 final AlertDTO dto = getMapper().toDto(alert);
-
                 beforeSendingDTO(dto, alert);
-
-                if (dto.getCreatedAt() != null) {
-                    dto.setCreatedAt(Date.from(dto.getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-                }
-                if (dto.getUpdatedAt() != null) {
-                    dto.setUpdatedAt(Date.from(dto.getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-                }
-                if (dto.getPatient() != null) {
-                    if (dto.getPatient().getCreatedAt() != null) {
-                        dto.getPatient().setCreatedAt(Date.from(dto.getPatient().getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-                    }
-                    if (dto.getPatient().getUpdatedAt() != null) {
-                        dto.getPatient().setUpdatedAt(Date.from(dto.getPatient().getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-                    }
-                }
-                if (dto.getStaff() != null) {
-                    if (dto.getStaff().getCreatedAt() != null) {
-                        dto.getStaff().setCreatedAt(Date.from(dto.getStaff().getCreatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-                    }
-                    if (dto.getStaff().getUpdatedAt() != null) {
-                        dto.getStaff().setUpdatedAt(Date.from(dto.getStaff().getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
-                    }
-                }
                 toSend.add(dto);
             }
             return toSend;
