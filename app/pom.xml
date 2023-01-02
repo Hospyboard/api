@@ -27,8 +27,13 @@
         <dependency>
             <groupId>fr.funixgaming.api.server</groupId>
             <artifactId>funix-api-server</artifactId>
-            <version>${funixgaming.server.version}</version>
+            <version>1.2.1</version>
             <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
     </dependencies>
 

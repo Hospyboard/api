@@ -10,4 +10,5 @@ import java.util.Set;
 @Repository
 public interface UserTokenRepository extends ApiRepository<UserToken> {
     Set<UserToken> findAllByUser(User user);
+    void deleteAllByUser(User user);
 }

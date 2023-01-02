@@ -2,19 +2,20 @@ package com.hospyboard.api.app.user.entity;
 
 import com.hospyboard.api.app.core.db_converters.EncryptionDatabaseString;
 import fr.funixgaming.api.core.crud.entities.ApiEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.*;
 import java.util.*;
 
 @Getter
 @Setter
 @Entity(name = "auth_user")
 public class User extends ApiEntity implements UserDetails {
+
     @Column(nullable = false, unique = true)
     @Convert(converter = EncryptionDatabaseString.class)
     private String username;
@@ -50,10 +51,10 @@ public class User extends ApiEntity implements UserDetails {
     private Date lastLoginAt;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<UserToken> tokens;
+    private Set<UserToken> tokens = new HashSet<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<UserPasswordReset> passwordResets;
+    private Set<UserPasswordReset> passwordResets = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

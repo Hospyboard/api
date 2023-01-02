@@ -2,30 +2,23 @@ package com.hospyboard.api.app.user.config;
 
 import com.hospyboard.api.app.user.enums.UserRole;
 import com.hospyboard.api.app.user.services.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import javax.servlet.http.HttpServletResponse;
-
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-        securedEnabled = true,
-        jsr250Enabled = true,
-        prePostEnabled = true
-)
 public class WebSecurity {
 
     private final UserService userService;
@@ -59,28 +52,39 @@ public class WebSecurity {
                 )
                 .and();
 
-        http.authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/user/register").permitAll()
-                .antMatchers(HttpMethod.POST, "/user/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/user/forgotPassword").permitAll()
-                .antMatchers(HttpMethod.POST, "/user/forgotPassword/change").permitAll()
-                .antMatchers(HttpMethod.POST, "/user/changePassword").permitAll()
-                .antMatchers(HttpMethod.GET, "/user/session").authenticated()
-                .antMatchers(HttpMethod.GET, "/user/logout").authenticated()
-                .antMatchers("/user/").hasAuthority(UserRole.ADMIN)
-                .antMatchers("/user/batch/").hasAuthority(UserRole.ADMIN)
+        http.authorizeHttpRequests(exchanges -> exchanges
 
-                .antMatchers("/mail/contact").permitAll()
+                .requestMatchers(
+                        new AntPathRequestMatcher("/user/register**"),
+                        new AntPathRequestMatcher("/user/login**"),
+                        new AntPathRequestMatcher("/user/login**"),
+                        new AntPathRequestMatcher("/user/forgotPassword**"),
+                        new AntPathRequestMatcher("/user/forgotPassword/change**"),
+                        new AntPathRequestMatcher("/user/changePassword**")
+                ).permitAll()
 
-                .antMatchers("/userToken/**").hasAuthority(UserRole.ADMIN)
+                .requestMatchers(
+                        new AntPathRequestMatcher("/user/session**"),
+                        new AntPathRequestMatcher("/user/logout**")
+                ).authenticated()
 
-                .antMatchers("/hospital/**").hasAuthority(UserRole.ADMIN)
+                .requestMatchers(
+                        new AntPathRequestMatcher("/user**"),
+                        new AntPathRequestMatcher("/user/batch**")
+                ).hasAuthority(UserRole.ADMIN)
 
-                .antMatchers("/service/**").hasAuthority(UserRole.ADMIN)
+                .requestMatchers("/mail/contact**").permitAll()
 
-                .antMatchers("/room/**").hasAuthority(UserRole.ADMIN)
+                .requestMatchers("/userToken**").hasAuthority(UserRole.ADMIN)
 
-                .anyRequest().authenticated();
+                .requestMatchers("/hospital**").hasAuthority(UserRole.ADMIN)
+
+                .requestMatchers("/service**").hasAuthority(UserRole.ADMIN)
+
+                .requestMatchers("/room**").hasAuthority(UserRole.ADMIN)
+
+                .anyRequest().authenticated()
+        ).httpBasic();
 
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

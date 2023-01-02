@@ -1,12 +1,12 @@
 package com.hospyboard.api.app.log_action.entities;
 
 import fr.funixgaming.api.core.crud.entities.ApiEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.Nullable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
 import java.util.Date;
 import java.util.UUID;
 

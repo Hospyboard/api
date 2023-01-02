@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -116,10 +117,10 @@ public class UserCrudTests {
         final UserTokenDTO credentials = userHelper.generateAdminToken();
 
         final UserDTO request = new UserDTO();
-        request.setUsername("funix");
+        request.setUsername("funix-" + UUID.randomUUID());
         request.setFirstName("funixName");
         request.setLastName("funixLast");
-        request.setEmail("email@funix.fr");
+        request.setEmail(UUID.randomUUID() + "email@funix.fr");
         request.setPassword("aa1234567AAA");
         request.setRole(UserRole.ADMIN);
         request.setInfos("patient");
@@ -152,7 +153,7 @@ public class UserCrudTests {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
         ).andExpect(status().isOk());
 
-        this.mockMvc.perform(get(UserAuthTests.ROUTE + userDTO.getId())
+        this.mockMvc.perform(get(UserAuthTests.ROUTE + '/' + userDTO.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
         ).andExpect(status().isUnauthorized());
     }
@@ -172,7 +173,7 @@ public class UserCrudTests {
         final UserTokenDTO credentials = userHelper.generateAdminToken();
         final UserDTO userDTO = credentials.getUser();
 
-        MvcResult result = this.mockMvc.perform(get(UserAuthTests.ROUTE + userDTO.getId())
+        MvcResult result = this.mockMvc.perform(get(UserAuthTests.ROUTE + '/' + userDTO.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
         ).andExpect(status().isOk()).andReturn();
 
@@ -197,7 +198,7 @@ public class UserCrudTests {
         resetPasswordDTO.setNewPassword("12345dxcfAS");
         resetPasswordDTO.setNewPasswordConfirmation("12345dxcfAS");
 
-        this.mockMvc.perform(patch(UserAuthTests.ROUTE + "changePassword")
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE + "/changePassword")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
                 .content(jsonHelper.toJson(resetPasswordDTO))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -212,7 +213,7 @@ public class UserCrudTests {
         resetPasswordDTO.setNewPassword("1234522");
         resetPasswordDTO.setNewPasswordConfirmation("12345");
 
-        this.mockMvc.perform(patch(UserAuthTests.ROUTE + "changePassword")
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE + "/changePassword")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
                 .content(jsonHelper.toJson(resetPasswordDTO))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -227,7 +228,7 @@ public class UserCrudTests {
         resetPasswordDTO.setNewPassword("1234522");
         resetPasswordDTO.setNewPasswordConfirmation("12345");
 
-        this.mockMvc.perform(patch(UserAuthTests.ROUTE + "changePassword")
+        this.mockMvc.perform(patch(UserAuthTests.ROUTE + "/changePassword")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + credentials.getToken())
                 .content(jsonHelper.toJson(resetPasswordDTO))
                 .contentType(MediaType.APPLICATION_JSON)

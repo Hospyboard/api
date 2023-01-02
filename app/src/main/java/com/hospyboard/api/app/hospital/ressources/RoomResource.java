@@ -4,9 +4,9 @@ import com.hospyboard.api.app.hospital.dto.RoomDTO;
 import com.hospyboard.api.app.hospital.dto.requests.LinkRoomAndPatientDTO;
 import com.hospyboard.api.app.hospital.services.RoomsService;
 import fr.funixgaming.api.core.crud.resources.ApiResource;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController

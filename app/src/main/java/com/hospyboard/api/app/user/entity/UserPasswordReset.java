@@ -2,10 +2,10 @@ package com.hospyboard.api.app.user.entity;
 
 import com.hospyboard.api.app.core.db_converters.EncryptionDatabaseString;
 import fr.funixgaming.api.core.crud.entities.ApiEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
 import java.time.Instant;
 import java.util.Date;
 

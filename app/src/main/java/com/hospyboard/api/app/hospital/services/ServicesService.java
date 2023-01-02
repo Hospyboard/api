@@ -10,10 +10,10 @@ import com.hospyboard.api.app.hospital.repositories.ServiceRepository;
 import fr.funixgaming.api.core.crud.services.ApiService;
 import fr.funixgaming.api.core.exceptions.ApiBadRequestException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
+import jakarta.annotation.Nullable;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 @Service

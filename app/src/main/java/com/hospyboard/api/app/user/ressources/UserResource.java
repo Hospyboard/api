@@ -7,13 +7,12 @@ import com.hospyboard.api.app.user.exception.LoginHospyboardException;
 import com.hospyboard.api.app.user.services.CurrentUser;
 import com.hospyboard.api.app.user.services.UserService;
 import fr.funixgaming.api.core.crud.resources.ApiResource;
+import jakarta.validation.Valid;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("user")

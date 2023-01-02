@@ -12,4 +12,6 @@ public interface UserForgotPasswordResetRepository extends ApiRepository<UserPas
     Optional<UserPasswordReset> findUserPasswordResetByCode(String code);
 
     Optional<UserPasswordReset> findUserPasswordResetByUser(User user);
+
+    void deleteAllByUser(User user);
 }

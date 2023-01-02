@@ -14,9 +14,9 @@ import com.hospyboard.api.app.user.services.CurrentUser;
 import fr.funixgaming.api.core.crud.services.ApiService;
 import fr.funixgaming.api.core.exceptions.ApiForbiddenException;
 import fr.funixgaming.api.core.exceptions.ApiNotFoundException;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
@@ -97,6 +97,9 @@ public class AlertService extends ApiService<AlertDTO, AlertEntity, AlertMapper,
             }
             if (dto.getPatient().getUpdatedAt() != null) {
                 dto.getPatient().setUpdatedAt(Date.from(dto.getPatient().getUpdatedAt().toInstant().plus(1, ChronoUnit.HOURS)));
+            }
+            if (dto.getPatient().getLastLoginAt() != null) {
+                dto.getPatient().setLastLoginAt(Date.from(dto.getPatient().getLastLoginAt().toInstant().plus(1, ChronoUnit.HOURS)));
             }
         }
         if (dto.getStaff() != null) {
