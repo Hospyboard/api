@@ -1,5 +1,7 @@
 # Hospyboard API
 
+Projet non maintenu, le projet a pris fin
+
 L'api Hospyboard est dédiée à la gestion des différetes données, entitées du projet. elle est utilisée sur une
 application mobile et sur un dashboard orienté administrateur pour la gestion des app mobiles.
 
